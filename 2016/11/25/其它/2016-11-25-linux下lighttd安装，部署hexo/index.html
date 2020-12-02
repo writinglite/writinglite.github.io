@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="安装第三方软件包下载第三方软件包64位 wget http:&#x2F;&#x2F;epel.mirror.net.in&#x2F;epel&#x2F;6&#x2F;x86_64&#x2F;epel-release-6-8.noarch.rpm 32位 wget http:&#x2F;&#x2F;epel.mirror.net.in&#x2F;epel&#x2F;6&#x2F;i386&#x2F;epel-release-6-8.noarch.rpm 安装第三方软件包 rpm -ivh epel-release-6">
+<meta property="og:type" content="article">
+<meta property="og:title" content="linux下lighttd安装，部署hexo">
+<meta property="og:url" content="http://example.com/2016/11/25/%E5%85%B6%E5%AE%83/2016-11-25-linux%E4%B8%8Blighttd%E5%AE%89%E8%A3%85%EF%BC%8C%E9%83%A8%E7%BD%B2hexo/index.html">
+<meta property="og:site_name" content="Writing Lite">
+<meta property="og:description" content="安装第三方软件包下载第三方软件包64位 wget http:&#x2F;&#x2F;epel.mirror.net.in&#x2F;epel&#x2F;6&#x2F;x86_64&#x2F;epel-release-6-8.noarch.rpm 32位 wget http:&#x2F;&#x2F;epel.mirror.net.in&#x2F;epel&#x2F;6&#x2F;i386&#x2F;epel-release-6-8.noarch.rpm 安装第三方软件包 rpm -ivh epel-release-6">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2016-11-25T01:14:57.000Z">
+<meta property="article:modified_time" content="2020-12-02T06:52:04.961Z">
+<meta property="article:author" content="hwyoung">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2016/11/25/%E5%85%B6%E5%AE%83/2016-11-25-linux%E4%B8%8Blighttd%E5%AE%89%E8%A3%85%EF%BC%8C%E9%83%A8%E7%BD%B2hexo/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>linux下lighttd安装，部署hexo | Writing Lite</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Writing Lite</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2016/11/25/%E5%85%B6%E5%AE%83/2016-11-25-linux%E4%B8%8Blighttd%E5%AE%89%E8%A3%85%EF%BC%8C%E9%83%A8%E7%BD%B2hexo/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/avatar.png">
+      <meta itemprop="name" content="hwyoung">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Writing Lite">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          linux下lighttd安装，部署hexo
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2016-11-25 01:14:57" itemprop="dateCreated datePublished" datetime="2016-11-25T01:14:57+00:00">2016-11-25</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-02 06:52:04" itemprop="dateModified" datetime="2020-12-02T06:52:04+00:00">2020-12-02</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="安装第三方软件包"><a href="#安装第三方软件包" class="headerlink" title="安装第三方软件包"></a>安装第三方软件包</h3><p>下载第三方软件包<br>64位</p>
+<p><code>wget http://epel.mirror.net.in/epel/6/x86_64/epel-release-6-8.noarch.rpm</code></p>
+<p>32位</p>
+<p><code>wget http://epel.mirror.net.in/epel/6/i386/epel-release-6-8.noarch.rpm</code></p>
+<p>安装第三方软件包</p>
+<p><code>rpm -ivh epel-release-6-8.noarch.rpm</code></p>
+<h3 id="安装lighttpd"><a href="#安装lighttpd" class="headerlink" title="安装lighttpd"></a>安装lighttpd</h3><p><code>yum install lighttpd</code></p>
+<h3 id="lighttpd部署hexo"><a href="#lighttpd部署hexo" class="headerlink" title="lighttpd部署hexo"></a>lighttpd部署hexo</h3><p>新建lighttpd.conf配置文件</p>
+<p><code>touch lighttpd.conf</code></p>
+<p>输入如下内容</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line">server.document-root &#x3D; &quot;&#x2F;root&#x2F;blog&#x2F;public&quot;</span><br><span class="line"></span><br><span class="line">server.port &#x3D; 80</span><br><span class="line"></span><br><span class="line">mimetype.assign             &#x3D; (</span><br><span class="line">  &quot;.pdf&quot;          &#x3D;&gt;      &quot;application&#x2F;pdf&quot;,</span><br><span class="line">  &quot;.sig&quot;          &#x3D;&gt;      &quot;application&#x2F;pgp-signature&quot;,</span><br><span class="line">  &quot;.spl&quot;          &#x3D;&gt;      &quot;application&#x2F;futuresplash&quot;,</span><br><span class="line">  &quot;.class&quot;        &#x3D;&gt;      &quot;application&#x2F;octet-stream&quot;,</span><br><span class="line">  &quot;.ps&quot;           &#x3D;&gt;      &quot;application&#x2F;postscript&quot;,</span><br><span class="line">  &quot;.torrent&quot;      &#x3D;&gt;      &quot;application&#x2F;x-bittorrent&quot;,</span><br><span class="line">  &quot;.dvi&quot;          &#x3D;&gt;      &quot;application&#x2F;x-dvi&quot;,</span><br><span class="line">  &quot;.gz&quot;           &#x3D;&gt;      &quot;application&#x2F;x-gzip&quot;,</span><br><span class="line">  &quot;.pac&quot;          &#x3D;&gt;      &quot;application&#x2F;x-ns-proxy-autoconfig&quot;,</span><br><span class="line">  &quot;.swf&quot;          &#x3D;&gt;      &quot;application&#x2F;x-shockwave-flash&quot;,</span><br><span class="line">  &quot;.tar.gz&quot;       &#x3D;&gt;      &quot;application&#x2F;x-tgz&quot;,</span><br><span class="line">  &quot;.tgz&quot;          &#x3D;&gt;      &quot;application&#x2F;x-tgz&quot;,</span><br><span class="line">  &quot;.tar&quot;          &#x3D;&gt;      &quot;application&#x2F;x-tar&quot;,</span><br><span class="line">  &quot;.zip&quot;          &#x3D;&gt;      &quot;application&#x2F;zip&quot;,</span><br><span class="line">  &quot;.mp3&quot;          &#x3D;&gt;      &quot;audio&#x2F;mpeg&quot;,</span><br><span class="line">  &quot;.m3u&quot;          &#x3D;&gt;      &quot;audio&#x2F;x-mpegurl&quot;,</span><br><span class="line">  &quot;.wma&quot;          &#x3D;&gt;      &quot;audio&#x2F;x-ms-wma&quot;,</span><br><span class="line">  &quot;.wax&quot;          &#x3D;&gt;      &quot;audio&#x2F;x-ms-wax&quot;,</span><br><span class="line">  &quot;.ogg&quot;          &#x3D;&gt;      &quot;application&#x2F;ogg&quot;,</span><br><span class="line">  &quot;.wav&quot;          &#x3D;&gt;      &quot;audio&#x2F;x-wav&quot;,</span><br><span class="line">  &quot;.gif&quot;          &#x3D;&gt;      &quot;image&#x2F;gif&quot;,</span><br><span class="line">  &quot;.jpg&quot;          &#x3D;&gt;      &quot;image&#x2F;jpeg&quot;,</span><br><span class="line">  &quot;.jpeg&quot;         &#x3D;&gt;      &quot;image&#x2F;jpeg&quot;,</span><br><span class="line">  &quot;.png&quot;          &#x3D;&gt;      &quot;image&#x2F;png&quot;,</span><br><span class="line">  &quot;.xbm&quot;          &#x3D;&gt;      &quot;image&#x2F;x-xbitmap&quot;,</span><br><span class="line">  &quot;.xpm&quot;          &#x3D;&gt;      &quot;image&#x2F;x-xpixmap&quot;,</span><br><span class="line">  &quot;.xwd&quot;          &#x3D;&gt;      &quot;image&#x2F;x-xwindowdump&quot;,</span><br><span class="line">  &quot;.css&quot;          &#x3D;&gt;      &quot;text&#x2F;css&quot;,</span><br><span class="line">  &quot;.html&quot;         &#x3D;&gt;      &quot;text&#x2F;html&quot;,</span><br><span class="line">  &quot;.htm&quot;          &#x3D;&gt;      &quot;text&#x2F;html&quot;,</span><br><span class="line">  &quot;.js&quot;           &#x3D;&gt;      &quot;text&#x2F;javascript&quot;,</span><br><span class="line">  &quot;.asc&quot;          &#x3D;&gt;      &quot;text&#x2F;plain&quot;,</span><br><span class="line">  &quot;.c&quot;            &#x3D;&gt;      &quot;text&#x2F;plain&quot;,</span><br><span class="line">  &quot;.cpp&quot;          &#x3D;&gt;      &quot;text&#x2F;plain&quot;,</span><br><span class="line">  &quot;.log&quot;          &#x3D;&gt;      &quot;text&#x2F;plain&quot;,</span><br><span class="line">  &quot;.conf&quot;         &#x3D;&gt;      &quot;text&#x2F;plain&quot;,</span><br><span class="line">  &quot;.text&quot;         &#x3D;&gt;      &quot;text&#x2F;plain&quot;,</span><br><span class="line">  &quot;.txt&quot;          &#x3D;&gt;      &quot;text&#x2F;plain&quot;,</span><br><span class="line">  &quot;.spec&quot;         &#x3D;&gt;      &quot;text&#x2F;plain&quot;,</span><br><span class="line">  &quot;.dtd&quot;          &#x3D;&gt;      &quot;text&#x2F;xml&quot;,</span><br><span class="line">  &quot;.xml&quot;          &#x3D;&gt;      &quot;text&#x2F;xml&quot;,</span><br><span class="line">  &quot;.mpeg&quot;         &#x3D;&gt;      &quot;video&#x2F;mpeg&quot;,</span><br><span class="line">  &quot;.mpg&quot;          &#x3D;&gt;      &quot;video&#x2F;mpeg&quot;,</span><br><span class="line">  &quot;.mov&quot;          &#x3D;&gt;      &quot;video&#x2F;quicktime&quot;,</span><br><span class="line">  &quot;.qt&quot;           &#x3D;&gt;      &quot;video&#x2F;quicktime&quot;,</span><br><span class="line">  &quot;.avi&quot;          &#x3D;&gt;      &quot;video&#x2F;x-msvideo&quot;,</span><br><span class="line">  &quot;.asf&quot;          &#x3D;&gt;      &quot;video&#x2F;x-ms-asf&quot;,</span><br><span class="line">  &quot;.asx&quot;          &#x3D;&gt;      &quot;video&#x2F;x-ms-asf&quot;,</span><br><span class="line">  &quot;.wmv&quot;          &#x3D;&gt;      &quot;video&#x2F;x-ms-wmv&quot;,</span><br><span class="line">  &quot;.bz2&quot;          &#x3D;&gt;      &quot;application&#x2F;x-bzip&quot;,</span><br><span class="line">  &quot;.tbz&quot;          &#x3D;&gt;      &quot;application&#x2F;x-bzip-compressed-tar&quot;,</span><br><span class="line">  &quot;.tar.bz2&quot;      &#x3D;&gt;      &quot;application&#x2F;x-bzip-compressed-tar&quot;,</span><br><span class="line">  &quot;.odt&quot;          &#x3D;&gt;      &quot;application&#x2F;vnd.oasis.opendocument.text&quot;, </span><br><span class="line">  &quot;.ods&quot;          &#x3D;&gt;      &quot;application&#x2F;vnd.oasis.opendocument.spreadsheet&quot;, </span><br><span class="line">  &quot;.odp&quot;          &#x3D;&gt;      &quot;application&#x2F;vnd.oasis.opendocument.presentation&quot;, </span><br><span class="line">  &quot;.odg&quot;          &#x3D;&gt;      &quot;application&#x2F;vnd.oasis.opendocument.graphics&quot;, </span><br><span class="line">  &quot;.odc&quot;          &#x3D;&gt;      &quot;application&#x2F;vnd.oasis.opendocument.chart&quot;, </span><br><span class="line">  &quot;.odf&quot;          &#x3D;&gt;      &quot;application&#x2F;vnd.oasis.opendocument.formula&quot;, </span><br><span class="line">  &quot;.odi&quot;          &#x3D;&gt;      &quot;application&#x2F;vnd.oasis.opendocument.image&quot;, </span><br><span class="line">  &quot;.odm&quot;          &#x3D;&gt;      &quot;application&#x2F;vnd.oasis.opendocument.text-master&quot;, </span><br><span class="line">  &quot;.ott&quot;          &#x3D;&gt;      &quot;application&#x2F;vnd.oasis.opendocument.text-template&quot;,</span><br><span class="line">  &quot;.ots&quot;          &#x3D;&gt;      &quot;application&#x2F;vnd.oasis.opendocument.spreadsheet-template&quot;,</span><br><span class="line">  &quot;.otp&quot;          &#x3D;&gt;      &quot;application&#x2F;vnd.oasis.opendocument.presentation-template&quot;,</span><br><span class="line">  &quot;.otg&quot;          &#x3D;&gt;      &quot;application&#x2F;vnd.oasis.opendocument.graphics-template&quot;,</span><br><span class="line">  &quot;.otc&quot;          &#x3D;&gt;      &quot;application&#x2F;vnd.oasis.opendocument.chart-template&quot;,</span><br><span class="line">  &quot;.otf&quot;          &#x3D;&gt;      &quot;application&#x2F;vnd.oasis.opendocument.formula-template&quot;,</span><br><span class="line">  &quot;.oti&quot;          &#x3D;&gt;      &quot;application&#x2F;vnd.oasis.opendocument.image-template&quot;,</span><br><span class="line">  &quot;.oth&quot;          &#x3D;&gt;      &quot;application&#x2F;vnd.oasis.opendocument.text-web&quot;,</span><br><span class="line"></span><br><span class="line"># make the default mime type application&#x2F;octet-stream.</span><br><span class="line">  &quot;&quot;              &#x3D;&gt;      &quot;application&#x2F;octet-stream&quot;,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>详细的mimetype.assign可参考官网——<a target="_blank" rel="noopener" href="http://redmine.lighttpd.net/projects/lighttpd/wiki/Mimetype_assignDetails">http://redmine.lighttpd.net/projects/lighttpd/wiki/Mimetype_assignDetails</a></p>
+<h3 id="启动lighttpd"><a href="#启动lighttpd" class="headerlink" title="启动lighttpd"></a>启动lighttpd</h3><p><code>lighttpd -D -f lighttpd.conf</code></p>
+<p>这里的-D是指在当前窗口运行，不加-D就是在后台运行的。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/11/25/%E5%85%B6%E5%AE%83/2016-11-25-linux%E5%AE%89%E8%A3%85dropx/" rel="prev" title="linux安装dropx">
+      <i class="fa fa-chevron-left"></i> linux安装dropx
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2016/11/25/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/2016-11-25-%E9%9A%90%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E6%A8%A1%E5%9E%8B/" rel="next" title="隐马尔可夫模型">
+      隐马尔可夫模型 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85%E7%AC%AC%E4%B8%89%E6%96%B9%E8%BD%AF%E4%BB%B6%E5%8C%85"><span class="nav-number">1.</span> <span class="nav-text">安装第三方软件包</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%89%E8%A3%85lighttpd"><span class="nav-number">2.</span> <span class="nav-text">安装lighttpd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lighttpd%E9%83%A8%E7%BD%B2hexo"><span class="nav-number">3.</span> <span class="nav-text">lighttpd部署hexo</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%90%AF%E5%8A%A8lighttpd"><span class="nav-number">4.</span> <span class="nav-text">启动lighttpd</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="hwyoung"
+      src="/avatar.png">
+  <p class="site-author-name" itemprop="name">hwyoung</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">77</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">hwyoung</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

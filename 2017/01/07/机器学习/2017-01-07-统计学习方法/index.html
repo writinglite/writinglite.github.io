@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="统计学习  如果一个系统能够通过执行某个过程改进它的性能，这就是学习。  统计学习的前提统计学习关于数据的基本假设是同类数据具有一定的统计规律性，这就是统计学习的前提。 统计学习方法组成统计计算由监督学习，非监督学习，半监督学习和强化学习等组成。 监督学习概括从给定的、有限的、用于学习的训练数据集合出发，假设数据是独立同分布产生的；并且假设要学习模型属于某个函数集合，称为假设空间；应用某个评价准则">
+<meta property="og:type" content="article">
+<meta property="og:title" content="统计学习方法">
+<meta property="og:url" content="http://example.com/2017/01/07/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/2017-01-07-%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/index.html">
+<meta property="og:site_name" content="Writing Lite">
+<meta property="og:description" content="统计学习  如果一个系统能够通过执行某个过程改进它的性能，这就是学习。  统计学习的前提统计学习关于数据的基本假设是同类数据具有一定的统计规律性，这就是统计学习的前提。 统计学习方法组成统计计算由监督学习，非监督学习，半监督学习和强化学习等组成。 监督学习概括从给定的、有限的、用于学习的训练数据集合出发，假设数据是独立同分布产生的；并且假设要学习模型属于某个函数集合，称为假设空间；应用某个评价准则">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2017-01-07T09:35:00.000Z">
+<meta property="article:modified_time" content="2020-12-02T06:52:04.973Z">
+<meta property="article:author" content="hwyoung">
+<meta property="article:tag" content="机器学习">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://example.com/2017/01/07/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/2017-01-07-%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>统计学习方法 | Writing Lite</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Writing Lite</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2017/01/07/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/2017-01-07-%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/avatar.png">
+      <meta itemprop="name" content="hwyoung">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Writing Lite">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          统计学习方法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2017-01-07 09:35:00" itemprop="dateCreated datePublished" datetime="2017-01-07T09:35:00+00:00">2017-01-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-02 06:52:04" itemprop="dateModified" datetime="2020-12-02T06:52:04+00:00">2020-12-02</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="统计学习"><a href="#统计学习" class="headerlink" title="统计学习"></a>统计学习</h2><blockquote>
+<p> 如果一个系统能够通过执行某个过程改进它的性能，这就是学习。</p>
+</blockquote>
+<h3 id="统计学习的前提"><a href="#统计学习的前提" class="headerlink" title="统计学习的前提"></a>统计学习的前提</h3><p>统计学习关于数据的基本假设是同类数据具有一定的统计规律性，这就是统计学习的前提。</p>
+<h3 id="统计学习方法组成"><a href="#统计学习方法组成" class="headerlink" title="统计学习方法组成"></a>统计学习方法组成</h3><p>统计计算由监督学习，非监督学习，半监督学习和强化学习等组成。</p>
+<h3 id="监督学习概括"><a href="#监督学习概括" class="headerlink" title="监督学习概括"></a>监督学习概括</h3><p>从给定的、有限的、用于学习的训练数据集合出发，假设数据是<strong>独立同分布</strong>产生的；并且假设要学习模型属于某个函数集合，称为假设空间；应用某个评价准则，从假设空间中选取一个最优的模型，使它对已知训练数据及未知测试数据在给定的评价准则下有最优的预测；最优模型的选取由算法实现。</p>
+<h3 id="统计学习方法的三要素"><a href="#统计学习方法的三要素" class="headerlink" title="统计学习方法的三要素"></a>统计学习方法的三要素</h3><ul>
+<li> 模型</li>
+<li> 策略</li>
+<li> 算法</li>
+</ul>
+<h3 id="实现统计学习方法的步骤"><a href="#实现统计学习方法的步骤" class="headerlink" title="实现统计学习方法的步骤"></a>实现统计学习方法的步骤</h3><ol>
+<li> 得到一个有限的训练数据集合</li>
+<li> 确定包含所有可能模型的假设空间，即学习模型的集合</li>
+<li> 确定模型选择的准则，即学习的策略</li>
+<li> 实现求解最优模型的算法，取出学习的算法</li>
+<li> 通过学习方法选择最做强模型</li>
+<li> 利用学习的最优模型对新数据进行预测和分析</li>
+</ol>
+<h2 id="基本概念"><a href="#基本概念" class="headerlink" title="基本概念"></a>基本概念</h2><h3 id="输入空间"><a href="#输入空间" class="headerlink" title="输入空间"></a>输入空间</h3><p>输入所有可能的空间</p>
+<h3 id="输出空间"><a href="#输出空间" class="headerlink" title="输出空间"></a>输出空间</h3><p>输出所有可能的空间</p>
+<h3 id="特征空间"><a href="#特征空间" class="headerlink" title="特征空间"></a>特征空间</h3><p>每个具体的输入是一个实例，通常由特征向量表示。这时所有特征向量存在的空间称为特征空间。</p>
+<h3 id="样本"><a href="#样本" class="headerlink" title="样本"></a>样本</h3><p>输入输出对又称为样本或样本点。</p>
+<h3 id="问题的分类"><a href="#问题的分类" class="headerlink" title="问题的分类"></a>问题的分类</h3><ul>
+<li><p> 回归问题</p>
+<blockquote>
+<p> 输入变量与输出变量均为连续变量的预测问题称为回归问题。</p>
+</blockquote>
+</li>
+<li><p> 分类问题  </p>
+<blockquote>
+<p> 输出变量为有限个离散变量的预测问题称为分类问题。</p>
+</blockquote>
+</li>
+<li><p> 标注问题  </p>
+<blockquote>
+<p> 输入变量与输出变量均为变量序列的预测问题称为标注问题。</p>
+</blockquote>
+</li>
+</ul>
+<h3 id="联合概率分布"><a href="#联合概率分布" class="headerlink" title="联合概率分布"></a>联合概率分布</h3><p>监督学习假设输入与输出的随机变量X与Y遵循联合概率分布。训练数据与测试数据被看作是依联合概率分布P(X,Y)独立同分布产生的。</p>
+<h3 id="假设空间"><a href="#假设空间" class="headerlink" title="假设空间"></a>假设空间</h3><p>模型属于由输入空间到输出空间的映射的集合，这个集合就是假设空间。</p>
+<blockquote>
+<p> 监督学习的模型可以是概率模型或非概率模型，由条件概率分布P(Y|X)或决策函数Y=f(X)表示，随具体学习方法而定。</p>
+</blockquote>
+<hr>
+<h2 id="统计学习的三要素"><a href="#统计学习的三要素" class="headerlink" title="统计学习的三要素"></a>统计学习的三要素</h2><blockquote>
+<p> 方法=模型+策略+算法</p>
+</blockquote>
+<h3 id="模型"><a href="#模型" class="headerlink" title="模型"></a>模型</h3><h3 id="策略"><a href="#策略" class="headerlink" title="策略"></a>策略</h3><blockquote>
+<p> 损失函数:度量一次预测的好坏<br> 风险函数：度量平均意义下模型预测的好坏</p>
+</blockquote>
+<h4 id="常用的损失函数"><a href="#常用的损失函数" class="headerlink" title="常用的损失函数"></a>常用的损失函数</h4><ul>
+<li> 0-1损失函数<br>$$<br>L(Y,f(X))=<br>\begin{cases}<br>1,Y \neq f(X)\<br>0,Y = f(X)\<br>\end{cases}<br>$$</li>
+<li> 平方损失函数<br>$$<br>L(Y,f(X))=(Y-f(X))^2<br>$$</li>
+<li> 绝对损失函数<br>$$<br>L(Y,f(X))=|Y-f(X)|<br>$$</li>
+<li> 对数损失函数或对数似然损失函数<br>$$<br>L(Y,f(X))=-logP(Y|X)<br>$$</li>
+</ul>
+<h3 id="期望风险，损失函数的期望"><a href="#期望风险，损失函数的期望" class="headerlink" title="期望风险，损失函数的期望"></a>期望风险，损失函数的期望</h3><p>$$<br>R_{exp}(f)=E_p[L(Y,f(X)]=\int_{x*y}L(y,f(x))P(x,y)dxdy<br>$$<br>称为<strong>风险函数</strong>或期望损失。</p>
+<blockquote>
+<p> 学习的目标就是选择期望风险最小的模型。由于联合分布p(X,Y)是未知的，$R_{exp}f(x)$不能直接计算。实际上，<strong>如果知道联合分布P(X,Y)，可以从联合分布直接求出条件概率分布P(X,Y)，也就不需要学习了。正因为不知道联合概率分布，所以才需要学习。</strong></p>
+</blockquote>
+<p>一方面根据期望风险最小学习模型要用到联合分布，另一方面联合分布又是未知的，所以监督学习就成为一个病态问题。</p>
+<h3 id="经验风险"><a href="#经验风险" class="headerlink" title="经验风险"></a>经验风险</h3><p>模型f(X)关于训练数据集的平均损失称为经验风险，或经验损失。记作$R_{emp}$：<br>$$<br>R_{emp}(f)=\frac{1}{N}\sum_{n=1}^nL(y_i,f(x_i))<br>$$</p>
+<blockquote>
+<p> 期望风险$R_{exp}f(x)$是模型关于联合分布的期望损失，经验风险$R_{emp}(f)$是模型关于样本集的平均损失。</p>
+</blockquote>
+<p>根据大数定律，当样本容量N趋于无穷时，经验风险$R_{emp}(f)$趋于期望风险$R_{exp}(f)$。所以一个很自然的想法是用经验风险估计期望风险。但是，由于现实中训练样本数目有限，甚至很小，所以用经验风险估计期望风险常常并不理想，要对经验风险进行一定的矫正。这就关系到监督学习的两个基本策略：经验风险最小化和结构风险最小化。</p>
+<h3 id="经验风险最小化"><a href="#经验风险最小化" class="headerlink" title="经验风险最小化"></a>经验风险最小化</h3><p>$$<br>R_{srm}(f)=\min_{f\in F}\frac{1}{N}\sum_{n=1}^nL(y_i,f(x_i))<br>$$<br>当样本容量足够大时，经验风险最小化能够保证有很好的学习效果，在现实中被广泛使用。</p>
+<blockquote>
+<p> 比如，极大似然估计就是经验风险最小化的例子。当模型是条件概念分布，损失函数是对数缺失函数时，经验最小化就等价于极大似然估计。</p>
+</blockquote>
+<p>当然，当样本容量很小时，经验风险最小化学习的效果就未必很好，会产生后面将叙述的“过拟合”现象。</p>
+<h3 id="结构风险最小化"><a href="#结构风险最小化" class="headerlink" title="结构风险最小化"></a>结构风险最小化</h3><p>$$<br>\min_{f\in \digamma}\frac{1}{N}\sum_{n=1}^nL(y_i,f(x_i))+\lambda J(f)<br>$$</p>
+<p>结构风险的定义：<br>$$<br>R_{srm}(f)=\frac{1}{N}\sum_{n=1}^nL(y_i,f(x_i))+\lambda J(f)<br>$$<br>其中J(f)为模型的复杂度，是定义在假设空间$\digamma$上的泛函。模型越复杂，复杂度J(f)就大；反之，模型f越简单，复杂度J(f)就越小。</p>
+<blockquote>
+<p> 贝叶斯估计中的最大后验概率估计就是结构风险最小化的一个例子。当模型是条件概率分布、损失函数是对数损失函数、模型复杂度由模型的先验概率表示时，结构风险最小化就等价于最大后验概率估计。</p>
+</blockquote>
+<p>结构风险最小化是为了防止过拟合而提出来的策略。结构风险最小化等价于正则化。结构风险在经验风险上加上表示模型复杂度的正则化项或罚项。</p>
+<hr>
+<h2 id="模型评估与模型选择"><a href="#模型评估与模型选择" class="headerlink" title="模型评估与模型选择"></a>模型评估与模型选择</h2><h3 id="训练误差与测试误差"><a href="#训练误差与测试误差" class="headerlink" title="训练误差与测试误差"></a>训练误差与测试误差</h3><p>统计学习的目的是使学到的模型不仅对已知数据而且对未知数据都能有很好的预测能力。不同的学习方法会给出不同的模型。当损失函数给定时，基于缺失函数的模型的训练误差和模型的测试误就自然成为学习方法评估的标准。注意，统计学习方法具体采用的损失函数未必是评估时使用的损失函数。</p>
+<p>假设学习到的模型是$Y=f^{\hat{}}(X)$<br>训练误差是模型$Y=f^{\wedge}(X)$关于训练数据集的平均损失：<br>$$<br>e_{emp}=\frac{1}{N^{‘}}I(y_i,f(x_i))<br>$$<br>这里I是指示函数，即$Y\neq f(x)$时为1，否则为0.<br>相应的，常见的测试数据集上的准确为：<br>$$<br>r_{test}=\frac{1}{N^{‘}}\sum_{i=1}^{N’}I(y_i,f(x_i))<br>$$<br>显然，<br>$$<br>r_{test} + e_{test} = 1<br>$$</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/" rel="tag"># 机器学习</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2016/11/27/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/2016-11-27-%E6%9C%80%E5%A4%A7%E7%86%B5%E6%A8%A1%E5%9E%8B/" rel="prev" title="最大熵模型">
+      <i class="fa fa-chevron-left"></i> 最大熵模型
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2017/01/12/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/2017-01-12-%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E5%9B%9E%E5%BD%92/" rel="next" title="最小二乘回归">
+      最小二乘回归 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B9%A0"><span class="nav-number">1.</span> <span class="nav-text">统计学习</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B9%A0%E7%9A%84%E5%89%8D%E6%8F%90"><span class="nav-number">1.1.</span> <span class="nav-text">统计学习的前提</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95%E7%BB%84%E6%88%90"><span class="nav-number">1.2.</span> <span class="nav-text">统计学习方法组成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%9B%91%E7%9D%A3%E5%AD%A6%E4%B9%A0%E6%A6%82%E6%8B%AC"><span class="nav-number">1.3.</span> <span class="nav-text">监督学习概括</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95%E7%9A%84%E4%B8%89%E8%A6%81%E7%B4%A0"><span class="nav-number">1.4.</span> <span class="nav-text">统计学习方法的三要素</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AE%9E%E7%8E%B0%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95%E7%9A%84%E6%AD%A5%E9%AA%A4"><span class="nav-number">1.5.</span> <span class="nav-text">实现统计学习方法的步骤</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%A6%82%E5%BF%B5"><span class="nav-number">2.</span> <span class="nav-text">基本概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%93%E5%85%A5%E7%A9%BA%E9%97%B4"><span class="nav-number">2.1.</span> <span class="nav-text">输入空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%BE%93%E5%87%BA%E7%A9%BA%E9%97%B4"><span class="nav-number">2.2.</span> <span class="nav-text">输出空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%89%B9%E5%BE%81%E7%A9%BA%E9%97%B4"><span class="nav-number">2.3.</span> <span class="nav-text">特征空间</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A0%B7%E6%9C%AC"><span class="nav-number">2.4.</span> <span class="nav-text">样本</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%97%AE%E9%A2%98%E7%9A%84%E5%88%86%E7%B1%BB"><span class="nav-number">2.5.</span> <span class="nav-text">问题的分类</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%81%94%E5%90%88%E6%A6%82%E7%8E%87%E5%88%86%E5%B8%83"><span class="nav-number">2.6.</span> <span class="nav-text">联合概率分布</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%81%87%E8%AE%BE%E7%A9%BA%E9%97%B4"><span class="nav-number">2.7.</span> <span class="nav-text">假设空间</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B9%A0%E7%9A%84%E4%B8%89%E8%A6%81%E7%B4%A0"><span class="nav-number">3.</span> <span class="nav-text">统计学习的三要素</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.1.</span> <span class="nav-text">模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%AD%96%E7%95%A5"><span class="nav-number">3.2.</span> <span class="nav-text">策略</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B8%B8%E7%94%A8%E7%9A%84%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0"><span class="nav-number">3.2.1.</span> <span class="nav-text">常用的损失函数</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9C%9F%E6%9C%9B%E9%A3%8E%E9%99%A9%EF%BC%8C%E6%8D%9F%E5%A4%B1%E5%87%BD%E6%95%B0%E7%9A%84%E6%9C%9F%E6%9C%9B"><span class="nav-number">3.3.</span> <span class="nav-text">期望风险，损失函数的期望</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%8F%E9%AA%8C%E9%A3%8E%E9%99%A9"><span class="nav-number">3.4.</span> <span class="nav-text">经验风险</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%8F%E9%AA%8C%E9%A3%8E%E9%99%A9%E6%9C%80%E5%B0%8F%E5%8C%96"><span class="nav-number">3.5.</span> <span class="nav-text">经验风险最小化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%BB%93%E6%9E%84%E9%A3%8E%E9%99%A9%E6%9C%80%E5%B0%8F%E5%8C%96"><span class="nav-number">3.6.</span> <span class="nav-text">结构风险最小化</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E8%AF%84%E4%BC%B0%E4%B8%8E%E6%A8%A1%E5%9E%8B%E9%80%89%E6%8B%A9"><span class="nav-number">4.</span> <span class="nav-text">模型评估与模型选择</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%AE%AD%E7%BB%83%E8%AF%AF%E5%B7%AE%E4%B8%8E%E6%B5%8B%E8%AF%95%E8%AF%AF%E5%B7%AE"><span class="nav-number">4.1.</span> <span class="nav-text">训练误差与测试误差</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="hwyoung"
+      src="/avatar.png">
+  <p class="site-author-name" itemprop="name">hwyoung</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">77</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">hwyoung</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>

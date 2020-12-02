@@ -1,0 +1,569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.2.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"example.com","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="本次分享内容： 上次分享内容回顾 RNN 理论知识 唐诗生成器实例讲解 本次课程内容总结  上次分享我们介绍了关于Tensorflow2的基础语法，以及通过手写数字识别任务讲解了如何通过Tensorflow2来搭建全连接神经网络模型。今天我们来介绍用于处理序列信息的网络结构-RNN。 RNN理论知识循环神经网络（Recurrent neural network：RNN）是神经网络的一种。循环神经网">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Tensorflow实战(2)_循环神经网络实战_唐诗生成器">
+<meta property="og:url" content="http://example.com/2020/07/22/Tensorflow2.x%E5%AE%9E%E6%88%98/Tensorflow%E5%AE%9E%E6%88%98(2)_%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%AE%9E%E6%88%98_%E5%94%90%E8%AF%97%E7%94%9F%E6%88%90%E5%99%A8/index.html">
+<meta property="og:site_name" content="Writing Lite">
+<meta property="og:description" content="本次分享内容： 上次分享内容回顾 RNN 理论知识 唐诗生成器实例讲解 本次课程内容总结  上次分享我们介绍了关于Tensorflow2的基础语法，以及通过手写数字识别任务讲解了如何通过Tensorflow2来搭建全连接神经网络模型。今天我们来介绍用于处理序列信息的网络结构-RNN。 RNN理论知识循环神经网络（Recurrent neural network：RNN）是神经网络的一种。循环神经网">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="http://example.com/2020/07/22/Tensorflow2.x%E5%AE%9E%E6%88%98/Tensorflow%E5%AE%9E%E6%88%98(2)_%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%AE%9E%E6%88%98_%E5%94%90%E8%AF%97%E7%94%9F%E6%88%90%E5%99%A8/_image/RNN.png">
+<meta property="og:image" content="http://example.com/2020/07/22/Tensorflow2.x%E5%AE%9E%E6%88%98/Tensorflow%E5%AE%9E%E6%88%98(2)_%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%AE%9E%E6%88%98_%E5%94%90%E8%AF%97%E7%94%9F%E6%88%90%E5%99%A8/_image/Deep_RNN.png">
+<meta property="og:image" content="http://example.com/2020/07/22/Tensorflow2.x%E5%AE%9E%E6%88%98/Tensorflow%E5%AE%9E%E6%88%98(2)_%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%AE%9E%E6%88%98_%E5%94%90%E8%AF%97%E7%94%9F%E6%88%90%E5%99%A8/_image/Bidirectional_RNN.png">
+<meta property="og:image" content="http://example.com/2020/07/22/Tensorflow2.x%E5%AE%9E%E6%88%98/Tensorflow%E5%AE%9E%E6%88%98(2)_%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%AE%9E%E6%88%98_%E5%94%90%E8%AF%97%E7%94%9F%E6%88%90%E5%99%A8/_image/task.png">
+<meta property="article:published_time" content="2020-07-22T20:43:00.000Z">
+<meta property="article:modified_time" content="2020-12-02T06:52:04.933Z">
+<meta property="article:author" content="hwyoung">
+<meta property="article:tag" content="深度学习 Tensorflow">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://example.com/2020/07/22/Tensorflow2.x%E5%AE%9E%E6%88%98/Tensorflow%E5%AE%9E%E6%88%98(2)_%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%AE%9E%E6%88%98_%E5%94%90%E8%AF%97%E7%94%9F%E6%88%90%E5%99%A8/_image/RNN.png">
+
+<link rel="canonical" href="http://example.com/2020/07/22/Tensorflow2.x%E5%AE%9E%E6%88%98/Tensorflow%E5%AE%9E%E6%88%98(2)_%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%AE%9E%E6%88%98_%E5%94%90%E8%AF%97%E7%94%9F%E6%88%90%E5%99%A8/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>Tensorflow实战(2)_循环神经网络实战_唐诗生成器 | Writing Lite</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Writing Lite</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://example.com/2020/07/22/Tensorflow2.x%E5%AE%9E%E6%88%98/Tensorflow%E5%AE%9E%E6%88%98(2)_%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%AE%9E%E6%88%98_%E5%94%90%E8%AF%97%E7%94%9F%E6%88%90%E5%99%A8/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/avatar.png">
+      <meta itemprop="name" content="hwyoung">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Writing Lite">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Tensorflow实战(2)_循环神经网络实战_唐诗生成器
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2020-07-22 20:43:00" itemprop="dateCreated datePublished" datetime="2020-07-22T20:43:00+00:00">2020-07-22</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-12-02 06:52:04" itemprop="dateModified" datetime="2020-12-02T06:52:04+00:00">2020-12-02</time>
+              </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="本次分享内容："><a href="#本次分享内容：" class="headerlink" title="本次分享内容："></a>本次分享内容：</h2><ul>
+<li>上次分享内容回顾</li>
+<li>RNN 理论知识</li>
+<li>唐诗生成器实例讲解</li>
+<li>本次课程内容总结</li>
+</ul>
+<p>上次分享我们介绍了关于Tensorflow2的基础语法，以及通过手写数字识别任务讲解了如何通过Tensorflow2来搭建全连接神经网络模型。今天我们来介绍用于处理序列信息的网络结构-RNN。</p>
+<h2 id="RNN理论知识"><a href="#RNN理论知识" class="headerlink" title="RNN理论知识"></a>RNN理论知识</h2><p>循环神经网络（Recurrent neural network：RNN）是神经网络的一种。循环神经网络可以描述动态时间行为，与前馈神经网络（feedforward neural network）接受较特定结构的输入不同，RNN将状态在自身网络中循环传递，因此可以接受更广泛的时间序列结构输入。<br>如果说一个全连接的神经网络的计算公式是：$y^t=f(x^t)$，那么RNN的公式可以这样表示$y^t, h^t = f(x^t, h^{t-1})$ 。一个单层的RNN可以用下图表示：<br><img src="_image/RNN.png"></p>
+<h3 id="Deep-RNN"><a href="#Deep-RNN" class="headerlink" title="Deep RNN"></a>Deep RNN</h3><p>与全连接神经网络一样，RNN也可以叠加多层：<br><img src="_image/Deep_RNN.png"></p>
+<h3 id="Bidirectional-RNN"><a href="#Bidirectional-RNN" class="headerlink" title="Bidirectional RNN"></a>Bidirectional RNN</h3><p>Bidirectional RNN 是将传统RNN的状态神经元拆分为两个部分，一个负责forward states，另一个负责backward states。Forward states的输出并不会连接到Backward states的输入。这个结构提供给输出层输入序列中每一个点的完整的过去和未来的上下文信息。<br><img src="_image/Bidirectional_RNN.png"></p>
+<h3 id="RNN-计算方式"><a href="#RNN-计算方式" class="headerlink" title="RNN 计算方式"></a>RNN 计算方式</h3><h4 id="Native-RNN"><a href="#Native-RNN" class="headerlink" title="Native RNN"></a>Native RNN</h4><p>$$<br>\begin{align}<br>&amp; h_t = \sigma(W^h h_{t-1} + W^i x_t) \<br>&amp; y_t = \sigma(W^o h_t)<br>\end{align}<br>$$</p>
+<h4 id="LSTM"><a href="#LSTM" class="headerlink" title="LSTM"></a>LSTM</h4><p>$$<br>\begin{align}<br>&amp; i_t = sigm(W^{xi}x_t + W^{hi}h_{t-1}) \<br>&amp; f_t = sigm(W^{xf}x_t + W^{hf}h_{t-1}) \<br>&amp; o_t = sigm(W^{xo}x_t + W^{ho}h_{t-1}) \<br>&amp; \tilde{c_t} = tanh(W^{xc}x_t + W^{hc}h_{t-1}) \<br>&amp; c_t = f_t \bigodot c_{t-1} + i_t \bigodot \tilde{c_t} \<br>&amp; h_t = o_t \bigodot tanh(c_t) \<br>&amp; y_t = \sigma(W^o h_t)<br>\end{align}<br>$$<br>LSTM内部主要有阶段：</p>
+<ol>
+<li><p>忘记阶段。这个阶段主要是对上一个节点传进来的输入进行选择性忘记。简单来说就是会 “忘记不重要的，记住重要的”。具体来说是通过计算得到的 $f_t$ （f表示forget）来作为忘记门控，来控制上一个状态的 $c_{t-1}$ 哪些需要留哪些需要忘。</p>
+</li>
+<li><p>选择记忆阶段。这个阶段将这个阶段的输入有选择性地进行“记忆”。主要是会对输入进行选择记忆。哪些重要则着重记录下来，哪些不重要，则少记一些。当前的输入内容由前面计算得到的 $\tilde{c_t}$ 表示。而选择的门控信号则是由 $i_t$ （i代表information）来进行控制。</p>
+</li>
+<li><p>将上面两步得到的结果相加，即可得到传输给下一个状态的 $c_{t}$ 。也就是上图中的第一个公式。</p>
+</li>
+<li><p>输出阶段。这个阶段将决定哪些将会被当成当前状态的输出。主要是通过 $o_t$ 来进行控制的。并且对上一阶段得到的 $c_t$ 进行了缩放（通过一个tanh激活函数进行变化）。</p>
+</li>
+</ol>
+<p>另外LSTM与标准RNN不同的是它有两个state，分别是$c_t, h_t$ 。</p>
+<h4 id="GRU"><a href="#GRU" class="headerlink" title="GRU"></a>GRU</h4><p>$$<br>\begin{align}<br>&amp; z_t = sigm(W^{xz}x_t + W^{hz}h_{t-1}) \<br>&amp; r_t = sigm(W^{xr}x_t + W^{hr}h_{t-1}) \<br>&amp; \tilde{h_t} = tanh(W^{xh}x_t + r_t \bigodot (W^{hh}h_{t-1}) \<br>&amp; h_t = (1-z_t) \bigodot \tilde{h_t} + z_t \bigodot h_{t-1} \<br>&amp; y_t = \sigma(W^o h_t)<br>\end{align}<br>$$</p>
+<p>$z_t \bigodot h_{t-1}$ ：表示对原本隐藏状态的选择性“遗忘”。这里的 $z_t$ 可以想象成遗忘门（forget gate），忘记 $h_{t-1}$ 维度中一些不重要的信息。</p>
+<p>$(1-z_t) \bigodot \tilde{h_t}$ ：表示对包含当前节点信息的 $\tilde{h_t}$ 进行选择性“记忆”。</p>
+<p>GRU很聪明的一点就在于，我们使用了同一个门控 $z_t$ 就同时可以进行遗忘和选择记忆</p>
+<h3 id="Tensorflow-Code"><a href="#Tensorflow-Code" class="headerlink" title="Tensorflow Code"></a>Tensorflow Code</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> random</span><br><span class="line"><span class="keyword">import</span> tensorflow <span class="keyword">as</span> tf</span><br></pre></td></tr></table></figure>
+
+
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># RNN layer 与 RNNCell layer 的区别</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 锄禾日当午 -&gt; [0, 1, 2, 3, 4]</span></span><br><span class="line"><span class="comment"># 离离原上草 -&gt; [5, 6, 6, 7, 8]</span></span><br><span class="line"></span><br><span class="line">words = tf.constant([[<span class="number">0</span>, <span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>], [<span class="number">5</span>, <span class="number">6</span>, <span class="number">6</span>, <span class="number">7</span>, <span class="number">8</span>]], dtype=tf.int32)</span><br><span class="line">print(<span class="string">&#x27;words :&#x27;</span>, words.shape) <span class="comment"># batch_size, sequence_length</span></span><br><span class="line"></span><br><span class="line">embedding_ret = tf.keras.layers.Embedding(input_dim=<span class="number">9</span>, output_dim=<span class="number">4</span>)(words)</span><br><span class="line">print(<span class="string">&#x27;embedding ret shape :&#x27;</span>, embedding_ret.shape) <span class="comment"># batch_size, sequence_length, embedding_size</span></span><br><span class="line"></span><br><span class="line">gru_cell = tf.keras.layers.GRUCell(units=<span class="number">4</span>)</span><br><span class="line"></span><br><span class="line">rnn = tf.keras.layers.RNN(gru_cell)</span><br><span class="line">initial_state=tf.zeros(shape=(<span class="number">2</span>, <span class="number">4</span>), dtype=tf.float32)</span><br><span class="line">rnn_ret = rnn(embedding_ret, initial_state=initial_state)</span><br><span class="line">print(<span class="string">&#x27;rnn ret is : \n&#x27;</span>, rnn_ret) <span class="comment"># batch_size, rnn_units</span></span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">self_rnn</span>(<span class="params">rnn_cell, embedding, initial_state</span>):</span></span><br><span class="line">    states = initial_state</span><br><span class="line">    all_outputs = []</span><br><span class="line">    all_states = []</span><br><span class="line">    <span class="keyword">for</span> position <span class="keyword">in</span> <span class="built_in">range</span>(embedding.shape[<span class="number">1</span>]): <span class="comment"># embedding.shape[1] 对应字符串长度</span></span><br><span class="line">        inputs = embedding[: , position, : ] <span class="comment"># 取每个batch上，对应位置上的embedding值 </span></span><br><span class="line">        outputs, states = rnn_cell(inputs, states)</span><br><span class="line">        all_outputs.append(outputs)</span><br><span class="line">        all_states.append(states)</span><br><span class="line">    <span class="keyword">return</span> all_outputs[-<span class="number">1</span>]</span><br><span class="line"></span><br><span class="line">self_rnn_ret = self_rnn(gru_cell, embedding_ret, initial_state=initial_state)</span><br><span class="line">print(<span class="string">&#x27;self rnn ret is : \n&#x27;</span>, self_rnn_ret)</span><br></pre></td></tr></table></figure>
+
+<pre><code>words : (2, 5)
+embedding ret shape : (2, 5, 4)
+rnn ret is : 
+ tf.Tensor(
+[[ 0.02378952  0.01149105  0.01898541  0.02086249]
+ [-0.00381493  0.01658207  0.00360551  0.00680503]], shape=(2, 4), dtype=float32)
+self rnn ret is : 
+ tf.Tensor(
+[[ 0.02378952  0.01149105  0.01898541  0.02086249]
+ [-0.00381493  0.01658207  0.00360551  0.00680503]], shape=(2, 4), dtype=float32)</code></pre>
+<p>RNNCell是RNN是单步的执行单元，RNN layer 的执行原理是遍历每步并将state将向后转递</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">lstm_cell = tf.keras.layers.LSTMCell(<span class="number">4</span>)</span><br><span class="line">inputs = tf.ones(shape=(<span class="number">2</span>, <span class="number">3</span>), dtype=tf.float32)</span><br><span class="line">states1 = tf.zeros(shape=(<span class="number">2</span>, <span class="number">4</span>), dtype=tf.float32)</span><br><span class="line">states2 = tf.zeros(shape=(<span class="number">2</span>, <span class="number">4</span>), dtype=tf.float32)</span><br><span class="line">outpus, states = lstm_cell(inputs, (states1, states2))</span><br><span class="line">print(states)</span><br></pre></td></tr></table></figure>
+
+<pre><code>[&lt;tf.Tensor: shape=(2, 4), dtype=float32, numpy=
+array([[ 0.251225  , -0.09634911,  0.13881163, -0.04482196],
+       [ 0.251225  , -0.09634911,  0.13881163, -0.04482196]],
+      dtype=float32)&gt;, &lt;tf.Tensor: shape=(2, 4), dtype=float32, numpy=
+array([[ 0.47264358, -0.22557989,  0.3101259 , -0.10946771],
+       [ 0.47264358, -0.22557989,  0.3101259 , -0.10946771]],
+      dtype=float32)&gt;]</code></pre>
+<p>可以看出代码结果与理论是对应的，LSTM 会返回两个state，一个是$c_t$， 另一个是$h_t$</p>
+<h2 id="唐诗生成器实例"><a href="#唐诗生成器实例" class="headerlink" title="唐诗生成器实例"></a>唐诗生成器实例</h2><p>古诗生成器：已知有一堆现成的古诗作为训练数据，我们的目标是生成一个可以写作古诗的模型。</p>
+<p><img src="_image/task.png"></p>
+<h3 id="数据处理"><a href="#数据处理" class="headerlink" title="数据处理"></a>数据处理</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">read_poem</span>(<span class="params">file_name</span>):</span></span><br><span class="line">    poems = []</span><br><span class="line">    file = <span class="built_in">open</span>(file_name, <span class="string">&quot;r&quot;</span>, encoding=<span class="string">&#x27;utf-8&#x27;</span>)</span><br><span class="line">    words = []</span><br><span class="line">    <span class="keyword">for</span> line <span class="keyword">in</span> file:  <span class="comment">#every line is a poem</span></span><br><span class="line">        title, author, poem = line.strip().split(<span class="string">&quot;::&quot;</span>)  <span class="comment">#get title and poem</span></span><br><span class="line">        poem = poem.replace(<span class="string">&#x27; &#x27;</span>,<span class="string">&#x27;&#x27;</span>)</span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(poem) &lt; <span class="number">10</span> <span class="keyword">or</span> <span class="built_in">len</span>(poem) &gt; <span class="number">64</span>:  <span class="comment">#filter poem</span></span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        <span class="keyword">if</span> <span class="string">&#x27;_&#x27;</span> <span class="keyword">in</span> poem <span class="keyword">or</span> <span class="string">&#x27;《&#x27;</span> <span class="keyword">in</span> poem <span class="keyword">or</span> <span class="string">&#x27;[&#x27;</span> <span class="keyword">in</span> poem <span class="keyword">or</span> <span class="string">&#x27;(&#x27;</span> <span class="keyword">in</span> poem <span class="keyword">or</span> <span class="string">&#x27;（&#x27;</span> <span class="keyword">in</span> poem:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        <span class="comment"># poem = &#x27;[&#x27; + poem + &#x27;]&#x27; #add start and end signs</span></span><br><span class="line">        <span class="keyword">if</span> <span class="built_in">len</span>(poem) &gt; <span class="number">100</span>:</span><br><span class="line">            <span class="keyword">continue</span></span><br><span class="line">        poems.append(<span class="built_in">list</span>(poem))</span><br><span class="line">        words += <span class="built_in">list</span>(poem)</span><br><span class="line">  </span><br><span class="line">    words = <span class="built_in">list</span>(<span class="built_in">set</span>(words))</span><br><span class="line">    words.sort()</span><br><span class="line">    words = [<span class="string">&#x27;[PAD]&#x27;</span>, <span class="string">&#x27;[BOS]&#x27;</span>, <span class="string">&#x27;[EOS]&#x27;</span>] + words</span><br><span class="line">  </span><br><span class="line">    word_dict = &#123;&#125;</span><br><span class="line">    <span class="keyword">for</span> wid, word <span class="keyword">in</span> <span class="built_in">enumerate</span>(words):</span><br><span class="line">        word_dict[word] = wid </span><br><span class="line">    <span class="keyword">return</span> poems, words, word_dict</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">generate_data_set</span>(<span class="params">data, maxlen=<span class="number">128</span></span>):</span></span><br><span class="line">    ret = []</span><br><span class="line">    <span class="keyword">for</span> text_list <span class="keyword">in</span> data:</span><br><span class="line">        ids = [word_dict[word] <span class="keyword">for</span> word <span class="keyword">in</span> text_list]</span><br><span class="line">        ret.append(ids)</span><br><span class="line">    <span class="keyword">return</span> tf.keras.preprocessing.sequence.pad_sequences(ret, maxlen=maxlen, padding=<span class="string">&#x27;post&#x27;</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">poems, words, word_dict = read_poem(<span class="string">&#x27;data/poetryTang.txt&#x27;</span>)</span><br><span class="line"></span><br><span class="line">vocab_number = <span class="built_in">len</span>(words) + <span class="number">1</span></span><br><span class="line">print(<span class="string">&#x27;字典大小：&#x27;</span>, <span class="built_in">str</span>(vocab_number))</span><br><span class="line"></span><br><span class="line">x_data = [[<span class="string">&#x27;[BOS]&#x27;</span>] + poem <span class="keyword">for</span> poem <span class="keyword">in</span> poems]</span><br><span class="line">y_data = [poem + [<span class="string">&#x27;[EOS]&#x27;</span>] <span class="keyword">for</span> poem <span class="keyword">in</span> poems]</span><br><span class="line"></span><br><span class="line">x_valid_data = x_data[<span class="number">0</span>:<span class="number">1000</span>]</span><br><span class="line">y_valid_data = y_data[<span class="number">0</span>:<span class="number">1000</span>]</span><br><span class="line"></span><br><span class="line">x_train_data = x_data[<span class="number">1000</span>:]</span><br><span class="line">y_train_data = y_data[<span class="number">1000</span>:]</span><br><span class="line"></span><br><span class="line">x_mini_train_data = x_train_data[<span class="number">0</span>:<span class="number">1000</span>]</span><br><span class="line">y_mini_train_data = y_train_data[<span class="number">0</span>:<span class="number">1000</span>]</span><br><span class="line"></span><br><span class="line">print(<span class="string">&#x27;训练集size :&#x27;</span>, <span class="built_in">len</span>(x_train_data))</span><br><span class="line">print(<span class="string">&#x27;验证集size :&#x27;</span>, <span class="built_in">len</span>(x_valid_data))</span><br><span class="line"></span><br><span class="line">x_train_dataset  = generate_data_set(x_train_data, maxlen=<span class="number">65</span>)</span><br><span class="line">y_train_dataset  = generate_data_set(y_train_data, maxlen=<span class="number">65</span>)</span><br><span class="line"></span><br><span class="line">x_valid_dataset  = generate_data_set(x_valid_data, maxlen=<span class="number">65</span>)</span><br><span class="line">y_valid_dataset  = generate_data_set(y_valid_data, maxlen=<span class="number">65</span>)</span><br><span class="line"></span><br><span class="line">x_mini_train_dataset  = generate_data_set(x_mini_train_data, maxlen=<span class="number">65</span>)</span><br><span class="line">y_mini_train_dataset  = generate_data_set(y_mini_train_data, maxlen=<span class="number">65</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># np.array(words)[x_train_dataset[0]]</span></span><br></pre></td></tr></table></figure>
+
+<pre><code>字典大小： 6632
+训练集size : 41136
+验证集size : 1000</code></pre>
+<h3 id="搭建模型"><a href="#搭建模型" class="headerlink" title="搭建模型"></a>搭建模型</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">build_model</span>(<span class="params">vocab_size</span>):</span></span><br><span class="line">    <span class="built_in">input</span> = tf.keras.Input(shape=[<span class="literal">None</span>,], name=<span class="string">&#x27;inputs&#x27;</span>)</span><br><span class="line">    embedding = tf.keras.layers.Embedding(input_dim=vocab_size, output_dim=<span class="number">768</span>, mask_zero=<span class="literal">True</span>, name=<span class="string">&#x27;embedding_layer&#x27;</span>)</span><br><span class="line">    output = embedding(<span class="built_in">input</span>)</span><br><span class="line">    output = tf.keras.layers.Dropout(<span class="number">0.5</span>, name=<span class="string">&#x27;dropout_1&#x27;</span>)(output)</span><br><span class="line">    output = tf.keras.layers.GRU(units = <span class="number">1024</span>, return_sequences=<span class="literal">True</span>, name=<span class="string">&#x27;rnn_layer_1&#x27;</span>)(output)</span><br><span class="line">    output = tf.keras.layers.LayerNormalization(epsilon=<span class="number">1e-6</span>, name=<span class="string">&#x27;layernorm_layer_1&#x27;</span>)(output)</span><br><span class="line"></span><br><span class="line">    output = tf.keras.layers.GRU(units=<span class="number">512</span>, return_sequences=<span class="literal">True</span>, name=<span class="string">&#x27;rnn_layer_2&#x27;</span>)(output)</span><br><span class="line">    output = tf.keras.layers.LayerNormalization(epsilon=<span class="number">1e-6</span>, name=<span class="string">&#x27;layernorm_layer_2&#x27;</span>)(output)</span><br><span class="line"></span><br><span class="line">    output = tf.keras.layers.Dropout(<span class="number">0.5</span>, name=<span class="string">&#x27;dropout_2&#x27;</span>)(output)</span><br><span class="line">    output = tf.keras.layers.Dense(vocab_number, name=<span class="string">&#x27;output_layer&#x27;</span>, activation=<span class="string">&quot;softmax&quot;</span>)(output)</span><br><span class="line">    model = tf.keras.Model(inputs=<span class="built_in">input</span>, outputs=output, name=<span class="string">&quot;rnn_genrater_model&quot;</span>)</span><br><span class="line">    <span class="keyword">return</span> model</span><br><span class="line">model = build_model(vocab_size=vocab_number)</span><br><span class="line">model.load_weights(<span class="string">&#x27;./model_20.h5&#x27;</span>, by_name=<span class="literal">True</span>)</span><br><span class="line">model.summary()</span><br></pre></td></tr></table></figure>
+
+<pre><code>Model: &quot;rnn_genrater_model&quot;
+_________________________________________________________________
+Layer (type)                 Output Shape              Param #   
+=================================================================
+inputs (InputLayer)          [(None, None)]            0         
+_________________________________________________________________
+embedding_layer (Embedding)  (None, None, 768)         5093376   
+_________________________________________________________________
+dropout_1 (Dropout)          (None, None, 768)         0         
+_________________________________________________________________
+rnn_layer_1 (GRU)            (None, None, 1024)        5511168   
+_________________________________________________________________
+layernorm_layer_1 (LayerNorm (None, None, 1024)        2048      
+_________________________________________________________________
+rnn_layer_2 (GRU)            (None, None, 512)         2362368   
+_________________________________________________________________
+layernorm_layer_2 (LayerNorm (None, None, 512)         1024      
+_________________________________________________________________
+dropout_2 (Dropout)          (None, None, 512)         0         
+_________________________________________________________________
+output_layer (Dense)         (None, None, 6632)        3402216   
+=================================================================
+Total params: 16,372,200
+Trainable params: 16,372,200
+Non-trainable params: 0
+_________________________________________________________________</code></pre>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">loss_object = tf.keras.losses.SparseCategoricalCrossentropy(reduction=<span class="string">&#x27;none&#x27;</span>)</span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">loss_function</span>(<span class="params">real, pred</span>):</span></span><br><span class="line">    mask = tf.math.logical_not(tf.math.equal(real, <span class="number">0</span>))</span><br><span class="line">    loss_ = loss_object(real, pred) </span><br><span class="line"></span><br><span class="line">    mask = tf.cast(mask, dtype=loss_.dtype)</span><br><span class="line">    loss_ *= mask</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> tf.reduce_mean(loss_)</span><br></pre></td></tr></table></figure>
+
+<h3 id="模型训练"><a href="#模型训练" class="headerlink" title="模型训练"></a>模型训练</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">model.<span class="built_in">compile</span>(loss=loss_function, metrics=[tf.keras.metrics.SparseCategoricalAccuracy(name=<span class="string">&#x27;train_accuracy&#x27;</span>)], optimizer=<span class="string">&#x27;adam&#x27;</span>)</span><br><span class="line">history = model.fit(x_mini_train_dataset, y_mini_train_dataset, batch_size=<span class="number">64</span>, epochs=<span class="number">1</span>, validation_data=(x_valid_dataset, y_valid_dataset))</span><br></pre></td></tr></table></figure>
+
+<pre><code>16/16 [==============================] - 66s 4s/step - loss: 1.6746 - train_accuracy: 0.2262 - val_loss: 2.7021 - val_train_accuracy: 0.2201</code></pre>
+<h3 id="查看效果"><a href="#查看效果" class="headerlink" title="查看效果"></a>查看效果</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">probs_to_word</span>(<span class="params">weights</span>):</span></span><br><span class="line">    <span class="string">&quot;&quot;&quot;probs to word&quot;&quot;&quot;</span></span><br><span class="line">    prefixSum = np.cumsum(weights) <span class="comment">#prefix sum</span></span><br><span class="line">    ratio = np.random.rand(<span class="number">1</span>)</span><br><span class="line">    index = np.searchsorted(prefixSum, ratio * prefixSum[-<span class="number">1</span>]) <span class="comment"># large margin has high possibility to be sampled</span></span><br><span class="line">    <span class="keyword">return</span> words[index[<span class="number">0</span>]]</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">random_sample</span>(<span class="params">probs_to_word_fun</span>):</span></span><br><span class="line">    chars = [<span class="number">1</span>] <span class="comment"># [BOS]</span></span><br><span class="line">    <span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">100</span>):</span><br><span class="line">        ret = model.call(tf.constant([chars], dtype=tf.int32))</span><br><span class="line">        <span class="comment"># print(&#x27;ret:&#x27;, ret.shape)</span></span><br><span class="line">        choice_word = probs_to_word_fun(ret.numpy()[<span class="number">0</span>][-<span class="number">1</span>])</span><br><span class="line">        <span class="keyword">if</span> choice_word == <span class="string">&#x27;[EOS]&#x27;</span>:</span><br><span class="line">            <span class="keyword">break</span></span><br><span class="line">        chars.append(word_dict[choice_word])</span><br><span class="line">    <span class="keyword">return</span> <span class="string">&#x27;&#x27;</span>.join([words[tmp] <span class="keyword">for</span> tmp <span class="keyword">in</span> chars])</span><br><span class="line"></span><br><span class="line"><span class="keyword">for</span> _ <span class="keyword">in</span> <span class="built_in">range</span>(<span class="number">10</span>):</span><br><span class="line">    poetry = random_sample(probs_to_word)</span><br><span class="line">    print(poetry)</span><br></pre></td></tr></table></figure>
+
+<pre><code>[BOS]去便天峰来，百忧忘道士。争来蜀水平，独与鱼台守。雨景能相和，茵间茶不歇。
+[BOS]金凤曲兮南岩嚬，彤纱碧袅幽思。深妆绿蘋含浅碧，妍姿激暎流水中。花剡馆静吟满云，台边帆挂无得闲。疏谷似云远杀人，梁禽肠断长不还。
+[BOS]桃花江北平，相望未能情。咂酒穿花晚，看书归马多。寒山倚谿寺，夕水落南陂。唯有南迁客，相游高隐难。
+[BOS]微雨寺门安，覆井千峰绿。僧语寄佳空，西风见人怪。
+[BOS]竹坞晚凉霁，药庭头李鸣。秋花入山尽，闻道应相寻。
+[BOS]秦甸数千里，风流河转流。人间不能用，山上保风流。已对秦钱酒，唯擎楚客舟。双舟无处去，但见独留留。
+[BOS]昨夜风微吹落梅，新声万骑报明台。此中欲折长杨柳，到处将文更战来。
+[BOS]绿杨高万在，东照复全归。太守看山远，家家觉日稀。学泉封岁醉，过水著霄稀。欲问初归计，朝朝暮复归。
+[BOS]蓬蒿春日长，殷勤雨露声。未央仙府好，有弄空山荣。坐见白昼日，闲因白云城。年年见官意，洒送出林名。
+[BOS]故树春堂欲画阑，预辞新熟过梨花。金毛晴烧青衫近，青绿阴园白露寒。</code></pre>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0-Tensorflow/" rel="tag"># 深度学习 Tensorflow</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2020/07/16/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/2020-07-16-%E9%80%9A%E8%BF%87Tensorflow2%E4%BD%BF%E7%94%A8Bert%E9%A2%84%E8%AE%AD%E7%BB%83%E6%A8%A1%E5%9E%8B%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E5%BC%8F/" rel="prev" title="通过Tensorflow2使用Bert预训练模型的两种方式">
+      <i class="fa fa-chevron-left"></i> 通过Tensorflow2使用Bert预训练模型的两种方式
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2020/07/29/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/2020-07-29-Batch_Normalization%E4%B8%8ELayer_Normalization%E7%9A%84%E7%90%86%E8%A7%A3%E6%95%B4%E7%90%86/" rel="next" title="Batch Normalization与Layer Normalization的理解整理">
+      Batch Normalization与Layer Normalization的理解整理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E6%AC%A1%E5%88%86%E4%BA%AB%E5%86%85%E5%AE%B9%EF%BC%9A"><span class="nav-number">1.</span> <span class="nav-text">本次分享内容：</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RNN%E7%90%86%E8%AE%BA%E7%9F%A5%E8%AF%86"><span class="nav-number">2.</span> <span class="nav-text">RNN理论知识</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Deep-RNN"><span class="nav-number">2.1.</span> <span class="nav-text">Deep RNN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Bidirectional-RNN"><span class="nav-number">2.2.</span> <span class="nav-text">Bidirectional RNN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#RNN-%E8%AE%A1%E7%AE%97%E6%96%B9%E5%BC%8F"><span class="nav-number">2.3.</span> <span class="nav-text">RNN 计算方式</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Native-RNN"><span class="nav-number">2.3.1.</span> <span class="nav-text">Native RNN</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LSTM"><span class="nav-number">2.3.2.</span> <span class="nav-text">LSTM</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#GRU"><span class="nav-number">2.3.3.</span> <span class="nav-text">GRU</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tensorflow-Code"><span class="nav-number">2.4.</span> <span class="nav-text">Tensorflow Code</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%94%90%E8%AF%97%E7%94%9F%E6%88%90%E5%99%A8%E5%AE%9E%E4%BE%8B"><span class="nav-number">3.</span> <span class="nav-text">唐诗生成器实例</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%A4%84%E7%90%86"><span class="nav-number">3.1.</span> <span class="nav-text">数据处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%90%AD%E5%BB%BA%E6%A8%A1%E5%9E%8B"><span class="nav-number">3.2.</span> <span class="nav-text">搭建模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%A8%A1%E5%9E%8B%E8%AE%AD%E7%BB%83"><span class="nav-number">3.3.</span> <span class="nav-text">模型训练</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%9F%A5%E7%9C%8B%E6%95%88%E6%9E%9C"><span class="nav-number">3.4.</span> <span class="nav-text">查看效果</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="hwyoung"
+      src="/avatar.png">
+  <p class="site-author-name" itemprop="name">hwyoung</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">77</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+        <span class="site-state-item-count">6</span>
+        <span class="site-state-item-name">分类</span>
+      </div>
+      <div class="site-state-item site-state-tags">
+        <span class="site-state-item-count">26</span>
+        <span class="site-state-item-name">标签</span>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">hwyoung</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+
+<script>
+  if (typeof MathJax === 'undefined') {
+    window.MathJax = {
+      loader: {
+        source: {
+          '[tex]/amsCd': '[tex]/amscd',
+          '[tex]/AMScd': '[tex]/amscd'
+        }
+      },
+      tex: {
+        inlineMath: {'[+]': [['$', '$']]},
+        tags: 'ams'
+      },
+      options: {
+        renderActions: {
+          findScript: [10, doc => {
+            document.querySelectorAll('script[type^="math/tex"]').forEach(node => {
+              const display = !!node.type.match(/; *mode=display/);
+              const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display);
+              const text = document.createTextNode('');
+              node.parentNode.replaceChild(text, node);
+              math.start = {node: text, delim: '', n: 0};
+              math.end = {node: text, delim: '', n: 0};
+              doc.math.push(math);
+            });
+          }, '', false],
+          insertedScript: [200, () => {
+            document.querySelectorAll('mjx-container').forEach(node => {
+              let target = node.parentNode;
+              if (target.nodeName.toLowerCase() === 'li') {
+                target.parentNode.classList.add('has-jax');
+              }
+            });
+          }, '', false]
+        }
+      }
+    };
+    (function () {
+      var script = document.createElement('script');
+      script.src = '//cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js';
+      script.defer = true;
+      document.head.appendChild(script);
+    })();
+  } else {
+    MathJax.startup.document.state(0);
+    MathJax.texReset();
+    MathJax.typeset();
+  }
+</script>
+
+    
+
+  
+
+</body>
+</html>
