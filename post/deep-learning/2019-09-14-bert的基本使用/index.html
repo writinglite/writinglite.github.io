@@ -1,0 +1,107 @@
+<!doctype html><html class=no-js lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="IE=edge"><title>bert的基本使用 - Writing Lite</title><script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script><meta name=description content><meta property="og:title" content="bert的基本使用"><meta property="og:description" content="本文试图回答的问题：
+ bert的使用过程是什么样的 bert的输入输出是什么样的 在使用bert的过程中有哪些关键点  源码下载 !git clone https://github.com/google-research/bert.git 下载bert中文预训练模型文件 # 下载 !wget https://storage.googleapis.com/bert_models/2018_11_03/chinese_L-12_H-768_A-12.zip # 解压 !unzip chinese_L-12_H-768_A-12.zip 定义模型 import tensorflow as tf from bert import modeling max_length = 10 input_ids = tf.placeholder(tf.int64, shape=[bash_size, max_length]) input_mask = tf.placeholder(tf.int64, shape=[bash_size, max_length]) token_type_ids = tf.placeholder(tf.int64, shape=[bash_size, max_length]) # 生成bert_config &#34;&#34;&#34;&#34; 不使用预训练模型时也可以自己定义： config = modeling.BertConfig(vocab_size=32000, hidden_size=512, num_hidden_layers=8, num_attention_heads=6, intermediate_size=1024) &#34;&#34;&#34; bert_config_file = 'chinese_L-12_H-768_A-12/bert_config.json' bert_config = modeling.BertConfig.from_json_file(bert_config_file) model = modeling.BertModel( config=bert_config, input_ids=input_ids, input_mask=input_mask, token_type_ids=token_type_ids, is_training=False, use_one_hot_embeddings=True) 生成测试数据 from bert import tokenization tokenizer = tokenization."><meta property="og:type" content="article"><meta property="og:url" content="/post/deep-learning/2019-09-14-bert%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/"><meta property="article:section" content="post"><meta itemprop=name content="bert的基本使用"><meta itemprop=description content="本文试图回答的问题：
+ bert的使用过程是什么样的 bert的输入输出是什么样的 在使用bert的过程中有哪些关键点  源码下载 !git clone https://github.com/google-research/bert.git 下载bert中文预训练模型文件 # 下载 !wget https://storage.googleapis.com/bert_models/2018_11_03/chinese_L-12_H-768_A-12.zip # 解压 !unzip chinese_L-12_H-768_A-12.zip 定义模型 import tensorflow as tf from bert import modeling max_length = 10 input_ids = tf.placeholder(tf.int64, shape=[bash_size, max_length]) input_mask = tf.placeholder(tf.int64, shape=[bash_size, max_length]) token_type_ids = tf.placeholder(tf.int64, shape=[bash_size, max_length]) # 生成bert_config &#34;&#34;&#34;&#34; 不使用预训练模型时也可以自己定义： config = modeling.BertConfig(vocab_size=32000, hidden_size=512, num_hidden_layers=8, num_attention_heads=6, intermediate_size=1024) &#34;&#34;&#34; bert_config_file = 'chinese_L-12_H-768_A-12/bert_config.json' bert_config = modeling.BertConfig.from_json_file(bert_config_file) model = modeling.BertModel( config=bert_config, input_ids=input_ids, input_mask=input_mask, token_type_ids=token_type_ids, is_training=False, use_one_hot_embeddings=True) 生成测试数据 from bert import tokenization tokenizer = tokenization."><meta itemprop=wordCount content="363"><meta itemprop=keywords content="深度学习,"><meta name=twitter:card content="summary"><meta name=twitter:title content="bert的基本使用"><meta name=twitter:description content="本文试图回答的问题：
+ bert的使用过程是什么样的 bert的输入输出是什么样的 在使用bert的过程中有哪些关键点  源码下载 !git clone https://github.com/google-research/bert.git 下载bert中文预训练模型文件 # 下载 !wget https://storage.googleapis.com/bert_models/2018_11_03/chinese_L-12_H-768_A-12.zip # 解压 !unzip chinese_L-12_H-768_A-12.zip 定义模型 import tensorflow as tf from bert import modeling max_length = 10 input_ids = tf.placeholder(tf.int64, shape=[bash_size, max_length]) input_mask = tf.placeholder(tf.int64, shape=[bash_size, max_length]) token_type_ids = tf.placeholder(tf.int64, shape=[bash_size, max_length]) # 生成bert_config &#34;&#34;&#34;&#34; 不使用预训练模型时也可以自己定义： config = modeling.BertConfig(vocab_size=32000, hidden_size=512, num_hidden_layers=8, num_attention_heads=6, intermediate_size=1024) &#34;&#34;&#34; bert_config_file = 'chinese_L-12_H-768_A-12/bert_config.json' bert_config = modeling.BertConfig.from_json_file(bert_config_file) model = modeling.BertModel( config=bert_config, input_ids=input_ids, input_mask=input_mask, token_type_ids=token_type_ids, is_training=False, use_one_hot_embeddings=True) 生成测试数据 from bert import tokenization tokenizer = tokenization."><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=dns-prefetch href=//fonts.googleapis.com><link rel=dns-prefetch href=//fonts.gstatic.com><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700"><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/custom.css><link rel="shortcut icon" href=/favicon.ico></head><body class=body><div class="container container--outer"><header class=header><div class="container header__container"><div class=logo><a class=logo__link href=/ title="Writing Lite" rel=home><div class="logo__item logo__text"><div class=logo__title>Writing Lite</div><div class=logo__tagline>Just writing a lite blog</div></div></a></div><div class=divider></div></div></header><div class="wrapper flex"><div class=primary><main class=main role=main><article class=post><header class=post__header><h1 class=post__title>bert的基本使用</h1><div class="post__meta meta"><div class="meta__item-author meta__item"><svg class="meta__icon icon icon-author" width="16" height="16" viewBox="0 0 12 16"><path d="M6 1c2.2.0 3.5 2 3.5 4.5C9.5 7 8.9 8.2 8 9c2.9.8 4 2.5 4 5v1H0v-1c0-2.5 1.1-4.2 4-5-.9-.8-1.5-2-1.5-3.5C2.5 3 3.8 1 6 1z"/></svg><span class=meta__text>hwyang</span></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/deep-learning/ rel=category>deep learning</a></span></div></div></header><div class="post__toc toc"><div class=toc__title>Page content</div><div class=toc__menu><nav id=TableOfContents><ul><li><a href=#源码下载>源码下载</a></li><li><a href=#下载bert中文预训练模型文件>下载bert中文预训练模型文件</a></li><li><a href=#定义模型>定义模型</a></li><li><a href=#生成测试数据>生成测试数据</a></li><li><a href=#输出bert结果>输出bert结果</a></li><li><a href=#加载bert预训练模型>加载bert预训练模型</a></li></ul></nav></div></div><div class="content post__content clearfix"><p>本文试图回答的问题：</p><ul><li>bert的使用过程是什么样的</li><li>bert的输入输出是什么样的</li><li>在使用bert的过程中有哪些关键点</li></ul><h2 id=源码下载>源码下载</h2><pre><code>!git clone https://github.com/google-research/bert.git
+</code></pre><h2 id=下载bert中文预训练模型文件>下载bert中文预训练模型文件</h2><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-bash data-lang=bash><span style=color:#75715e># 下载</span>
+!wget https://storage.googleapis.com/bert_models/2018_11_03/chinese_L-12_H-768_A-12.zip
+
+<span style=color:#75715e># 解压</span>
+!unzip chinese_L-12_H-768_A-12.zip
+</code></pre></div><h2 id=定义模型>定义模型</h2><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#f92672>import</span> tensorflow <span style=color:#f92672>as</span> tf
+<span style=color:#f92672>from</span> bert <span style=color:#f92672>import</span> modeling
+</code></pre></div><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>max_length <span style=color:#f92672>=</span> <span style=color:#ae81ff>10</span>
+input_ids <span style=color:#f92672>=</span> tf<span style=color:#f92672>.</span>placeholder(tf<span style=color:#f92672>.</span>int64, shape<span style=color:#f92672>=</span>[bash_size, max_length])
+input_mask <span style=color:#f92672>=</span> tf<span style=color:#f92672>.</span>placeholder(tf<span style=color:#f92672>.</span>int64, shape<span style=color:#f92672>=</span>[bash_size, max_length])
+token_type_ids <span style=color:#f92672>=</span> tf<span style=color:#f92672>.</span>placeholder(tf<span style=color:#f92672>.</span>int64, shape<span style=color:#f92672>=</span>[bash_size, max_length])
+
+<span style=color:#75715e># 生成bert_config</span>
+<span style=color:#e6db74>&#34;&#34;&#34;&#34;
+</span><span style=color:#e6db74>不使用预训练模型时也可以自己定义：
+</span><span style=color:#e6db74>config = modeling.BertConfig(vocab_size=32000, hidden_size=512,
+</span><span style=color:#e6db74>    num_hidden_layers=8, num_attention_heads=6, intermediate_size=1024)
+</span><span style=color:#e6db74>&#34;&#34;&#34;</span>
+bert_config_file <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;chinese_L-12_H-768_A-12/bert_config.json&#39;</span>
+bert_config <span style=color:#f92672>=</span> modeling<span style=color:#f92672>.</span>BertConfig<span style=color:#f92672>.</span>from_json_file(bert_config_file)
+
+model <span style=color:#f92672>=</span> modeling<span style=color:#f92672>.</span>BertModel(
+        config<span style=color:#f92672>=</span>bert_config,
+        input_ids<span style=color:#f92672>=</span>input_ids,
+        input_mask<span style=color:#f92672>=</span>input_mask,
+        token_type_ids<span style=color:#f92672>=</span>token_type_ids,
+        is_training<span style=color:#f92672>=</span>False,
+        use_one_hot_embeddings<span style=color:#f92672>=</span>True)
+</code></pre></div><h2 id=生成测试数据>生成测试数据</h2><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#f92672>from</span> bert <span style=color:#f92672>import</span> tokenization
+tokenizer <span style=color:#f92672>=</span> tokenization<span style=color:#f92672>.</span>FullTokenizer(
+        vocab_file<span style=color:#f92672>=</span><span style=color:#e6db74>&#39;chinese_L-12_H-768_A-12/vocab.txt&#39;</span>, do_lower_case<span style=color:#f92672>=</span>True)
+
+
+<span style=color:#66d9ef>def</span> <span style=color:#a6e22e>generate_features</span>(input_text, max_seq_length):
+    tokens <span style=color:#f92672>=</span> tokenizer<span style=color:#f92672>.</span>tokenize(input_text)
+    
+    <span style=color:#66d9ef>if</span> len(tokens) <span style=color:#f92672>&gt;</span> max_seq_length <span style=color:#f92672>-</span> <span style=color:#ae81ff>2</span>:
+      tokens <span style=color:#f92672>=</span> tokens[<span style=color:#ae81ff>0</span>:(max_seq_length <span style=color:#f92672>-</span> <span style=color:#ae81ff>2</span>)]
+
+    tokens<span style=color:#f92672>.</span>insert(<span style=color:#ae81ff>0</span>, <span style=color:#e6db74>&#39;[CLS]&#39;</span>)
+    tokens<span style=color:#f92672>.</span>append(<span style=color:#e6db74>&#39;[SEP]&#39;</span>)
+    input_ids <span style=color:#f92672>=</span> tokenizer<span style=color:#f92672>.</span>convert_tokens_to_ids(tokens)
+    <span style=color:#66d9ef>while</span> len(input_ids) <span style=color:#f92672>&lt;</span> max_seq_length:
+        input_ids<span style=color:#f92672>.</span>append(<span style=color:#ae81ff>0</span>)
+    input_mask <span style=color:#f92672>=</span> [ <span style=color:#ae81ff>0</span> <span style=color:#66d9ef>if</span> input_id <span style=color:#f92672>==</span><span style=color:#ae81ff>0</span> <span style=color:#66d9ef>else</span> <span style=color:#ae81ff>1</span> <span style=color:#66d9ef>for</span> input_id <span style=color:#f92672>in</span> input_ids]
+    segment_ids <span style=color:#f92672>=</span> [<span style=color:#ae81ff>0</span>] <span style=color:#f92672>*</span> len(input_ids)
+
+    <span style=color:#66d9ef>return</span> input_ids, input_mask, segment_ids
+
+<span style=color:#75715e># 生成一个example</span>
+feature_input_ids, feature_input_mask, feature_segment_ids <span style=color:#f92672>=</span> generate_features(<span style=color:#e6db74>&#39;测试句子&#39;</span>, <span style=color:#ae81ff>10</span>)
+<span style=color:#75715e># input_ids 字的one-hot编码，不足max_seq_length部分用0补齐</span>
+<span style=color:#75715e># input_mask 补齐部分为0，非补齐部分为1</span>
+<span style=color:#75715e># segments_ids 第一部分为0，第二部分为1</span>
+<span style=color:#66d9ef>print</span>(feature_input_ids)
+<span style=color:#66d9ef>print</span>(feature_input_mask)
+<span style=color:#66d9ef>print</span>(feature_segment_ids)
+</code></pre></div><p>输出：</p><pre><code>[101, 3844, 6407, 1368, 2094, 102, 0, 0, 0, 0]
+[1, 1, 1, 1, 1, 1, 0, 0, 0, 0]
+[0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+</code></pre><h2 id=输出bert结果>输出bert结果</h2><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python><span style=color:#75715e># [CLS] 结果全联接层后的结果</span>
+pooled_output <span style=color:#f92672>=</span> model<span style=color:#f92672>.</span>get_pooled_output()
+<span style=color:#75715e># 整个sequence的结果包括[CLS][SEP]</span>
+sequence_output <span style=color:#f92672>=</span> model<span style=color:#f92672>.</span>get_sequence_output()
+
+<span style=color:#66d9ef>with</span> tf<span style=color:#f92672>.</span>Session() <span style=color:#66d9ef>as</span> sess:
+    sess<span style=color:#f92672>.</span>run(tf<span style=color:#f92672>.</span>global_variables_initializer())
+    pool_ret, sequence_ret <span style=color:#f92672>=</span> sess<span style=color:#f92672>.</span>run([output_layer, sequence_output], 
+                                      feed_dict<span style=color:#f92672>=</span>{
+                                          input_ids: [feature_input_ids], 
+                                          input_mask: [feature_input_mask], 
+                                          token_type_ids:[segment_ids]})
+    <span style=color:#66d9ef>print</span>(pool_ret<span style=color:#f92672>.</span>shape)
+    <span style=color:#66d9ef>print</span>(sequence_ret<span style=color:#f92672>.</span>shape)
+</code></pre></div><p>输出</p><pre><code># batch_size, embeding_size
+(1, 768)
+# batch_size, max_seq_length, embeding_size
+(1, 10, 768)
+</code></pre><p>对于句子门类等任务我们使用<code>pooled_output</code>即可，如果是序列标注则使用<code>sequence_output</code></p><h2 id=加载bert预训练模型>加载bert预训练模型</h2><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>init_checkpoint <span style=color:#f92672>=</span> <span style=color:#e6db74>&#39;chinese_L-12_H-768_A-12/bert_model.ckpt&#39;</span>
+<span style=color:#75715e># 调用init_from_checkpoint方法</span>
+tvars <span style=color:#f92672>=</span> tf<span style=color:#f92672>.</span>trainable_variables()
+(assignment_map, initialized_variable_names) <span style=color:#f92672>=</span> modeling<span style=color:#f92672>.</span>get_assignment_map_from_checkpoint(
+    tvars, init_checkpoint)
+tf<span style=color:#f92672>.</span>train<span style=color:#f92672>.</span>init_from_checkpoint(init_checkpoint, assignment_map)
+
+<span style=color:#75715e>## 以上代码需要在 模型定义之后，sess.run(tf.global_variables_initializer()) 调用</span>
+</code></pre></div><p>不加载bert预训练模型时我们输出一个bias变量：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-python data-lang=python>graph <span style=color:#f92672>=</span> tf<span style=color:#f92672>.</span>get_default_graph()
+bias_var <span style=color:#f92672>=</span> graph<span style=color:#f92672>.</span>get_tensor_by_name(<span style=color:#e6db74>&#39;bert/encoder/layer_9/output/dense/bias:0&#39;</span>)
+<span style=color:#66d9ef>with</span> tf<span style=color:#f92672>.</span>Session() <span style=color:#66d9ef>as</span> sess:
+    sess<span style=color:#f92672>.</span>run(tf<span style=color:#f92672>.</span>global_variables_initializer())
+    bias_var_ret <span style=color:#f92672>=</span> sess<span style=color:#f92672>.</span>run(bias_var)
+    <span style=color:#66d9ef>print</span>(bias_var_ret)
+</code></pre></div><p>输出：</p><pre><code>[0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0. 0.
+ 0. 0. 0. 0. ....]
+</code></pre><p>加载后在来看下：</p><pre><code>[ 1.59017026e-01  9.16422606e-02 -2.22222768e-02 -9.68082398e-02
+  3.88148576e-02 -1.29534647e-01  1.27454013e-01  5.71930073e-02
+  1.27984751e-02 -7.38708153e-02 -1.95696447e-02 -6.19950853e-02
+ -8.56598467e-02 -5.69710024e-02  6.46896958e-02 -3.26531418e-02
+  4.72894274e-02  4.64077713e-03 ...]
+</code></pre><p>我们看到已经加载成功了</p></div><footer class=post__footer><div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg><ul class=tags__list><li class=tags__item><a class="tags__link btn" href=/tags/%E6%B7%B1%E5%BA%A6%E5%AD%A6%E4%B9%A0/ rel=tag>深度学习</a></li></ul></div></footer></article></main><nav class="pager flex"><div class="pager__item pager__item--prev"><a class=pager__link href=/post/deep-learning/2020-10-16-deeplearning%E4%B8%ADcrf%E7%9A%84tensorflow%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0/ rel=prev><span class=pager__subtitle>«&#8201;Previous</span><p class=pager__title>DeepLearning中CRF的Tensorflow代码实现</p></a></div><div class="pager__item pager__item--next"><a class=pager__link href=/post/deep-learning/2020-07-29-batch_normalization%E4%B8%8Elayer_normalization%E7%9A%84%E7%90%86%E8%A7%A3%E6%95%B4%E7%90%86/ rel=next><span class=pager__subtitle>Next&#8201;»</span><p class=pager__title>Batch Normalization与Layer Normalization的理解整理</p></a></div></nav></div></div><footer class=footer><div class="container footer__container flex"><div class=footer__copyright>&copy; 2021 Writing Lite.
+<span class=footer__copyright-credits>Generated with <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> and <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> theme.</span></div></div></footer></div><script async defer src=/js/menu.js></script><script src=/js/custom.js></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script></body></html>

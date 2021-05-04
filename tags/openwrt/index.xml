@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>openwrt on Writing Lite</title><link>/tags/openwrt/</link><description>Recent content in openwrt on Writing Lite</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Mon, 04 Nov 2019 17:36:15 +0000</lastBuildDate><atom:link href="/tags/openwrt/index.xml" rel="self" type="application/rss+xml"/><item><title>免费证书安装-certbot</title><link>/post/other/2019-11-04-%E5%85%8D%E8%B4%B9%E8%AF%81%E4%B9%A6%E5%AE%89%E8%A3%85-certbot/</link><pubDate>Mon, 04 Nov 2019 17:36:15 +0000</pubDate><guid>/post/other/2019-11-04-%E5%85%8D%E8%B4%B9%E8%AF%81%E4%B9%A6%E5%AE%89%E8%A3%85-certbot/</guid><description>为了给网站添加https协议，本文记录了如何免费获取证书。
+免费的证书颁发机构：letsencrypt
+为了能使用证书还需要一个可以操作letsencrypt的客户端，这里使用官网推荐的工具certbot
+certbot的安装根据不同的系统安装方式不同，可以根据官网来操作。
+这里给出Debain10的安装方式：
+sudo apt-get install certbot 安装好之后就可以获取证书了，如果想把证书安装到nginx或apache等上，可以安装相应的插件。这里给出的是standalone方式：
+sudo certbot certonly --standalone -d yourdomain.me 输入命令之后，会提示输入email之类的，IMPORTANT NOTES:会提示获取的证书最终的输出位置。
+关于证书的更新
+需要注意的是，现在获取的证书的有效期是90天，90后证书就是过期，因此需要更新证书。
+正常安装certbot之后，证书是自动更新的，可参看官方文档
+可通过systemctl list-timers查看或查看 crotab
+例如在debian中在/etc/cron.d/certbot可以找到
+0 */12 * * * root test -x /usr/bin/certbot -a \! -d /run/systemd/system &amp;amp;&amp;amp; perl -e &amp;#39;sleep int(rand(43200))&amp;#39; &amp;amp;&amp;amp; certbot -q renew 在renew中，我们可以添加 ：
+certbot renew -q --pre-hook &amp;#34;nginx -s stop&amp;#34; --post-hook &amp;#34;nginx&amp;#34; -q：不进行输出
+--pre-hook、--post-hook如果证书可以更新（只有快过期时才会更新），则执行前后的命令。</description></item><item><title>树莓派3b+安装openwrt 18.06.4</title><link>/post/other/2019-07-27-%E6%A0%91%E8%8E%93%E6%B4%BE3b+-%E5%AE%89%E8%A3%85openwrt/</link><pubDate>Sat, 27 Jul 2019 22:36:15 +0000</pubDate><guid>/post/other/2019-07-27-%E6%A0%91%E8%8E%93%E6%B4%BE3b+-%E5%AE%89%E8%A3%85openwrt/</guid><description>本文的连接方式是，将树莓派连唯一的网口作为wan口连接到上级路由lan口上，然后通过树莓派无线来访问网络。
+刷固件 目前openwrt官方Stable Release版本是18.06.4，但是对于树莓派3b+开发版是不支持无线wifi的（unsupported functions：Country Code setting, WiFi 2.4GHz WiFi 5GHz , WIP）官方树莓派网页 ；不过snapshot版本支持，因此咱们刷这个版本；
+下载
+(下载地址)[https://downloads.openwrt.org/snapshots/targets/brcm2708/bcm2710/ ] 点击 rpi-3-ext4-factory.img.gz 下载
+格式化树莓派存储卡
+将img文件写到树莓派存储卡中
+设置树莓派网络 将树莓派连接电源，并将树莓派通过网线连接到电脑上 通过ssh连接树莓派（树莓派默认的ip是192.168.1.1） ssh root@192.168.1.1 修改树莓派的网络设置 vi /etc/config/network 此处有两处修改，一是将 config interface 'lan'下的option ifname 'eth0'注释掉，二是添加一个wan的interface，具体如下：
+config interface &amp;#39;lan&amp;#39; option type &amp;#39;bridge&amp;#39; # option ifname &amp;#39;eth0&amp;#39; option proto &amp;#39;static&amp;#39; option ipaddr &amp;#39;192.168.1.1&amp;#39; option netmask &amp;#39;255.255.255.0&amp;#39; option ip6assign &amp;#39;60&amp;#39; config interface &amp;#39;wan&amp;#39; option proto &amp;#39;dhcp&amp;#39; option ifname &amp;#39;eth0&amp;#39; option ipv6 &amp;#39;auto&amp;#39; 在将无线的配置修改掉</description></item></channel></rss>

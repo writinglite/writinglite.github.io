@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>散列表 on Writing Lite</title><link>/tags/%E6%95%A3%E5%88%97%E8%A1%A8/</link><description>Recent content in 散列表 on Writing Lite</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><atom:link href="/tags/%E6%95%A3%E5%88%97%E8%A1%A8/index.xml" rel="self" type="application/rss+xml"/><item><title>散列表</title><link>/post/algorithm/2017-05-14-%E6%95%A3%E5%88%97%E8%A1%A8/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/algorithm/2017-05-14-%E6%95%A3%E5%88%97%E8%A1%A8/</guid><description>背影 散列表是普通数组概念的推广。由于对普通数组可以直接寻址，使得能在O(1)时间内访问数组中的任意位置。
+如果存储空间允许，我们可以提供一个数组，为每个关键字保留一个位置，以利用直接寻址的技术。
+当实际关键字数目比全部的可能关键字总数要小时，采用散列表就成为直接数组寻址的一种有效替代，因为散列表使用一个长度与实际存储的关键字数目成比例的数组来存储在散列表中，不是直接把关键字作为数组下标，而是根据关键字计算出相应的下标。
+当实际关键字数目比全部的可能关键字总数要小时，可能会导致多个关键字映射到同一个下标。解决这种冲突有以下三种方式：
+链接方法 利用散列函数 开放寻址法 当关键字集合是静态存储时（即关键字一但存入后不再改变）时，通过“完全散列”在最坏时间为O(1)的情况下完成关键字查找。
+直接寻址法 链接法 开放寻址法 完全散列 参考 《算法导论》</description></item></channel></rss>

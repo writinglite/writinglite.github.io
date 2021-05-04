@@ -1,3 +1,505 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on My New Hugo Site</title><link>https://writinglite.github.io/post/</link><description>Recent content in Posts on My New Hugo Site</description><generator>Hugo -- gohugo.io</generator><language>en-us</language><lastBuildDate>Sat, 01 May 2021 19:10:40 +0800</lastBuildDate><atom:link href="https://writinglite.github.io/post/index.xml" rel="self" type="application/rss+xml"/><item><title>Hello</title><link>https://writinglite.github.io/post/hello/</link><pubDate>Sat, 01 May 2021 19:10:40 +0800</pubDate><guid>https://writinglite.github.io/post/hello/</guid><description>this is math $$ a $$ this anther $a$
-$$ aaa_b \
-aa $$</description></item></channel></rss>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Posts on Writing Lite</title><link>/post/</link><description>Recent content in Posts on Writing Lite</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Mon, 02 Mar 2020 17:36:15 +0000</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml"/><item><title>2020-03-02-基于nginx的acme免费证书方案</title><link>/post/other/2020-03-02-%E5%9F%BA%E4%BA%8Enginx%E7%9A%84acme%E5%85%8D%E8%B4%B9%E8%AF%81%E4%B9%A6%E6%96%B9%E6%A1%88/</link><pubDate>Mon, 02 Mar 2020 17:36:15 +0000</pubDate><guid>/post/other/2020-03-02-%E5%9F%BA%E4%BA%8Enginx%E7%9A%84acme%E5%85%8D%E8%B4%B9%E8%AF%81%E4%B9%A6%E6%96%B9%E6%A1%88/</guid><description>为了保护用户信息使网站更加安全，需要给网站添加https协议。搭建一个https网站的前提是要先拥有一个证书，当然一般的证书是需要收费，文本提供一个免费的解决方案。
+我们使用的github上开源的免费证书工具ACME.SH，网站地址：https://github.com/acmesh-official/acme.sh，
+在其github主页上已经有了一些很好的入门说明。这里根据实际情况进行操作。
+依赖安装 apt-get install cron socat -y 安装ACME.sh curl https://get.acme.sh | sh 安装成功后会提示Install success!，这个命令会将acme命令写到batchrc里，为了方便使用需要 ：
+source ~/.bashrc 申请证书 acme.sh --issue -d example.com --standalone 生成的证书被放在 /root/.acme.sh/
+复制证书到nginx acme.sh --installcert -d freegoooovideos.ml \ --key-file /etc/nginx/ssl/freegoooovideos.key \ --fullchain-file /etc/nginx/ssl/fullchain.cer \ --reloadcmd &amp;#34;systemctl force-reload nginx.service&amp;#34; #或sudo service nginx force-reload reloadcmd 会记住让nginx重新加载的方式 ，这样证书更新的时候就可以让你nginx重新加载了。
+这个命令不只是复制，它会把信息记录到本地中（.acme/example.com/example.com.conf），这样在更新证书的时候会自动将文件复制到容器中，并让其重新加载配置。
+附：nginx的配置文件（/etc/nginx/nginx.conf 默认位置）
+user nginx; worker_processes 1; error_log /var/log/nginx/error.log warn; pid /var/run/nginx.pid; events { worker_connections 1024; } http { map $http_upgrade $connection_upgrade { default upgrade; &amp;#39;&amp;#39; close; } server{ listen 443 ssl; ssl on; proxy_redirect off; ssl_certificate /etc/nginx/ssl/fullchain.</description></item><item><title>免费证书安装-certbot</title><link>/post/other/2019-11-04-%E5%85%8D%E8%B4%B9%E8%AF%81%E4%B9%A6%E5%AE%89%E8%A3%85-certbot/</link><pubDate>Mon, 04 Nov 2019 17:36:15 +0000</pubDate><guid>/post/other/2019-11-04-%E5%85%8D%E8%B4%B9%E8%AF%81%E4%B9%A6%E5%AE%89%E8%A3%85-certbot/</guid><description>为了给网站添加https协议，本文记录了如何免费获取证书。
+免费的证书颁发机构：letsencrypt
+为了能使用证书还需要一个可以操作letsencrypt的客户端，这里使用官网推荐的工具certbot
+certbot的安装根据不同的系统安装方式不同，可以根据官网来操作。
+这里给出Debain10的安装方式：
+sudo apt-get install certbot 安装好之后就可以获取证书了，如果想把证书安装到nginx或apache等上，可以安装相应的插件。这里给出的是standalone方式：
+sudo certbot certonly --standalone -d yourdomain.me 输入命令之后，会提示输入email之类的，IMPORTANT NOTES:会提示获取的证书最终的输出位置。
+关于证书的更新
+需要注意的是，现在获取的证书的有效期是90天，90后证书就是过期，因此需要更新证书。
+正常安装certbot之后，证书是自动更新的，可参看官方文档
+可通过systemctl list-timers查看或查看 crotab
+例如在debian中在/etc/cron.d/certbot可以找到
+0 */12 * * * root test -x /usr/bin/certbot -a \! -d /run/systemd/system &amp;amp;&amp;amp; perl -e &amp;#39;sleep int(rand(43200))&amp;#39; &amp;amp;&amp;amp; certbot -q renew 在renew中，我们可以添加 ：
+certbot renew -q --pre-hook &amp;#34;nginx -s stop&amp;#34; --post-hook &amp;#34;nginx&amp;#34; -q：不进行输出
+--pre-hook、--post-hook如果证书可以更新（只有快过期时才会更新），则执行前后的命令。</description></item><item><title>树莓派3b+安装openwrt 18.06.4</title><link>/post/other/2019-07-27-%E6%A0%91%E8%8E%93%E6%B4%BE3b+-%E5%AE%89%E8%A3%85openwrt/</link><pubDate>Sat, 27 Jul 2019 22:36:15 +0000</pubDate><guid>/post/other/2019-07-27-%E6%A0%91%E8%8E%93%E6%B4%BE3b+-%E5%AE%89%E8%A3%85openwrt/</guid><description>本文的连接方式是，将树莓派连唯一的网口作为wan口连接到上级路由lan口上，然后通过树莓派无线来访问网络。
+刷固件 目前openwrt官方Stable Release版本是18.06.4，但是对于树莓派3b+开发版是不支持无线wifi的（unsupported functions：Country Code setting, WiFi 2.4GHz WiFi 5GHz , WIP）官方树莓派网页 ；不过snapshot版本支持，因此咱们刷这个版本；
+下载
+(下载地址)[https://downloads.openwrt.org/snapshots/targets/brcm2708/bcm2710/ ] 点击 rpi-3-ext4-factory.img.gz 下载
+格式化树莓派存储卡
+将img文件写到树莓派存储卡中
+设置树莓派网络 将树莓派连接电源，并将树莓派通过网线连接到电脑上 通过ssh连接树莓派（树莓派默认的ip是192.168.1.1） ssh root@192.168.1.1 修改树莓派的网络设置 vi /etc/config/network 此处有两处修改，一是将 config interface 'lan'下的option ifname 'eth0'注释掉，二是添加一个wan的interface，具体如下：
+config interface &amp;#39;lan&amp;#39; option type &amp;#39;bridge&amp;#39; # option ifname &amp;#39;eth0&amp;#39; option proto &amp;#39;static&amp;#39; option ipaddr &amp;#39;192.168.1.1&amp;#39; option netmask &amp;#39;255.255.255.0&amp;#39; option ip6assign &amp;#39;60&amp;#39; config interface &amp;#39;wan&amp;#39; option proto &amp;#39;dhcp&amp;#39; option ifname &amp;#39;eth0&amp;#39; option ipv6 &amp;#39;auto&amp;#39; 在将无线的配置修改掉</description></item><item><title>Git 常用命令</title><link>/post/other/2019-05-18-git-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</link><pubDate>Sat, 18 May 2019 19:36:15 +0000</pubDate><guid>/post/other/2019-05-18-git-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</guid><description>1、删除文件
+rm test.txt git rm test.txt git commit -m &amp;#34;remove test.txt&amp;#34; git push 2、git更换远程仓库Ur
+git remote set-url origin [url] 3、把误删的文件恢复到最新版本：
+git checkout -- test.txt 4、创建新分支：
+git branch branchName 5、分支合并
+# 切换到Master分支 git checkout master # 对Develop分支进行合并 git merge --no-ff develo 6、切换到新分支：
+git checkout branchName 7、添加远程仓库
+git remote add origin &amp;lt;your_github_repo_url&amp;gt; 8、删除远程分支
+git push origin :branchname 9、查找删除的文件
+# 通过git log可查找到文件的commitid git checkout commit_id -- file_name 10、.git目录清理-删除git中的大文件
+# 1.使用以下命令可以查看占用空间最多的五个文件： git rev-list --objects --all | grep &amp;#34;$(git verify-pack -v .</description></item><item><title>Linux 常用命令</title><link>/post/other/2019-05-18-linux-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</link><pubDate>Sat, 18 May 2019 19:36:15 +0000</pubDate><guid>/post/other/2019-05-18-linux-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</guid><description>1、scp
+scp -r /home/xxx/xxx.txt root@192.168.1.122:/home/xxx/xxx 2、 磁盘空间
+du -h --max-depth=0 ./ du sh * 3、当前文件夹大小：
+du -sm 4、查看文档多少行
+cat **.txt | wc -l 5、解压
+tar -xzvf .tar.gz 6、压缩
+tar –czf jpg.tar.gz *.jpg 7、给file的属主增加执行权限
+chmod u+x file 8、zip 解压
+unzip mydata.zip -d mydatabak 9、zip 压缩：
+zip -r xx.zip dir 10、进行压缩，但不要.git目录下的所有文件（包含data目录）
+zip -r yasuo.zip * -x *.git* 11、查看 zip 文件列表
+unzip -l xx.zip</description></item><item><title>最大熵模型</title><link>/post/machine-learning/2016-11-27-%E6%9C%80%E5%A4%A7%E7%86%B5%E6%A8%A1%E5%9E%8B/</link><pubDate>Sun, 27 Nov 2016 09:03:04 +0000</pubDate><guid>/post/machine-learning/2016-11-27-%E6%9C%80%E5%A4%A7%E7%86%B5%E6%A8%A1%E5%9E%8B/</guid><description>最大熵原理 我们的预测应当满足全部已知条件，而对未知的情况不要做任何主观假设。也可以表述为在满足约束条件的模型集体合选取熵最大的模型。
+假设现在需要做一个自动将英语到法语的翻译模型，为了方便说明，我们将这个问题简化为将英文句子中的单词{in}翻译成法语词汇。那么翻译模型p就是对于给定包含单词”in”的英文句子，需要给出选择某个法语单词f 做为”in”的翻译结果的概率p(f)。为了帮助开发这个模型，需要收集大量已经翻译好的样本数据。收集好样本之后，接下来需要做两件事情：一是从样本中抽取规则（特征），二是基于这些规则建立模型。 从样本中我们能得到的第一个规则就是in可能被翻译成的法语词汇有： {dans, en, à, au cours de, pendant}。 也就是说，我们可以给模型p施加第一个约束条件： p(dans)+p(en)+ p(à)+p(au cours de)+p(pendant) = 1。 这个等式是翻译模型可以用到的第一个对样本的统计信息。显然，有无数可以满足上面约束的模型p可供选择，例如： p(dans)=1，即这个模型总是预测dans 或者 p(pendant)=1/2 and p(à)=1/2，即模型要么选择预测pendant，要么预测à。 这两个模型都只是在没有足够经验数据的情况下，做的大胆假设。事实上我们只知道当前可能的选项是5个法语词汇，没法确定究竟哪个概率分布式正确。那么，一个更合理的模型假设可能是： p(dans) = 1/5 p(en) = 1/5 p(à) = 1/5 p(au cours de) = 1/5 p(pendant) = 1/5 即该模型将概率均等地分给5个词汇。但现实情况下，肯定不会这么简单，所以我们尝试收集更多的经验知识。假设我们从语料中发现有30%的情况下，in会被翻译成dans 或者en，那么运用这个知识来更新我们的模型，得到2模型约束： p(dans) + p(en) = 3/10 p(dans)+p(en)+ p(à)+p(au cours de)+p(pendant) = 1 同样，还是有很多概率分布满足这两个约束。在没有其他知识的情况下，最直观的模型p应该是最均匀的模型（例如，我拿出一个色子问你丢出5的概率是多少，你肯定会回答1/6），也就是在满足约束条件的情况下，将概率均等分配： p(dans) = 3/20 p(en) = 3/20 p(à) = 7/30 p(au cours de) = 7/30 p(pendant) = 7/30 假设我们再一次观察样本数据，发现：有一半的情况，in被翻译成了dans 或 à。这样，我们有就了3个模型约束： p(dans) + p(en) = 3/10 p(dans)+p(en)+ p(à)+p(au cours de)+p(pendant) = 1 p(dans)+ p(à)=1/2 我们可以再一次选择满足3个约束的最均匀的模型p，但这一次结果没有那么明显。由于经验知识的增加，问题的复杂度也增加了，归结起来，我们要解决两组问题：第一，均匀(uniform)究竟是什么意思?</description></item><item><title>linux下lighttd安装，部署hexo</title><link>/post/other/2016-11-25-linux%E4%B8%8Blighttd%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2hexo/</link><pubDate>Fri, 25 Nov 2016 01:14:57 +0000</pubDate><guid>/post/other/2016-11-25-linux%E4%B8%8Blighttd%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2hexo/</guid><description>安装第三方软件包 下载第三方软件包 64位
+wget http://epel.mirror.net.in/epel/6/x86_64/epel-release-6-8.noarch.rpm
+32位
+wget http://epel.mirror.net.in/epel/6/i386/epel-release-6-8.noarch.rpm
+安装第三方软件包
+rpm -ivh epel-release-6-8.noarch.rpm
+安装lighttpd yum install lighttpd
+lighttpd部署hexo 新建lighttpd.conf配置文件
+touch lighttpd.conf
+输入如下内容
+server.document-root = &amp;quot;/root/blog/public&amp;quot; server.port = 80 mimetype.assign = ( &amp;quot;.pdf&amp;quot; =&amp;gt; &amp;quot;application/pdf&amp;quot;, &amp;quot;.sig&amp;quot; =&amp;gt; &amp;quot;application/pgp-signature&amp;quot;, &amp;quot;.spl&amp;quot; =&amp;gt; &amp;quot;application/futuresplash&amp;quot;, &amp;quot;.class&amp;quot; =&amp;gt; &amp;quot;application/octet-stream&amp;quot;, &amp;quot;.ps&amp;quot; =&amp;gt; &amp;quot;application/postscript&amp;quot;, &amp;quot;.torrent&amp;quot; =&amp;gt; &amp;quot;application/x-bittorrent&amp;quot;, &amp;quot;.dvi&amp;quot; =&amp;gt; &amp;quot;application/x-dvi&amp;quot;, &amp;quot;.gz&amp;quot; =&amp;gt; &amp;quot;application/x-gzip&amp;quot;, &amp;quot;.pac&amp;quot; =&amp;gt; &amp;quot;application/x-ns-proxy-autoconfig&amp;quot;, &amp;quot;.swf&amp;quot; =&amp;gt; &amp;quot;application/x-shockwave-flash&amp;quot;, &amp;quot;.tar.gz&amp;quot; =&amp;gt; &amp;quot;application/x-tgz&amp;quot;, &amp;quot;.tgz&amp;quot; =&amp;gt; &amp;quot;application/x-tgz&amp;quot;, &amp;quot;.tar&amp;quot; =&amp;gt; &amp;quot;application/x-tar&amp;quot;, &amp;quot;.zip&amp;quot; =&amp;gt; &amp;quot;application/zip&amp;quot;, &amp;quot;.</description></item><item><title>linux安装dropx</title><link>/post/other/2016-11-25-linux%E5%AE%89%E8%A3%85dropx/</link><pubDate>Fri, 25 Nov 2016 00:44:52 +0000</pubDate><guid>/post/other/2016-11-25-linux%E5%AE%89%E8%A3%85dropx/</guid><description>本文内容来自dropbox官网，最新内容以官网为主，原文地址https://www.dropbox.com/zh_CN/install-linux
+下载安装 32-bit:
+cd ~ &amp;amp;&amp;amp; wget -O - &amp;quot;https://www.dropbox.com/download?plat=lnx.x86&amp;quot; | tar xzf -
+64-bit:
+cd ~ &amp;amp;&amp;amp; wget -O - &amp;quot;https://www.dropbox.com/download?plat=lnx.x86_64&amp;quot; | tar xzf -
+运行 接着，从新建的 .dropbox-dist 文件夹运行 Dropbox 守护程序。
+~/.dropbox-dist/dropboxd
+关联 如果是首次在服务器上运行 Dropbox，系统会要求您将链接复制并粘贴到运行的浏览器中，以便创建一个新的帐户或将服务器附加到现有帐户上。操作完成后，系统会在您的主目录中创建 Dropbox 文件夹。下载这个 Python 脚本，通过命令行控制 Dropbox。为了方便访问，请在 PATH 中的任何地方放入此脚本的符号链接。</description></item><item><title>“醒言”</title><link>/post/other/2016-11-24-%E9%86%92%E8%A8%80/</link><pubDate>Thu, 24 Nov 2016 23:51:05 +0000</pubDate><guid>/post/other/2016-11-24-%E9%86%92%E8%A8%80/</guid><description> 此时此刻就是上帝对你最好的安排。 人生苦难重重。这是个伟大的真理，是世界上最伟大的真理之一。它的伟大，在于我们一旦想通了它，便也超越了它。 勇气不是不害怕，而是明明很害怕却依然去做。</description></item><item><title>ubuntu14.4-server控制台中文乱码问题解决</title><link>/post/other/2016-04-09-ubuntu14-4-server%E6%8E%A7%E5%88%B6%E5%8F%B0%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/</link><pubDate>Sat, 09 Apr 2016 10:42:36 +0000</pubDate><guid>/post/other/2016-04-09-ubuntu14-4-server%E6%8E%A7%E5%88%B6%E5%8F%B0%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/</guid><description>问题 今天在安装ubuntu14.4 server版本后，出现了乱码问题。
+解决方法 修改/etc/default/local文件
+LANG=&amp;quot;en_US.UTF-8&amp;quot; LANGUAGE=&amp;quot;en_US:en&amp;quot; 问题原因分析 大概是我在安装系统的时候选择了中文，所以控制台想打印的中文字符，但解码时出现了问题。该解决方法也只是将中文还原成了英文并没有根本解决问题。PS:话说，其实还是看英文的比较习惯吧。</description></item><item><title>hexo与githubpages搭建个人博客</title><link>/post/other/2016-04-08-hexo%E4%B8%8Egithubpages%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</link><pubDate>Fri, 08 Apr 2016 21:45:15 +0000</pubDate><guid>/post/other/2016-04-08-hexo%E4%B8%8Egithubpages%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</guid><description>软件环境 操作系统：windows node.js hexo github 原理简介 这所以能搭建这样一个免费的博客，是因为我们使用了Github的Pages功能，它提供了免费的空间来可以展示你的网站。而hexo一个博客框架提供了对博客相关一系列功能。有了以上两个前提我们就可以在本地用hexo写博客再将hexo生成的html上传到github，这样就完成了博客的搭建。
+大致步骤 安装git 安装node.js 安装hexo 配置hexo 安装next主题 配置next git与node.js是安装hexo的前提。
+安装Hexo\ 可参考hexo官方文档 git和node.js均可以windows下安装。 node安装成功可以使用node -v判断。 hexo安装成功可以使用hexo -v判断。 鼠标右键Git Bash使用如下命令安装hexo
+npm install -g hexo-cli 新建一个目录，比如这里就用hexo_dir右键这个目录 Git Bash，使用如下命令：
+hexo init &amp;lt;dir&amp;gt; 通过命令hexo server使用如下命令就可以在连接查看到其首页了。 以上hexo就已经安装完成了。
+配置github 新建repository命名为&amp;lt;username&amp;gt;.github.io
+初步配置Hexo hexo的配置文件在hexo_dir/_config.yml在此我使用的也是在网上找到的资源略作修改
+## 配置信息：后必须有一个空格 ## Site title: Charlotte's Blog ## 网站标题 subtitle: 随心 随笔 ## 简介 description: 随心 随笔 ## 描述 author: Charlotte ## 网站作者 language: default ## 网站语言 email: yhw1813@gmail.</description></item><item><title>Albert在Bert基础上的几点改进</title><link>/post/deep-learning/2020-02-20-albert%E5%9C%A8bert%E5%9F%BA%E7%A1%80%E4%B8%8A%E7%9A%84%E5%87%A0%E7%82%B9%E6%94%B9%E8%BF%9B/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/deep-learning/2020-02-20-albert%E5%9C%A8bert%E5%9F%BA%E7%A1%80%E4%B8%8A%E7%9A%84%E5%87%A0%E7%82%B9%E6%94%B9%E8%BF%9B/</guid><description>减少参数 减少Embeding参数 ，用两层替代之前的一层，参数从原来的V * H 变成 V * E + E * H ， 这个E &amp;laquo; H 共享Block参数 ​ 这样做的好处是，将参数减少，进而增加模型的深度和宽度来提升模型效果，但同时带来了计算量的增加（大概3倍）
+改进训练任务 通过实验表示，Next Sentence Predict 任务太过简单，使用 Reverce 的方式会更好；
+去掉Dropout Dropout实际的操作是防止过拟合，但对于无监督学习来说，训练语料是很多的不会有过拟合的问题，使用Dropout反而会增加内存的使用（会有一些缓存），去掉Dropout会有0.3的性能提升
+增加训练数据 这个就没啥说的了
+最重要的一点还是减少参数增加模型的深度和宽度带来的</description></item><item><title>Auto-Encoder</title><link>/post/deep-learning/2019-08-18-auto-encoder/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/deep-learning/2019-08-18-auto-encoder/</guid><description>什么是auto-encoder ?
+auto-encoder输入一个向量，目标是要让网络可以还原输入向量；从input layer 到bottle的过程叫encoder目的是给input降维，从bottle到output layer 的过程叫decoder目的是从input的低维向量表示还原回Input；bottle 是 compact（稠密，维度远低于input维度）的向量；
+核心是思想是：如果低维的code 能够还原回input 那说明 code 能够很好的表示input向量（即稠密又没有丢失信息）；
+decoder 的不同方式： 如下是一种让decoder （判断input 与 code 是否匹配）以二分类方式来评估 decoder 是否足够好</description></item><item><title>Batch Normalization与Layer Normalization的理解整理</title><link>/post/deep-learning/2020-07-29-batch_normalization%E4%B8%8Elayer_normalization%E7%9A%84%E7%90%86%E8%A7%A3%E6%95%B4%E7%90%86/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/deep-learning/2020-07-29-batch_normalization%E4%B8%8Elayer_normalization%E7%9A%84%E7%90%86%E8%A7%A3%E6%95%B4%E7%90%86/</guid><description>问题背景　 　接着引入covariate shift的概念：如果ML系统实例集合&amp;lt;X,Y&amp;gt;中的输入值X的分布老是变，这不符合IID假设，网络模型很难稳定的学规律，这不得引入迁移学习才能搞定吗，我们的ML系统还得去学习怎么迎合这种分布变化啊。对于深度学习这种包含很多隐层的网络结构，在训练过程中，因为各层参数不停在变化，所以每个隐层都会面临covariate shift的问题，也就是在训练过程中，隐层的输入分布老是变来变去，这就是所谓的“Internal Covariate Shift”，Internal指的是深层网络的隐层，是发生在网络内部的事情，而不是covariate shift问题只发生在输入层。　我们知道网络一旦train起来，那么参数就要发生更新，除了输入层的数据外(因为输入层数据，我们已经人为的为每个样本归一化)，后面网络每一层的输入数据分布是一直在发生变化的，因为在训练的时候，前面层训练参数的更新将导致后面层输入数据分布的变化。以网络第二层为例：网络的第二层输入，是由第一层的参数和input计算得到的，而第一层的参数在整个训练过程中一直在变化，因此必然会引起后面每一层输入数据分布的改变。我们把网络中间层在训练过程中，数据分布的改变称之为：“Internal Covariate Shift”。Paper所提出的算法，就是要解决在训练过程中，中间层数据分布发生改变的情况，于是就有了Batch Normalization，这个牛逼算法的诞生。
+Normalization 的通用框架 $$ \hat{x}=\frac{x-\mu}{\sigma^2} $$ $$ y = g\hat{x}+b $$
+$\mu$和$\sigma^2$分别是均值和方差，它们是根据特征值计算出来的，g和b是需要训练过程中去学习的参数。
+总结 Layer Normalization与Batch Normalization对比：　BN针对一个minibatch的输入样本，计算均值和方差，基于计算的均值和方差来对某一层神经网络的输入X中每一个case进行归一化操作。但BN有两个明显不足：1、高度依赖于mini-batch的大小，实际使用中会对mini-Batch大小进行约束，不适合类似在线学习（mini-batch为1）情况；2、不适用于RNN网络中normalize操作：BN实际使用时需要计算并且保存某一层神经网络mini-batch的均值和方差等统计信息，对于对一个固定深度的前向神经网络（DNN，CNN）使用BN，很方便；但对于RNN来说，sequence的长度是不一致的，换句话说RNN的深度不是固定的，不同的time-step需要保存不同的statics特征，可能存在一个特殊sequence比其的sequence长很多，这样training时，计算很麻烦。但LN可以有效解决上面这两个问题。
+LN适用于LSTM的加速，但用于CNN加速时并没有取得比BN更好的效果。
+BN的特点
+但是，BN 的转换是针对单个神经元可训练的——不同神经元的输入经过再平移和再缩放后分布在不同的区间，而 LN 对于一整层的神经元训练得到同一个转换——所有的输入都在同一个区间范围内。如果不同输入特征不属于相似的类别（比如颜色和大小），那么 LN 的处理可能会降低模型的表达能力。
+LN的缺点
+BN 的转换是针对单个神经元可训练的——不同神经元的输入经过再平移和再缩放后分布在不同的区间，而 LN 对于一整层的神经元训练得到同一个转换——所有的输入都在同一个区间范围内。如果不同输入特征不属于相似的类别（比如颜色和大小），那么 LN 的处理可能会降低模型的表达能力。
+参考： Batch Normalization（BN，批量归一化） 【深度学习】深入理解Batch Normalization批标准化 深度学习（二十九）Batch Normalization 学习笔记 深度学习加速策略BN、WN和LN的联系与区别，各自的优缺点和适用的场景？？</description></item><item><title>bert的基本使用</title><link>/post/deep-learning/2019-09-14-bert%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/deep-learning/2019-09-14-bert%E7%9A%84%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/</guid><description>本文试图回答的问题：
+bert的使用过程是什么样的 bert的输入输出是什么样的 在使用bert的过程中有哪些关键点 源码下载 !git clone https://github.com/google-research/bert.git 下载bert中文预训练模型文件 # 下载 !wget https://storage.googleapis.com/bert_models/2018_11_03/chinese_L-12_H-768_A-12.zip # 解压 !unzip chinese_L-12_H-768_A-12.zip 定义模型 import tensorflow as tf from bert import modeling max_length = 10 input_ids = tf.placeholder(tf.int64, shape=[bash_size, max_length]) input_mask = tf.placeholder(tf.int64, shape=[bash_size, max_length]) token_type_ids = tf.placeholder(tf.int64, shape=[bash_size, max_length]) # 生成bert_config &amp;#34;&amp;#34;&amp;#34;&amp;#34; 不使用预训练模型时也可以自己定义： config = modeling.BertConfig(vocab_size=32000, hidden_size=512, num_hidden_layers=8, num_attention_heads=6, intermediate_size=1024) &amp;#34;&amp;#34;&amp;#34; bert_config_file = &amp;#39;chinese_L-12_H-768_A-12/bert_config.json&amp;#39; bert_config = modeling.BertConfig.from_json_file(bert_config_file) model = modeling.BertModel( config=bert_config, input_ids=input_ids, input_mask=input_mask, token_type_ids=token_type_ids, is_training=False, use_one_hot_embeddings=True) 生成测试数据 from bert import tokenization tokenizer = tokenization.</description></item><item><title>DeepLearning中CRF的Tensorflow代码实现</title><link>/post/deep-learning/2020-10-16-deeplearning%E4%B8%ADcrf%E7%9A%84tensorflow%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/deep-learning/2020-10-16-deeplearning%E4%B8%ADcrf%E7%9A%84tensorflow%E4%BB%A3%E7%A0%81%E5%AE%9E%E7%8E%B0/</guid><description>主方法 def crf_log_likelihood( inputs: TensorLike, tag_indices: TensorLike, sequence_lengths: TensorLike, transition_params: Optional[TensorLike] = None, ) -&amp;gt; tf.Tensor: &amp;#34;&amp;#34;&amp;#34;Computes the log-likelihood of tag sequences in a CRF. Args: inputs: A [batch_size, max_seq_len, num_tags] tensor of unary potentials to use as input to the CRF layer. tag_indices: A [batch_size, max_seq_len] matrix of tag indices for which we compute the log-likelihood. sequence_lengths: A [batch_size] vector of true sequence lengths. transition_params: A [num_tags, num_tags] transition matrix, if available.</description></item><item><title>DeepLearning中CRF计算原理</title><link>/post/deep-learning/2020-10-16-deeplearning%E4%B8%ADcrf%E8%AE%A1%E7%AE%97%E5%8E%9F%E7%90%86/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/deep-learning/2020-10-16-deeplearning%E4%B8%ADcrf%E8%AE%A1%E7%AE%97%E5%8E%9F%E7%90%86/</guid><description>主要内容来处：https://createmomo.github.io：
+CRF Layer on the Top of BiLSTM - 1 Outline and Introduction CRF Layer on the Top of BiLSTM - 2 CRF Layer (Emission and Transition Score) CRF Layer on the Top of BiLSTM - 3 CRF Loss Function CRF Layer on the Top of BiLSTM - 4 Real Path Score CRF Layer on the Top of BiLSTM - 5 The Total Score of All the Paths CRF Layer on the Top of BiLSTM - 6 Infer the Labels for a New Sentence CRF Layer on the Top of BiLSTM - 7 Chainer Implementation Warm Up CRF Layer on the Top of BiLSTM - 8 Demo Code CRF计算原理 CRF的计算分为三个部分，第一部分先介绍输入参数，第二部分说明在训练阶段如何计算-损失函数，第三部分是预测时的计算方式。</description></item><item><title>EM算法</title><link>/post/machine-learning/2016-11-27-em%E7%AE%97%E6%B3%95/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/machine-learning/2016-11-27-em%E7%AE%97%E6%B3%95/</guid><description>EM算法和最大似然估计一样是一种参数估计方法，与最大似然估计不同的是EM算法可以对着包含隐变量的数据进行参数估计。EM算法的思想是：若参数$\Theta$已知，则可根据训练数据推断出隐变量Z的值（E步）；反之，若Z的值已知，则可方便地对参数$\Theta$做极大似然估计（M步）。
+Jensen不等式 令f(x)是一个凸函数(e.g f''(x)&amp;gt;=0,二阶导数大于0)，令x为随机变量。 那么， $$ f(E[x])&amp;lt;=E[f(x)] $$ 用一句话表达Jensen不等式，当函数是凸函数，那么该函数的期望大于等于期望的函数值。当X=E(X),当X为常量概率为1，E[f(x)] = f(E[x])。
+如图，有0.5的概率是a，有0.5的概率是b。（就像掷硬币一样）。X的期望值就是a和b的中值了。
+同理，对于凹函数，f''&amp;lt;=0,$f(E[x])&amp;gt;=E[f(x)]$。
+##EM算法 假定有训练数据集 $$ { x^{(1)} , x^{(2)} , x^{(3)} \dots x^{(m)} } $$ 样本相互独立，我们想找到每个样例隐含的类别z。 模型$P(x,z;\theta)$,只能观测到x，对数似然函数， $$ \begin{align} l(\theta) &amp;amp;= \sum^m_{i=1}\log P(x^i;\theta) \
+&amp;amp;= \sum^m_{i=1}\log \sum_{z^i} P(x^i,z^i;\theta) \end{align} $$ 然后我们求极大似然 $$ \begin{align} \sum^m_{i=1}\log \sum_{z^i} P(x^i,z^i;\theta) &amp;amp; = \sum_i\log\sum_{z^{(i)}}P(x^{(i)},z^{(i)};\theta) \
+&amp;amp; = \sum_i \log \sum_{z^{(i)}} Q(z^{(i)}) \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})} \
+&amp;amp; \ge \sum_i \sum_{z^{(i)}} Q(z^{(i)}) \log \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})} \end{align} $$ 最后一步用到了Jensen不等式，f(x)的f对应log函数，x对应$ \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})}$，p(x)对应$Q(z^{(i)})$。那么$f(E[x])$对应$\log \sum_{z^{(i)}} Q(z^{(i)}) \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})}$，$E[f(x)]$对应$\sum_{z^{(i)}} Q(z^{(i)}) \log \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})}$。 因此$Q(z^{(i)})$代表的是p(x)也就是概率，所以显然 $$ \sum_{z^{(i)}} Q(z^{(i)}) = 1 , Q(z^{(i)})&amp;gt;0 $$</description></item><item><title>GBDT 解理</title><link>/post/machine-learning/2019-04-14-gbdt%E7%90%86%E8%A7%A3/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/machine-learning/2019-04-14-gbdt%E7%90%86%E8%A7%A3/</guid><description>GBDT 全称是 Gradient Boosting Decision Tree，我们从分别这几个词来理解 GBDT;
+Boosting GBDT 整体框架属于Boosting算法。Boosting方法是一种常用的统计学习方法，应用广泛有效。分类问题中，它通过改变训练样本的权重，学习多个弱分类器，并将这些分类器进行线性组合，提高分类性能。这里只对Boosting 这做简单说明。
+Decision Tree 在 GBDT中学习的弱分类器就是决策树，具体来说是回归树并不是分类树，这里也不展开说明。
+Gradient GBDT中改变训练样本的权重的方式是Gradient，使用 GBDT 来做回归任务时，通过推导Gradient=残差
+回归问题的GBDT的学习过程 通俗点来讲，GBDT 是由一排回归树组成的，每一颗决策树学习目标是拟合前一颗树的Gradient或残差。
+初始化$f_0(x)=0$ 对$m = 1,2、、、M$ 计算残差 $$ r_{mi} = y_i-f_{m-1}(x), i=1,2、、、N $$ 拟合残差$r_{mi}$学习一棵回归树，得到$h_m(x)$ 更新$f_m(x) = f_{m-1} + h_m(x)$ 得到回归问题的提升树 参考：
+https://blog.csdn.net/zpalyq110/article/details/79527653 https://blog.csdn.net/u012422446/article/details/51506392 https://blog.csdn.net/anshuai_aw1/article/details/83040541
+机器学习算法GBDT的面试要点总结-上篇
+GBDT算法整理 https://www.msra.cn/zh-cn/news/features/lightgbm-20170105</description></item><item><title>Git版本控制</title><link>/post/other/2017-11-18-git%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/other/2017-11-18-git%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6/</guid><description>git是日常工作常用的开发工具，本篇文章将粗略讲解关于git的两部分内容，一是git中的基本概念这将有助于了解git命令的具体含义，二是日常工作中常用到的一些git命令和git的开发流程。
+Git中的基础概念 git中比较重要的两个概念是空间和版本（commit），git中的命令都是对这两个概念的操作。了解了这两个概念，就可以感知到git中可以支持哪些操作，即使有些命令我们没有学过，也可以通过到搜索了解到。
+第一个概念：空间 git中有三种空间
+工作区（Word Space） 储存库（Repo） 暂存区（Staged Area，Index） 工作区就是git所在目录，就是文件系统中的一个普通目录。
+暂存区指.git目录下的index文件，通过git add命令可以将工作区目录下的文件添加到暂存区中。同时它也有索引作用，它对应到储存库中的文件（索引理解的还不是很透彻可能有错误）。
+储存库指工作区下的.git目录（应该是里面的某个目录），里面记录了各个版本的所有内容，只有commit的内容才是真正会保存到储存库中。
+第二个概念：版本（commit） 我理解的版本就是每一次commit的内容。各个版本之间是一种增量并且依赖的关系，新的版本会依赖旧的版本。每一个版本都有一个key来唯一标识这个commit。
+通过commit可以引出分支的概念，每个分支其实是其实就是指向了一个commit，HEAD指向的就是当前的commit。
+Git日常开发 git命令比较多，但日常开发中实际用到的比较小，下面会通过一些实际场景介绍一些常用的git命令。
+git配置 $ git config --global user.name &amp;quot;John Doe&amp;quot; $ git config --global user.email johndoe@example.com git提交时会注明提交人的姓名和邮箱，当多个协同工作时以标名操作人。
+git初始化 git的初始化分为两种场景，一是git库已经有了，要在这个git库基本上进行开发；另外一种是，我们先在本地进行的开发，然后想上传到服务器上。
+第一种的话可以使用git clone命令：
+$ git clone git://github.com/schacon/grit.git 第二种话，要先添加远程git然后将自己的代码提交上去。
+$ git remote add origin git@github.xxx.cn:xxx/xxx.git $ git push -u origin master 程序开发 git有不同的工作的流（gitflow），但共同的特点是，对于先功能的开发，要先新建分支开发完成后再merge回master分支。
+$ git branch &amp;lt;branch name&amp;gt; $ git checkout &amp;lt;branch name&amp;gt; ...开发 $ git checkout master $ git merge &amp;lt;branch name&amp;gt; 其它 git的分支是一种指标，指向commit</description></item><item><title>Guice 使用方法</title><link>/post/java/2017-05-13-guice%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/java/2017-05-13-guice%E4%BD%BF%E7%94%A8%E6%96%B9%E6%B3%95/</guid><description>注入方式 构造方法注入 通过构造方法注入，相对其它方法的好处是，与guice的耦合较低，即使之后不使用guice框架也不用大范围的修改代码。
+public class MyImplement { private MyProperty myProperty; @Inject public MyImplement(MyProperty myProperty) { this.myProperty =myProperty; } } 属性注入 属性注入最方便，但不那么符合规范。
+public class MyImplement { @Inject private MyProperty myProperty; } 方法注入 如果之前用的是spring通过set方法进行的配置，那么转换到guice就相对简单。
+public class MyImplement { private MyProperty myProperty; @Inject public void setMyProperty(MyProperty myProperty) { this.myProperty =myProperty; } } provider注入 如果一个对象有两种或多种不同的生成方式，则可以使用provider方式进行注入。
+public static class MyProvider1 implements Provider&amp;lt;MyInterface&amp;gt; { @Inject @Named(&amp;#34;myproperty1&amp;#34;) private MyProperty myProperty; public MyInterface invoke(MyInterface request) { MyImplement myImplement = new MyImplement(); myImplement.</description></item><item><title>Guice注入SLF4J</title><link>/post/java/2017-04-06-guice%E6%B3%A8%E5%85%A5slf4j/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/java/2017-04-06-guice%E6%B3%A8%E5%85%A5slf4j/</guid><description>创建注解 import javax.inject.Scope; import java.lang.annotation.Documented; import java.lang.annotation.Retention; import java.lang.annotation.Target; import static java.lang.annotation.ElementType.FIELD; import static java.lang.annotation.RetentionPolicy.RUNTIME; @Scope @Documented @Retention(RUNTIME) @Target(FIELD) public @interface Log { } 自定义MembersInjector import com.google.inject.MembersInjector; import org.slf4j.Logger; import org.slf4j.LoggerFactory; import java.lang.reflect.Field; public class SLF4JMembersInjector&amp;lt;T&amp;gt; implements MembersInjector&amp;lt;T&amp;gt; { private final Field field; private final Logger logger; public SLF4JMembersInjector(Field field) { this.field = field; this.logger = LoggerFactory.getLogger(field.getDeclaringClass()); field.setAccessible(true); } public void injectMembers(T t) { try { field.set(t, logger); } catch (IllegalAccessException e) { throw new RuntimeException(e); } } } 创建TypeListener import project.</description></item><item><title>Java NIO</title><link>/post/java/2019-04-18-java-nio/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/java/2019-04-18-java-nio/</guid><description>IO (input/output) 通常指数据在内部存储器和外部存储器或其他周边设备之间的输入和输出。 NIO 是 Non-blocking IO 的缩写，即非阻塞式 IO，是一种计算机处理输入和输出的一种方式。
+原始 IO 处理方式是，当数据可读之前会一直等待并占用线程资源却不做任何事情，因此当需要处理多个 chanle时就需要启用多个线程；而 NIO 可以只用一个线程来处理多个 chanle ,因为 NIO当数据可读之前不会一直傻等，而是每隔一段时间就检查，那么对于多个 chanle 来说，他们中有一个是可读状态才使用 cpu执行；
+JJava IO: A classic IO server design - one connection handled by one thread.
+Java NIO: A single thread managing multiple connections
+&amp;ndash; 参考：
+https://tech.meituan.com/2016/11/04/nio.html
+https://segmentfault.com/a/1190000017040893
+http://tutorials.jenkov.com/java-nio/nio-vs-io.html</description></item><item><title>Java并发测试CyclicBarrier与CountDownLatch</title><link>/post/java/2019-08-08-java%E5%B9%B6%E5%8F%91%E6%B5%8B%E8%AF%95cyclicbarrier%E4%B8%8Ecountdownlatch/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/java/2019-08-08-java%E5%B9%B6%E5%8F%91%E6%B5%8B%E8%AF%95cyclicbarrier%E4%B8%8Ecountdownlatch/</guid><description>CountDownLatch 相关的api
+//构造方法 public CountDownLatch(int count) //调用await()方法的线程会被挂起，它会等待直到count值为0才继续执行 public void await() throws InterruptedException { }; //和await()类似，只不过等待一定的时间后count值还没变为0的话就会继续执行 public boolean await(long timeout, TimeUnit unit) throws InterruptedException { }; //将count值减1 public void countDown() { }; 简单来说它的执行逻辑是：先初始化count，当执行countDown()时count会减1，当count为零时之前因为await()被挂起的线程都会被唤醒。
+示例代码：
+public static void main(String[] args) { int bash = 10; CountDownLatch countDownLatch = new CountDownLatch(1); for (int index = 0; index &amp;lt; bash; index++) { new Thread(new Runnable() { @Override public void run() { try { countDownLatch.await(); } catch (InterruptedException e) { e.</description></item><item><title>java开源字符串处理工具</title><link>/post/other/2016-11-27-java%E5%BC%80%E6%BA%90%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/other/2016-11-27-java%E5%BC%80%E6%BA%90%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/</guid><description>字符串多模匹配
+字符串相似度计算
+guava
+Type Parser</description></item><item><title>java日志框架-logback</title><link>/post/java/2017-04-06-java%E6%97%A5%E5%BF%97%E6%A1%86%E6%9E%B6-logback/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/java/2017-04-06-java%E6%97%A5%E5%BF%97%E6%A1%86%E6%9E%B6-logback/</guid><description>简单介绍 logback当前分成三个模块：logback-core,logback- classic和logback-access。
+logback-core 是其它两个模块的基础模块。 logback-classic是log4j的一个 改良版本。此外logback-classic完整实现SLF4J API。 logback-access提供HTTP访问日志功能。 MAVEN配置 &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;org.slf4j&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;slf4j-api&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;1.7.12&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;ch.qos.logback&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;logback-classic&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;1.2.3&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;ch.qos.logback&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;logback-core&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;1.2.3&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; 测试代码 Logger logger = LoggerFactory.getLogger(&amp;#34;test&amp;#34;); logger.info(&amp;#34;this is test string&amp;#34;); LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory(); StatusPrinter.print(lc); logback.xml配置 &amp;lt;?xml version=&amp;#34;1.0&amp;#34; encoding=&amp;#34;UTF-8&amp;#34;?&amp;gt; &amp;lt;configuration debug=&amp;#34;false&amp;#34;&amp;gt; &amp;lt;appender name=&amp;#34;STDOUT&amp;#34; class=&amp;#34;ch.qos.logback.core.ConsoleAppender&amp;#34;&amp;gt; &amp;lt;encoder&amp;gt; &amp;lt;pattern&amp;gt;%d{yyyy-MM-dd HH:mm:ss} [ %t:%r ] [ %p ] %m%n&amp;lt;/pattern&amp;gt; &amp;lt;/encoder&amp;gt; &amp;lt;/appender&amp;gt; &amp;lt;appender name=&amp;#34;FILE&amp;#34; class=&amp;#34;ch.qos.logback.core.FileAppender&amp;#34;&amp;gt; &amp;lt;file&amp;gt;logs/info.log&amp;lt;/file&amp;gt; &amp;lt;append&amp;gt;true&amp;lt;/append&amp;gt; &amp;lt;immediateFlush&amp;gt;true&amp;lt;/immediateFlush&amp;gt; &amp;lt;encoder&amp;gt; &amp;lt;pattern&amp;gt;%d{yyyy-MM-dd HH:mm:ss} [ %t:%r ] [ %p ] %m%n&amp;lt;/pattern&amp;gt; &amp;lt;/encoder&amp;gt; &amp;lt;/appender&amp;gt; &amp;lt;root level=&amp;#34;DEBUG&amp;#34;&amp;gt; &amp;lt;appender-ref ref=&amp;#34;STDOUT&amp;#34; /&amp;gt; &amp;lt;appender-ref ref=&amp;#34;FILE&amp;#34; /&amp;gt; &amp;lt;/root&amp;gt; &amp;lt;/configuration&amp;gt; logback官网：https://logback.</description></item><item><title>Logistic回归</title><link>/post/machine-learning/2017-02-12-logistic%E5%9B%9E%E5%BD%92/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/machine-learning/2017-02-12-logistic%E5%9B%9E%E5%BD%92/</guid><description>背景 logistic回归是统计学习中经典的分类方法，在深度学习也有很多应用。本文主要介绍logistic回归，然后将其推广到多分类问题-softmax回归。
+什么是logistic 虽然名称中有回归，其实logistic回归模型是一个经典二分类模型。logistic回归在线性回归的基础上，套用了一个逻辑函数，但也就由于这个逻辑函数。
+logstic回归模型的特点，一个事件的几率是指该事件发生的概率与不发生的概率的比值，如果事件发生的概率是p，那么该事件的几率是$\frac{p}{1-p}$，该事件的对数几率为 $$ logit(p) = \log \frac{p}{1-p} $$ 对于logistic回归而言这个对数几率就是wx，也就是说线性函数的值越接近正无穷，概率值越接近1；线性函数的值越接近负无穷，概率值越接近0，这样的模型就是logistic回归模型。一句话概括的话，logistic回归模型实际上是在用线性回归模型的预测结果去逼近真实标记的对数几率。
+$$ h(\theta) = g(\theta^Tx) = \frac{1}{1+e^{-\theta^Tx}} $$ where $$ g(z) = \frac{1}{1+e^{-z}} $$
+$$ P(p=1|x;\theta) = h_\theta(x) \
+P(p=0|x;\theta) = 1 - h_\theta(x) $$
+因此 $$ P(y|x;\theta) = (h_\theta(x))^y(1-h_\theta(x))^{1-y} $$
+所以似然函数为 $$ \begin{align} L(\theta) &amp;amp; = L(\theta;X,\vec{y}) = p(\vec{y}|X;θ) \\
+&amp;amp; =\prod_{i=1}^mp(y^{(i)}|x^{(i)};\theta) \\
+&amp;amp; =\prod_{i=1}^m(h_\theta(x^{(i)}))^{y^{(i)}}(1-h_\theta(x^{(i)}))^{1-y^{(i)}} \end{align} $$
+对数似然函数 $$ \begin{align} l(\theta) &amp;amp; = \log L(\theta) \\
+&amp;amp; = \sum_{i=1}^my^{(i)}\log h(x^{(i)}) + (1-y^{(i)})\log (1-h(x^{(i)})) \end{align} $$</description></item><item><title>Logistic回归梯度下降推导</title><link>/post/machine-learning/2017-09-02-logistic%E5%9B%9E%E5%BD%92%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E6%8E%A8%E5%AF%BC/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/machine-learning/2017-09-02-logistic%E5%9B%9E%E5%BD%92%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E6%8E%A8%E5%AF%BC/</guid><description>Logistic回归梯度下降推导 $$ P(p=1|x;\theta) = h_\theta(x) = \frac{exp(\theta^Tx)}{1+exp(\theta^Tx)} \
+P(p=0|x;\theta) = 1 - h_\theta(x) = \frac{1}{1+exp(\theta^Tx)} $$
+$$ \begin{align} L(\theta) &amp;amp; = L(\theta;X,\vec{y}) = p(\vec{y}|X;θ) \
+&amp;amp; =\prod_{i=1}^mp(y^{(i)}|x^{(i)};\theta) \
+&amp;amp; =\prod_{i=1}^m(h_\theta(x^{(i)}))^{y^{(i)}}(1-h_\theta(x^{(i)}))^{1-y^{(i)}} \end{align} $$
+$$ \begin{align} l(\theta) &amp;amp; = \log L(\theta) \
+&amp;amp; = \sum_{i=1}^m \left[ y^{(i)}\log h(x^{(i)}) + (1-y^{(i)})\log (1-h(x^{(i)})) \right] \
+&amp;amp; = \sum_{i=1}^m \left[ y^{(i)}\log \frac{h(x^{(i)})}{1-h(x^{(i)})} + \log (1-h(x^{(i)})) \right] \
+&amp;amp; = \sum_{i=1}^m \left[ y^{(i)}\theta^Tx + \log (1-h(x^{(i)})) \right] \end{align} $$</description></item><item><title>MMSeg分词方法</title><link>/post/nlp/2017-09-08-mmseg%E5%88%86%E8%AF%8D%E6%96%B9%E6%B3%95/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/nlp/2017-09-08-mmseg%E5%88%86%E8%AF%8D%E6%96%B9%E6%B3%95/</guid><description>概述 陈和刘（1992）完成的最大匹配的另一个变体比基本形式更复杂。 这种演算法指出，最可能的分词方式是三个单词，方式为从一个字串的第一个字开始，寻找分词的方式，只要存在有不同意义的词。
+MMSeg的四个规则 规则 1：最大匹配(Maximum matching) Simple方法：取最大长度的单词。 Complex方法：匹配出所有的“三个词的词组”（原文中使用了chunk，这里感觉用“词组”比较合适），即从某一既定的字为起始位置，得到所有可能的“以三个词为一组”的所有组合。比如“研究生命起源”，可以得到
+研_究_生 研_究_生命 研究生_命_起源 研究_生命_起源 规则 2：最大平均单词长度(Largest average word length) 经过规则1过滤后，如果剩余的词组超过1个，那就选择平均词语长度最大的那个（平均词长＝词组总字数／词语数量）。比如“生活水平”，可能得到如下词组：
+生_活水_平 (4/3=1.33) 生活_水_平 (4/3=1.33) 生活_水平 (4/2=2) 根据此规则，就可以确定选择“生活_水平”这个词组
+规则 3：单词长度的最小方差(Smallest variance of word lengths) 由于词语长度的变化率可以由标准差反映，所以此处直接套用标准差公式即可。比如
+研究_生命_起源 （标准差=sqrt(((2-2)^2+(2-2)^2+(2-2^2))/3)=0） 研究生_命_起源 （标准差=sqrt(((2-3)^2+(2-1)^2+(2-2)^2)/3)=0.8165） 于是选择“研究_生命_起源”这个词组。
+规则 4：单字单词的语素自由度的最大和(Largest sum of degree of morphemic freedom of one-character words) 其中degree of morphemic freedom可以用一个数学公式表达：log(frequency)，即词频的自然对数（这里log表示数学中的ln）。这个规则的意思是“计算词组中的所有单字词词频的自然对数，然后将得到的值相加，取总和最大的词组”。比如：
+设施_和服_务 设施_和_服务 这两个词组中分别有“务”和“和”这两个单字词，假设“务”作为单字词时候的频率是5，“和”作为单字词时候的频率是10，对5和10取自然对数，然后取最大值者，所以取“和”字所在的词组，即“设施_和_服务”。 也许会问为什么要对“词频”取自然对数呢？可以这样理解，词组中单字词词频总和可能一样，但是实际的效果并不同，比如
+A_BBB_C （单字词词频，A:3， C:7） DD_E_F （单字词词频，E:5，F:5） 表示两个词组，A、C、E、F表示不同的单字词，如果不取自然对数，单纯就词频来计算，那么这两个词组是一样的（3+7=5+5），但实际上不同的词频范围所表示的效果也不同，所以这里取自然对数，以表区分（ln(3)+ln(7) &amp;lt; ln(5)+ln(5)， 3.0445&amp;lt;3.2189）。
+总结 这个四个过滤规则中，如果使用simple的匹配方法，只能使用第一个规则过滤，如果使用complex的匹配方法，则四个规则都可以使用。实际使用中，一般都是使用complex的匹配方法＋四个规则过滤。 看到这里也许对MMSEG的分词方法有了一个大致的了解，它是一个“直观”的分词方法。它把一个句子“尽可能长（这里的长，是指所切分的词尽可能的长）”“尽可能均匀”的去切分，与中文的语法习惯比较相符。</description></item><item><title>PageRank算法</title><link>/post/algorithm/2016-11-25-pagerank%E7%AE%97%E6%B3%95/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/algorithm/2016-11-25-pagerank%E7%AE%97%E6%B3%95/</guid><description>背景 总的来讲，对于一个特定的查询，搜索结果的排名取决于两组信息，关于网页的质量信息，和这个查询与每个网页的相关信息。PageRank算法就是一种衡量网页质量的方法。
+核心思想（原理） 在互联网上，如果一个网页被很多其它网页所连接，说明它受到普遍的承认和信赖，那么它的排名就高。
+算法细节 算法的思想如上文所诉，但实际上要复杂得多。比如说，对于来自不同网页的链接区别对待，因此网页排名高的那些网页的链接更可靠，于是给这些链接以较大的权重。
+可以想像，一个新开的质量差的网站与另一个质量好的老网站它们的权重显然是不同的，否则就可以轻易作弊。
+那接下来的问题就是这些网站的权重要如何度量呢，可以想到应该是网页本身的网页排名。现在麻烦来了，计算搜索结果的网页排名的过程中需要用到网页本身的排名。
+解决方法是，把这个问题变成一个二维矩阵相乘的问题，并且用迭代的方法解决。先假定所有网页的排名是相同的，并且根据这个初始值，算出各个网页的第一次迭代排名，然后再根据第一次迭代排名算出第二次的排名 。
+PageRank计算方法 假定如下向量，为第一、第二、&amp;hellip;第N个网页的网页排名。 $$ B=(b_1,b_2,&amp;hellip;b_N)^T $$ 如下矩阵为网页之间的链接数目，其中$a_{mn}$代表第m个网页指向第n个网页的链接数。 $$ A= \begin{bmatrix} a_{11} &amp;amp; \cdots &amp;amp; a_{1n} &amp;amp; \cdots &amp;amp; a_{1M} \
+\cdots \
+a_{m1} &amp;amp; \cdots &amp;amp; a_{mn} &amp;amp; \cdots &amp;amp; a_{mM} \
+\cdots \
+a_{M1} &amp;amp; \cdots &amp;amp; a_{Mn} &amp;amp; \cdots &amp;amp; a_{MM} \
+\end{bmatrix} $$ A是已知的，B是未知的，是我们需要计算的。 假定$B_i$是第i次的迭代的结果，那么 $$ B_i=A \cdot B_{i-1} $$ 初始假设：所有网页的排名都是1/N，即 $$ B_0=\left( \frac{1}{N},\frac{1}{N},\cdots,\frac{1}{N} \right) $$
+**注：**关于矩阵计算的优化与技巧和链接数量的平滑，这里并没有给出，可以查阅相关资源。
+参考 《数学之美》</description></item><item><title>pytorch BI-LSTM CRF 代码解读</title><link>/post/deep-learning/2019-09-24-pytorch-bi-lstm-crf%E4%BB%A3%E7%A0%81%E8%A7%A3%E8%AF%BB/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/deep-learning/2019-09-24-pytorch-bi-lstm-crf%E4%BB%A3%E7%A0%81%E8%A7%A3%E8%AF%BB/</guid><description>词性标注是比较基本的NLP任务，通常我们可以使用BI-LSTM CRF模型来完成；CRF在这里起的作用是能够约束标签序列使结果的合法性更好。例如，如果不使用CRF可能的结果是B-LOC O E-LOC
+BLSTM这里就没什么说的了，我们这篇文章主要通过pytorch官网给的代码，讲解下CRF的实现部分。
+我们定义两种概率矩阵，发射概率（emission ）和转移概率（transition）。$\text{EMIT}(y_i \rightarrow x_i)$表示 $x_i$映射到$y_i$的非归一化概率，$\text{TRANS}(y_{i-1} \rightarrow y_i)$表示 $y_{i-1}$转移到$y_{i}$的概率。 $$ P(y|x) = \frac{\exp{(\text{Score}(x, y)})}{\sum_{y'} \exp{(\text{Score}(x, y')})} \
+\text{Score}(x,y) = \sum_i \log \psi_i(x,y) \
+\text{Score}(x,y) = \sum_i \log \psi_\text{EMIT}(y_i \rightarrow x_i) + \log \psi_\text{TRANS}(y_{i-1} \rightarrow y_i) $$
+因而在训练中，我们只需要最大化似然概率$P(y|x)$即可，这里我们利用对数似然 $$ \log{P(y|x)} = \log{(\frac{\exp{(\text{Score}(x, y)})}{\sum_{y'} \exp{(\text{Score}(x, y')})})} \
+= \text{Score}(x, y) - \log{(\sum_{y'} \exp{(\text{Score}(x, y')}))} $$ 所以我们将损失函数定义为$-\log{P(y|x)}$，就可以利用梯度下降法来进行网络的学习了。
+在对损失函数进行计算的时候，$\text{Score}(x,y)$的计算很简单，而$\log{(\sum_{y'} \exp{(\text{Score}(x, y')}))}$（下面记作logsumexp）的计算稍微复杂一些，这里使用前向算法（forward algorithm）来进行计算。
+如下代码中，feats 代表[W1, W2, W3]，next_tags代表[t1, t2, t3, t4]，当feat=W1，next_tag=t1时，feat里的值是[0.1, 0.2, 0.</description></item><item><title>shadowsocks服务端服务安装</title><link>/post/other/2018-8-11-shadowsocks%E6%9C%8D%E5%8A%A1%E7%AB%AF%E6%9C%8D%E5%8A%A1%E5%AE%89%E8%A3%85/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/other/2018-8-11-shadowsocks%E6%9C%8D%E5%8A%A1%E7%AB%AF%E6%9C%8D%E5%8A%A1%E5%AE%89%E8%A3%85/</guid><description>Shadowsocks服务端服务安装 环境：centos
+安装 安装python pip环境
+sudo yum install python-setuptools &amp;amp;&amp;amp; easy_install pip 通过pip安装shadowsocks
+sudo pip install shadowsocks 配置 sudo vi /etc/shadowsocks.json { &amp;#34;server&amp;#34;:&amp;#34;0.0.0.0&amp;#34;, &amp;#34;local_address&amp;#34;: &amp;#34;127.0.0.1&amp;#34;, &amp;#34;local_port&amp;#34;:1080, &amp;#34;server_port&amp;#34;:my_server_port, &amp;#34;password&amp;#34;:&amp;#34;my_password&amp;#34;, &amp;#34;timeout&amp;#34;:300, &amp;#34;method&amp;#34;:&amp;#34;aes-256-cfb&amp;#34; } 防火墙设置 firewall-cmd --permanent --add-port=my_server_port/tcp firewall-cmd --permanent --add-port=my_server_port/udp firewall-cmd --reload 服务启动 ssserver -c /etc/shadowsocks.json -d start</description></item><item><title>Stanford CoreNLP 使用</title><link>/post/nlp/2017-05-21-stanford-corenlp-%E4%BD%BF%E7%94%A8/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/nlp/2017-05-21-stanford-corenlp-%E4%BD%BF%E7%94%A8/</guid><description>介绍 斯坦福CoreNLP提供了一套自然语言分析工具。斯坦福CoreNLP集成了许多斯坦福的NLP工具，包括词性（POS），命名实体识别（NER）， 语法解析，指代消解，情感分析，自举模式学习和开放信息提取工具。
+如果有如下需求，要以选择Stanford CoreNLP：
+具有良好语法分析工具的集成工具包 快速，可靠地分析任意文本 整体最高品质的文字分析 支持一些主要（人类）语言 可用于大多数主要现代编程语言的接口 能够作为简单的Web服务运行 Github地址：Stanford CoreNLP GitHub site.
+使用前准备 Stanford CoreNLP是基于JAVA的，最新版本需要JDK1.8。JAR包可以通用官网，或者MAVEN下载到。如果使用MAVEN的话，可以使用如下配置。
+&amp;lt;dependencies&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;edu.stanford.nlp&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;stanford-corenlp&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;3.7.0&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;edu.stanford.nlp&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;stanford-corenlp&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;3.7.0&amp;lt;/version&amp;gt; &amp;lt;classifier&amp;gt;models&amp;lt;/classifier&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;/dependencies&amp;gt; 如果你想从阿拉伯语，中文，德语或西班牙语中获得Maven的语言模型，请将其添加到您的pom.xml：
+&amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;edu.stanford.nlp&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;stanford-corenlp&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;3.7.0&amp;lt;/version&amp;gt; &amp;lt;classifier&amp;gt;models-chinese&amp;lt;/classifier&amp;gt; &amp;lt;/dependency&amp;gt; 将“models-chinese”替换为“models-english”，“models-chinese-kbp”，“models-arabic”，“models-french”，“models-german”或“models-spanish”为其他语言！
+由于Stanford CoreNLP的模型文件太大（中文的模型就几百M），建议到官网下载。如果使用MAVEN的话，最好使用阿里的MAVEN仓库，这样速度更快些。
+通过命令行使用 Quick Start java -cp &amp;quot;*&amp;quot; -Xmx2g edu.stanford.nlp.pipeline.StanfordCoreNLP -annotators tokenize,ssplit,pos,lemma,ner,parse,dcoref -file input.txt -cp &amp;quot;*&amp;quot;是加载当前路径下的所有文件（主要是JAR包）
+该-props参数是可选的。默认情况下，Stanford CoreNLP将在您的类路径中搜索StanfordCoreNLP.properties，并使用分发中包含的默认值。
+该-annotators参数实际上是可选的。如果你离开它，代码使用一个内建的属性文件，它可以使用以下注释器：标记化和句子分割，POS标记，缩小，NER，解析和关联解析（也就是我们在这些例子中使用的）。
+如果要使用其它语言的话，
+java -mx3g -cp &amp;quot;*&amp;quot; edu.stanford.nlp.pipeline.StanfordCoreNLP -props StanfordCoreNLP-chinese.properties -file chinese.txt -outputFormat text 参考： https://stanfordnlp.</description></item><item><title>Tensorflow dataset</title><link>/post/deep-learning/2019-08-29-tensorflow-dataset/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/deep-learning/2019-08-29-tensorflow-dataset/</guid><description>tf.data API 在 TensorFlow 中引入了两个新的抽象类：
+tf.data.Dataset 表示一系列元素，其中每个元素包含一个或多个 Tensor 对象。例如，在图像管道中，元素可能是单个训练样本，具有一对表示图像数据和标签的张量。可以通过两种不同的方式来创建数据集： 创建来源（例如 Dataset.from_tensor_slices()），以通过一个或多个 tf.Tensor 对象构建数据集。 应用转换（例如 Dataset.batch()），以通过一个或多个 tf.data.Dataset 对象构建数据集。 tf.data.Iterator 提供了从数据集中提取元素的主要方法。Iterator.get_next() 返回的操作会在执行时生成 Dataset 的下一个元素，并且此操作通常充当输入管道代码和模型之间的接口。最简单的迭代器是“单次迭代器”，它与特定的 Dataset 相关联，并对其进行一次迭代。要实现更复杂的用途，您可以通过 Iterator.initializer 操作使用不同的数据集重新初始化和参数化迭代器，这样一来，您就可以在同一个程序中对训练和验证数据进行多次迭代（举例而言）。 1、从dataset中获取数据 1.1 one_shot_iterator import tensorflow as tf features = [[1,1,2,2], [3,3,4,4], [5,5,6,6]] # [1,1,2,2] 是一个sample ，1 1 2 2 是四个特征值 labels = [0, 1, 1] # 每个sample的标签值 dataset = tf.data.Dataset.from_tensor_slices((features, labels)) iterator = dataset.make_one_shot_iterator() next_element = iterator.get_next() with tf.Session() as sess: while True: try: value = sess.</description></item><item><title>Tensorflow example 和 TFRecord</title><link>/post/deep-learning/2019-09-03-tensorflow-example-%E5%92%8C-tfrecord/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/deep-learning/2019-09-03-tensorflow-example-%E5%92%8C-tfrecord/</guid><description>生成tf.example import tensorflow as tf import numpy as np def generate_example(feature0, feature1, feature2, feature3): &amp;#34;&amp;#34;&amp;#34; Creates a tf.Example message ready to be written to a file. &amp;#34;&amp;#34;&amp;#34; # Create a dictionary mapping the feature name to the tf.Example-compatible # data type. feature = { &amp;#39;feature0&amp;#39;: _int64_feature(feature0), &amp;#39;feature1&amp;#39;: _int64_feature(feature1), &amp;#39;feature2&amp;#39;: _bytes_feature(feature2), &amp;#39;feature3&amp;#39;: _float_feature(feature3), } # Create a Features message using tf.train.Example. example_proto = tf.train.Example(features=tf.train.Features(feature=feature)) return example_proto def _bytes_feature(value): &amp;#34;&amp;#34;&amp;#34;Returns a bytes_list from a string / byte.</description></item><item><title>Tensorflow 模型的保存和恢复</title><link>/post/deep-learning/2019-08-20-tensorflow-%E6%A8%A1%E5%9E%8B%E7%9A%84%E4%BF%9D%E5%AD%98%E5%92%8C%E6%81%A2%E5%A4%8D/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/deep-learning/2019-08-20-tensorflow-%E6%A8%A1%E5%9E%8B%E7%9A%84%E4%BF%9D%E5%AD%98%E5%92%8C%E6%81%A2%E5%A4%8D/</guid><description>tensorflow模型的保存和恢复方法基本上可以参考其官方文档： https://www.tensorflow.org/guide/saved_model?hl=zh-cn 本文讨论 自定义estimato保存恢复方法r 和 fine-tune 的参数恢复方法
+自定义estimator的保存和恢复 run_config = tf.estimator.RunConfig(model_dir=args.output_dir, save_summary_steps=500, save_checkpoints_steps=500, session_config=session_config) estimator = tf.estimator.Estimator( model_fn, params=params, config=run_config) 在train时会根据参数自动读取和保存模型 如果checkpoint 中的状态与描述的模型不兼容，因此重新训练失败并出现以下错误：
+... InvalidArgumentError (see above for traceback): tensor_name = dnn/hiddenlayer_1/bias/t_0/Adagrad; shape in shape_and_slice spec [10] does not match the shape stored in checkpoint: [20] fine-tune 参数恢复方法 tvars = tf.trainable_variables() (assignment_map, initialized_variable_names) = modeling.get_assignment_map_from_checkpoint(tvars, init_checkpoint) tf.train.init_from_checkpoint(init_checkpoint, assignment_map) graph = tf.get_default_graph() test_varibal = graph.get_tensor_by_name(&amp;#39;bert/encoder/layer_9/output/dense/bias:0&amp;#39;) with tf.Session() as sess: # 最后初始化变量 sess.</description></item><item><title>Tensorflow2.0 基于BERT的开发实战（huggingface-transformers）</title><link>/post/deep-learning/2019-12-12-tensorflow2.0-%E5%9F%BA%E4%BA%8Ebert%E7%9A%84%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98huggingface-transformers/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/deep-learning/2019-12-12-tensorflow2.0-%E5%9F%BA%E4%BA%8Ebert%E7%9A%84%E5%BC%80%E5%8F%91%E5%AE%9E%E6%88%98huggingface-transformers/</guid><description>tensorflow2.0 刚刚发布正式版，网上关于tf2.0使用bert的文章较少。之前想tf2.0做基于bert的NER任务，想了不少资料踩了许多坑，因此将期间的过程总结成文。
+在tf2.0上使用bert，主要的难点还是：自己写tf2.0代码适配google的官方源码的方案工作量大对tf熟练度的要求比较高。因此选择了第三方的实现，这里使用的是huggingface的transformers。
+除了transformers，其它兼容tf2.0的bert项目还有：
+keras-bert（Star:1.3k, Kashgari在使用）, 现在也开始兼容tf2.0了，但它只支持bert一种预训练模型
+bert-for-tf2（Star:280），缺点是不是很正规，只给了tf2.0 pipeline示例
+在tf2.0正式版发布前后huggingface的transformers也发布了transformers2.0，开始支持tf.2.0的各个预训练模型，虽然没有对pytorch支持的那么全面但在我们的场景已经足够适用了。
+环境 tensorflow版本：2.0.0
+transformers版本：2.2.1
+构建模型 class BertNerModel(TFBertPreTrainedModel): def __init__(self, config, *inputs, **kwargs): super(BERT_NER, self).__init__(config, *inputs, **kwargs) self.bert_layer = TFBertMainLayer(config, name=&amp;#39;bert&amp;#39;) self.bert_layer.trainable = False self.concat_layer = tf.keras.layers.Concatenate(name=&amp;#39;concat_bert&amp;#39;) def call(self, inputs): outputs = self.bert_layer(inputs) #将后n层的结果相连 tensor = self.concat_layer(list(outputs[2][-4:])) 这里给出的是简要的代码，可以自行根据任务在bert_layer之后加入RNN等
+自定义模型的写法可以参考官方源码里的TFBertForSequenceClassification， 继承TFBertPreTrainedModel
+self.bert_layer(inputs)的返回值为tuple类型：
+最后1层隐藏层的输出值，shape=(batch_size, max_length, hidden_dimention) [CLS] 对应的输出值，shape=(batch_size, hidden_dimention) 只有设置了config.output_hidden_states = True，才有该值，所有隐藏层的输出值，返回值类型是list 每个list里的值的shape是`(batch_size, max_length, hidden_dimention)`` 模型的初始化 bert_ner_model = BertNerModel.</description></item><item><title>Tensorflow2.0使用bert：transformers与kashgaria</title><link>/post/deep-learning/2019-11-22-tensorflow2.0%E4%BD%BF%E7%94%A8berttransformers%E4%B8%8Ekashgari/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/deep-learning/2019-11-22-tensorflow2.0%E4%BD%BF%E7%94%A8berttransformers%E4%B8%8Ekashgari/</guid><description>**背景：**最近打算做NER任务，打算使用kashgaria当baseline，然后使用transformers来做模型开发。
+**问题：**使用kashgaria来做Baseline，使用人民日报语料可以得到99.99%的准确率，但是使用transformers的TFBertForTokenClassification来做的话只能得到75%左右的效果， 看了两个项目的源码开始怀疑是模型结构的问题，因此使用transformers模拟kashgaria的结果又做了一次，效果还是在75%左右。相关代码如下：
+kashgaria代码：
+from kashgari.corpus import ChineseDailyNerCorpus from kashgari.tasks.labeling import BiLSTM_Model from kashgari.embeddings import BERTEmbedding import kashgari train_x, train_y = ChineseDailyNerCorpus.load_data(&amp;#39;train&amp;#39;) test_x, test_y = ChineseDailyNerCorpus.load_data(&amp;#39;test&amp;#39;) valid_x, valid_y = ChineseDailyNerCorpus.load_data(&amp;#39;valid&amp;#39;) bert_embed = BERTEmbedding(&amp;#39;chinese_L-12_H-768_A-12&amp;#39;, task=kashgari.LABELING, sequence_length=100) model = BiLSTM_Model(bert_embed) model.fit(train_x, train_y, valid_x, valid_y, epochs=1) transformers代码：
+# 数据的处理省略，但使用的同样语料 model = TFBertForTokenClassification.from_pretrained(&amp;#39;bert-base-chinese&amp;#39;) model.compile(loss=&amp;#39;categorical_crossentropy&amp;#39;, metrics=[&amp;#39;accuracy&amp;#39;], optimizer=&amp;#39;adam&amp;#39;) model.fit(all_input_ids, tf.constant(all_label_ids_ca, dtype=tf.float32), epochs=2, batch_size=32) transformers 模拟kashgaria代码：
+class BERT_NER(TFBertPreTrainedModel): def __init__(self, config, *inputs, **kwargs): super(BERT_NER, self).__init__(config, *inputs, **kwargs) self.</description></item><item><title>Tensorflow实战(1)-Tensorflow基本介绍及搭建全连接神经网络</title><link>/post/tensorflow2.x-keras/tensorflow%E5%AE%9E%E6%88%981-tensorflow%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D%E5%8F%8A%E6%90%AD%E5%BB%BA%E5%85%A8%E8%BF%9E%E6%8E%A5%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/tensorflow2.x-keras/tensorflow%E5%AE%9E%E6%88%981-tensorflow%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D%E5%8F%8A%E6%90%AD%E5%BB%BA%E5%85%A8%E8%BF%9E%E6%8E%A5%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</guid><description>大家好，今天是Tensorflow实战系列的第一次分享，本次分享共有3个主题：
+Tensorflow介绍 Tensorflow核心概念 使用Tensorflow实现手写数字识别任务 由于本次分享内容以实战为主不会涉及过多理论的讲解，但是分享过程中涉及到的理论知识也会做一个快速回顾。
+Tensorflow Introduction Tensorflow 是由Google研发的开源软件库，它既是一个实现机器学习算法的接口，同时也是执行机器学习算法的框架，它对深度学习中常用的神经网络结构等算法进行了封装，因此开发人员可以快速的进行模型搭建。
+1、Tensorflow 发展史 2011 年，Google Brain内部孵化出一个项目叫做DistBelief, 它是为深度神经网络构建的一个机器学习系统，是Tensorflow的前身。 2015年11月，Google正式发布了Tensorflow的白皮书并开源TensorFlow 0.1 版本。 2017年02月，Tensorflow正式发布了1.0.0版本，同时也标志着稳定版的诞生。 2019年10月，TensorFlow在经历七个多月(2019年3月1日-2019年10月1日)的2.0 Alpha 版本的更新迭代后发布 2.0 正式版。 通过上面的发展史我们可以看到，虽然经过了9年时间Tensorflow依然是目前最流行的深度学习框架之一。
+2、Tensorflow VS Pytorch 上面说到Tensorflow是目前最流行的深度学习框架之一，那另一款可以和Tensorflow一较高下的深度学习框架就是-Pytorch了。Pytorch是由Facebook研发的一款开源的机器学习库，自16年发布以来发展非常迅猛。Tensorflow和Pytorch如何选择呢，我的看法是：都可以，虽然刚开始时Pytorch和Tensorflow还是差别较大的，比较Pytorch有动态图、类python的编程方式，Tensorflow则支持可视化，生产部署更加简单易用，但通过这几年的发展Pytorch和Tensorfow越来越像了，Tensorflow添加了动态图，而Pytorch也在工业部署上有了很大改善。因此在两都的选择上不必太过纠结。
+import tensorflow as tf import matplotlib as mpl %matplotlib inline import matplotlib.pyplot as plt import numpy as np import pandas as pd import os import sys print(sys.version) 3.6.9 (default, Nov 7 2019, 10:44:02) [GCC 8.3.0] for module in tf, np, mpl: print(module.</description></item><item><title>Tensorflow实战(2)_循环神经网络实战_唐诗生成器</title><link>/post/tensorflow2.x-keras/tensorflow%E5%AE%9E%E6%88%982_%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%AE%9E%E6%88%98_%E5%94%90%E8%AF%97%E7%94%9F%E6%88%90%E5%99%A8/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/tensorflow2.x-keras/tensorflow%E5%AE%9E%E6%88%982_%E5%BE%AA%E7%8E%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%AE%9E%E6%88%98_%E5%94%90%E8%AF%97%E7%94%9F%E6%88%90%E5%99%A8/</guid><description>本次分享内容： 上次分享内容回顾 RNN 理论知识 唐诗生成器实例讲解 本次课程内容总结 上次分享我们介绍了关于Tensorflow2的基础语法，以及通过手写数字识别任务讲解了如何通过Tensorflow2来搭建全连接神经网络模型。今天我们来介绍用于处理序列信息的网络结构-RNN。
+RNN理论知识 循环神经网络（Recurrent neural network：RNN）是神经网络的一种。循环神经网络可以描述动态时间行为，与前馈神经网络（feedforward neural network）接受较特定结构的输入不同，RNN将状态在自身网络中循环传递，因此可以接受更广泛的时间序列结构输入。 如果说一个全连接的神经网络的计算公式是：$y^t=f(x^t)$，那么RNN的公式可以这样表示$y^t, h^t = f(x^t, h^{t-1})$ 。一个单层的RNN可以用下图表示： Deep RNN 与全连接神经网络一样，RNN也可以叠加多层： Bidirectional RNN Bidirectional RNN 是将传统RNN的状态神经元拆分为两个部分，一个负责forward states，另一个负责backward states。Forward states的输出并不会连接到Backward states的输入。这个结构提供给输出层输入序列中每一个点的完整的过去和未来的上下文信息。 RNN 计算方式 Native RNN $$ \begin{align} &amp;amp; h_t = \sigma(W^h h_{t-1} + W^i x_t) \
+&amp;amp; y_t = \sigma(W^o h_t) \end{align} $$
+LSTM $$ \begin{align} &amp;amp; i_t = sigm(W^{xi}x_t + W^{hi}h_{t-1}) \
+&amp;amp; f_t = sigm(W^{xf}x_t + W^{hf}h_{t-1}) \</description></item><item><title>Transformers的一些迷思</title><link>/post/deep-learning/2020-05-09-transformers%E7%9A%84%E4%B8%80%E4%BA%9B%E8%BF%B7%E6%80%9D/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/deep-learning/2020-05-09-transformers%E7%9A%84%E4%B8%80%E4%BA%9B%E8%BF%B7%E6%80%9D/</guid><description>通过from_pretrained缓存的模型在哪 如果调用from_pretrained方法时指定了cache_dir 则保存到cache_dir，
+cache_dir = kwargs.pop(&amp;#34;cache_dir&amp;#34;, None) 如果没指定则去通过系统环境变量寻找（&amp;ldquo;PYTORCH_TRANSFORMERS_CACHE&amp;rdquo;&amp;quot;, &amp;ldquo;PYTORCH_PRETRAINED_BERT_CACHE&amp;rdquo;）
+os.getenv(&amp;#34;PYTORCH_TRANSFORMERS_CACHE&amp;#34;, os.getenv(&amp;#34;PYTORCH_PRETRAINED_BERT_CACHE&amp;#34;, default_cache_path)) 如果还没找到则设置为pytorch_home下的transformers目录下
+from torch.hub import _get_torch_home torch_cache_home = _get_torch_home() os.path.join(torch_cache_home, &amp;#34;transformers&amp;#34;) from_pretrained方法是如何加载模型的 首先判断是否在pretrained_model_archive_map中，然后判断是否为目录或文件，如果都不是则默认为hf_bucket_url
+https://s3.amazonaws.com/models.huggingface.co/bert/{pretrained_model_name_or_path}/{pytorch_model.bin/tf_model.h5} pytorch_model.bin或tf_model.h5 通过from_tf判断
+不同模型实现from_pretrained的方式 from_pretrained 的根据不同 cls 来实现加载不同模型的差异， 以bert为例， cls -&amp;gt; BertPreTrainedModel；
+class BertPreTrainedModel(PreTrainedModel): &amp;#34;&amp;#34;&amp;#34; An abstract class to handle weights initialization and a simple interface for downloading and loading pretrained models. &amp;#34;&amp;#34;&amp;#34; config_class = BertConfig pretrained_model_archive_map = BERT_PRETRAINED_MODEL_ARCHIVE_MAP load_tf_weights = load_tf_weights_in_bert base_model_prefix = &amp;#34;bert&amp;#34; def _init_weights(self, module): &amp;#34;&amp;#34;&amp;#34; Initialize the weights &amp;#34;&amp;#34;&amp;#34; if isinstance(module, (nn.</description></item><item><title>一小时外</title><link>/post/reading/2018-10-04-%E4%B8%80%E5%B0%8F%E6%97%B6%E5%A4%96/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/reading/2018-10-04-%E4%B8%80%E5%B0%8F%E6%97%B6%E5%A4%96/</guid><description> 「做事就可以有结果，不管做的是什么事，都一样。」
+心理治疗的目标，并不是制造一种廉价的甚至虚幻的开心，恰恰相反，它应当致力于让来访者有更高的内省力，更强的自主感，更符合现实的自尊，更清晰地认识并处理自身情绪的能力，面对困境时更强的自我力量以及自我协调性，爱的能力，工作的能力，以及成熟依赖的能力——最终的目标，是进入一种她称之为「平和」的心境。而那也许是一个人毕生的追求。
+我相信生命是美好的，我深信这种美好，即使我们身处严峻的时代。但同时我也深信，这美好是一种复杂而深沉的体验，它同时包含着开心和痛苦，包含着我所体验到的一切真实。它承载我，如同大地。如果这种承载带来愉悦，那自然值得享受，而如果这种承载带来痛苦，那自然也就值得深深的哀伤——握着它，体会它的痛感，而不是幻想它变成一种别的什么。
+我们感到愤怒，往往是我们认为一件事不公平，打破了某种既定的规则，
+一个半吊子，图样图森破，但是自信，敢讲，也许会被当面反驳，也许会被背后窃笑。 或者玩沉默，笑而不语，光听不评，别人摸不清水有多深，也可能会显得很怯懦。 ——无所谓哪种比哪种更好，两种形象各有人喜欢，也各有人反感。</description></item><item><title>似然与极大似然估计</title><link>/post/machine-learning/2017-07-06-%E4%BC%BC%E7%84%B6%E4%B8%8E%E6%9E%81%E5%A4%A7%E4%BC%BC%E7%84%B6%E4%BC%B0%E8%AE%A1/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/machine-learning/2017-07-06-%E4%BC%BC%E7%84%B6%E4%B8%8E%E6%9E%81%E5%A4%A7%E4%BC%BC%E7%84%B6%E4%BC%B0%E8%AE%A1/</guid><description>概要 本文先会介绍似然的概念，似然与概率的区别，然后介绍参数估计的方法——极大似然估计。
+似然 在统计学中，似然函数（likelihood function，通常简写为likelihood，似然）是一个非常重要的内容，在非正式场合似然和概率（Probability）几乎是一对同义词，但是在统计学中似然和概率却是两个不同的概念。
+概率是在特定环境下某件事情发生的可能性，也就是结果没有产生之前依据环境所对应的参数来预测某件事情发生的可能性，比如抛硬币，抛之前我们不知道最后是哪一面朝上，但是根据硬币的性质我们可以推测任何一面朝上的可能性均为50%，这个概率只有在抛硬币之前才是有意义的，抛完硬币后的结果便是确定的；
+而似然刚好相反，是在确定的结果下去推测产生这个结果的可能环境（参数），还是抛硬币的例子，假设我们随机抛掷一枚硬币1,000次，结果500次人头朝上，500次数字朝上（实际情况一般不会这么理想，这里只是举个例子），我们很容易判断这是一枚标准的硬币，两面朝上的概率均为50%，这个过程就是我们根据结果来判断这个事情本身的性质（参数），也就是似然。
+极大似然估计 似大似然估计解决的问题是，最大似然估计提供了一种给定观察数据来评估模型参数的方法，即：“模型已定，参数未知”。似大似然估计经常在机器学习方法中作为一种学习策略。
+似然函数的最大值意味着什么？让我们回到概率和似然的定义，概率描述的是在一定条件下某个事件发生的可能性，概率越大说明这件事情越可能会发生；而似然描述的是结果已知的情况下，该事件在不同条件下发生的可能性，似然函数的值越大说明该事件在对应的条件下发生的可能性越大。
+也就是说似然函数取得最大值表示相应的参数能够使得统计模型最为合理。
+考虑一个抛硬币的例子。假设这个硬币正面跟反面轻重不同。我们把这个硬币抛80次（即，我们获取一个采样$x_1=H,x_2=T,&amp;hellip;..x_{80}$并把正面的次数记下来，正面记为H，反面记为T）。并把抛出一个正面的概率记为p，抛出一个反面的概率记为1-p（因此，这里的 p即相当于上边的 $\theta$ ）。 假设我们抛出了49个正面，31个反面，即49次H，31次T。假设这个硬币是我们从一个装了三个硬币的盒子里头取出的。这三个硬币抛出正面的概率分别为p=1/3, p=1/2,p=2/3.这些硬币没有标记，所以我们无法知道哪个是哪个。 使用最大似然估计，通过这些试验数据（即采样数据），我们可以计算出哪个硬币的可能性最大。这个似然函数取以下三个值中的一个： $$ P(H=49,T=31 | p=1/3) = (1/3)^{49}(1-1/3) ^{31}= 0.000 \
+P(H=49,T=31 | p=1/2) = (1/2)^{49}(1-1/2)^{31} = 0.012 \
+P(H=49,T=31 | p=2/3) = (2/3)^{49}(1-2/3)^{31} = 0.054 \
+$$ 我们可以看到当p=2/3时，似然函数取得最大值。这就是 p的最大似然估计。
+但在机器学习中我们要估计的并不是离散的情况，因此最大似然估计的一般求解过程是：
+写出似然函数； 对似然函数取对数，并整理，也就对数似然函数； 求导数，解似然方程，也就是取极值； 参考： https://zhuanlan.zhihu.com/p/22092462 https://zh.wikipedia.org/wiki/似然函数 https://zh.wikipedia.org/wiki/最大似然估计</description></item><item><title>信息的度量熵</title><link>/post/nlp/2017-07-06-%E4%BF%A1%E6%81%AF%E7%9A%84%E5%BA%A6%E9%87%8F%E7%86%B5/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/nlp/2017-07-06-%E4%BF%A1%E6%81%AF%E7%9A%84%E5%BA%A6%E9%87%8F%E7%86%B5/</guid><description>熵 一条信息的信息量与它的不确定性成正比关系。比如说，我们要搞清楚一件非常不确定的事，或是我们一无所知的事情，就需要了解大量的信息。相反，如果我们对某件事已经有了较多的了解，那么不需要太多的信息就能把它搞清楚。所以从这个角度来看，可以认为，信息量就等于不确定性的多少。
+它的定义如下： $$ H(X)=-\sum_{x\in X}P(x) \log P(x) $$
+条件熵 如果 H(Y|X=x) 为变数 Y 在 X 取特定值 x 条件下的熵，那么 H(Y|X)就是 H(Y|X=x) 在 X 取遍所有可能 x 后平均的结果： $$ \begin{align} H(Y|X) &amp;amp;= \sum_i^n P(x_i)H(Y|X=x_i) \
+&amp;amp;= \sum_i^n P(x_i) \sum_j^m P(y_j) \log P(y_j|x_i) \
+&amp;amp;= \sum_i^n \sum_j^m P(x_i,y_j) \log P(y_j|x_i) \
+&amp;amp;= - \sum_{x\in X,y \in Y}P(x,y) \log P(y|x) \
+\end{align} $$ 现在假定我们还知道X的一些情况，包括它和Y一起出现的概率，以及在X取不同值的前提下X的概率分布。定义在X的条件下Y的条件熵为： $$ H(Y|X)=-\sum_{x\in X,y \in Y}P(x,y) \log P(y|x) $$ H(Y)&amp;gt;=H(Y|X)，也就是说Y的不确定性下降了。
+互信息 互信息有时也叫“信息增益”。当获取的信息和要研究的事物“有关系”时，这些信息才能帮助我们消除不确定性。当然“有关系”这种说法太模糊，太不科学，最好能度化的度量“相关性”。香农在信息论中提出了一个“互信息”的概念作为对两个随机事件“相关性”的量化度量。假定有两个随机事件X和Y，它们的互信息定义如下： $$ I(X;Y)=\sum_{x \in X,y \in Y}P(x,y) \log \frac{P(x,y)}{P(x)P(y))} $$ 其实这个互信息就是，随机事件X的不确定性或者说熵H(X)，以及在知道随机事件Y条件下的不确定性或者说H(X|Y)之间的差异，即： $$ I(X;Y)=H(X) - H(X|Y) $$ 也就是说，**所谓的两个事件相关性的度量，就是在了解了其中一个Y的前提下，对消除另一个X不确定性所提供的信息量**。当X和Y完全相关是，它的取值是1；当两者完全无关时，它的取值是0。</description></item><item><title>全域哈希</title><link>/post/algorithm/2017-05-16-%E5%85%A8%E5%9F%9F%E5%93%88%E5%B8%8C/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/algorithm/2017-05-16-%E5%85%A8%E5%9F%9F%E5%93%88%E5%B8%8C/</guid><description>全域哈希的讲解有些不同，它是先给出一个奇怪的定义，然后推论出一些较好的性质。最后介绍构造方法，并证明符合定义。
+定义 设H为一组有限散列函数，它将给定的关键字全域 U映射到{1,2,&amp;hellip;m-1}中。这样的一组函数称为全域的，如果对每对不同的关键字$x,y \in U$，满足h(x)=h(y)的散列函数的个数至多为|H|/m。
+性质 推论1 当关键字x!=y时，两者发生冲突的概率小于等于1/m。
+推论2 随机选择一个函数，将n个关键字放进T表的m个槽中，对于给定的关键字x，它发生冲突的期望次数小于n/m（也就是装载因子）。 $$ E[#与x碰撞]&amp;lt;n/m $$ 证明： 设$C_{x}$表示哈希表T里与x发生碰撞的次数 $$ C_{xy}= \begin{cases} 1 \ if \ h(x) = h(y)\
+0 \ otherwise\
+\end{cases} $$ 根据全域函数的定义可知 $$ E[C_{xy}]=1/m $$ 因此 $$ C_x = \sum_{y\in T-{x}}C_{xy} $$ $$ \begin{align} E[C_x] &amp;amp;= E[\sum_{y\in T-{x}}C_{xy}] \
+&amp;amp;=\sum_{y\in T-{x}}E\left[C_{xy} \right] \
+&amp;amp;=\sum_{y\in T-{x}} 1/m \
+&amp;amp;= \frac{n-1}{m} \end{align} $$
+全域哈希构造方法 假设m是一个质数，将关键字k转换成r+1位的m进制数，$k=&amp;lt;k_0,k_1,\dots,k_r&amp;gt;,0&amp;lt;=k_r&amp;lt;=m-1$ 设随机数$a=&amp;lt;a_0,a_1,\dots,a_r&amp;gt;$同样为成r+1位的m进制数，defin 哈希函数为 $$ h_a(x)=(\sum_{i=0}^ra_ik_i) \mod m $$ 哈希函数集H的大小为$m^{r+1}$</description></item><item><title>决策树</title><link>/post/machine-learning/2017-07-19-%E5%86%B3%E7%AD%96%E6%A0%91/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/machine-learning/2017-07-19-%E5%86%B3%E7%AD%96%E6%A0%91/</guid><description>背景 决策树的优点是计算复杂度不高，输出结果易于理解，对中间值的缺失不敏感，可以处理不相关特征数据。缺点是可能会产生过度匹配问题。适用于连续值和离散值数据。
+决策树生成 训练集$D={(x_1,y_1),(x_2,y_2),\dots,(x_m,y_m)}$ 属性集$A={a_1,a_2,\dots,a_d}$
+def function treeGenerate(D,A): 生成结node; if Dv为空: 将该分支结点标记为叶结点，其类别标记为D中样本最多的类;return; if D中所有实例属于同一类: 将该分支结点标记为叶结点，将该类作为其类别标记;return; a* = 从A中选择最优划分属性; for v in a*: 为node生成一个分支； 令Dv表示D中在a*上取值为v的样本子集； 以treeGenerate(Dv,A-a*)为分支结点 特征选择 特征选择在于选取对训练数据具有分类能力的特征。这样可以提高决策树学习的效率。如果利用一个特征进行分类的结果与随机分类的结果没有很大差别，则称这个特征是没有特征是没有分类能力的。
+信息增益 信息增益也叫互信息。当获取的信息和要研究的事物“有关系”时，这些信息才能帮助我们消除不确定性。当然“有关系”这种说法太模糊，太不科学，最好能度化的度量“相关性”。 熵： $H(X) = -\sum_i^nP(x_i)\log(P(x_i)$ 条件熵： $H(Y|X) = \sum_i^nP(x_i)H(Y|X=x_i)$ 信息增益就是熵与条件熵的差值： $$ Gain(D,a) = H(D) - H(D|a) = -\sum_i^{|Y|} P(Y_i) \log P(Y_i) - \sum_j^{|a|}P(a_j)H(D|a=a_j) \
+= H(D) - \sum_{v=1}^V \frac{|D^v|}{|D|}H(D^v) $$
+信息增益比 信息增益作为划分训练数据的特征，存在偏向于选择取值较多的特征的问题。使用信息增益比可以对这一问题进行校正。 信息增益比： $$ Gain_ratio(D,a) = \frac{Gain(D,a)}{H(a)} \
+= \frac{H(D) - H(D|a)}{H(a)} \</description></item><item><title>卷积神经网络实战_图片分类</title><link>/post/tensorflow2.x-keras/tensorflow%E5%AE%9E%E6%88%984-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%AE%9E%E6%88%98_%E5%9B%BE%E7%89%87%E5%88%86%E7%B1%BB/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/tensorflow2.x-keras/tensorflow%E5%AE%9E%E6%88%984-%E5%8D%B7%E7%A7%AF%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C%E5%AE%9E%E6%88%98_%E5%9B%BE%E7%89%87%E5%88%86%E7%B1%BB/</guid><description>理论部分 CNN解决的问题 在CNN出现之前，图像对于人工智能来说是一个难题，有2个原因：
+图像需要处理的数据量太大，导致成本很高，效率很低。 图像在数字化的过程中很难保留原有的特征，导致图像处理的准确率不高。 另一个角度（用全连接神经网络处理大尺寸图像的缺点）：
+其次参数过多效率低下，训练困难，同时大量的参数也很快会导致网络过拟合 图像展开为向量会丢失空间信息； 卷积层 这个过程我们可以理解为我们使用一个过滤器（卷积核）来过滤图像的各个小区域，从而得到这些小区域的特征值。
+在具体应用中，往往有多个卷积核，可以认为，每个卷积核代表了一种图像模式，如果某个图像块与此卷积核卷积出的值大，则认为此图像块十分接近于此卷积核。如果我们设计了6个卷积核，可以理解：我们认为这个图像上有6种底层纹理模式，也就是我们用6中基础模式就能描绘出一副图像。以下就是25种不同的卷积核的示例：
+池化层 池化层简单说就是下采样，他可以大大降低数据的维度，也可以缓解卷积层对位置的过度敏感性。其过程如下：
+上图中，我们可以看到，原始图片是20×20的，我们对其进行下采样，采样窗口为10×10，最终将其下采样成为一个2×2大小的特征图。
+之所以这么做的原因，是因为即使做完了卷积，图像仍然很大（因为卷积核比较小），所以为了降低数据维度，就进行下采样。
+总结：池化层相比卷积层可以更有效的降低数据维度，这么做不但可以大大减少运算量，还可以有效的避免过拟合。
+实战部分 import matplotlib.pyplot as plt import numpy as np import os import PIL import tensorflow as tf from tensorflow import keras from tensorflow.keras import layers from tensorflow.keras.models import Sequential # 卷积层 x = tf.constant(range(9), dtype=tf.float32) x = tf.reshape(x, shape=(1, 3, 3, 1)) print(&amp;#39;x :&amp;#39;, tf.reshape(x, shape=(3, 3))) conv_layer = tf.keras.layers.Conv2D(filters=1, kernel_size=(2, 2), strides=(1, 1), kernel_initializer=tf.</description></item><item><title>在kaggle中使用keras做数字识别</title><link>/post/deep-learning/2017-07-11-%E5%9C%A8kaggle%E4%B8%AD%E4%BD%BF%E7%94%A8keras%E5%81%9A%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/deep-learning/2017-07-11-%E5%9C%A8kaggle%E4%B8%AD%E4%BD%BF%E7%94%A8keras%E5%81%9A%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB/</guid><description>背景 本文将讲述通过keras写一个深度学习模型，来完成 kaggle 的 Digit Recognizer 准确率可达到98%。
+下载数据 首先登入kaggle网站，点击competitions，在类型筛选中选择 Getting Started。然后点击Digit Recognizer。
+下载Data中的train.csv（模型的训练数据）和test.csv（测试数据）。 使用keras训练卷积神经网络模型 下面的代码分为三部分：
+读取数据 训练模型 预测测试数据 from __future__ import print_function import keras from keras.datasets import mnist from keras.models import Sequential from keras.layers import Conv2D, MaxPooling2D from keras import backend as K import pandas as pd from keras.utils import np_utils from keras.layers import Dense, Dropout, Activation, Flatten batch_size = 128 num_classes = 10 epochs = 12 # Read data train = pd.</description></item><item><title>基于统计的词切分和标注一体化模型</title><link>/post/nlp/2017-09-09-%E5%9F%BA%E4%BA%8E%E7%BB%9F%E8%AE%A1%E7%9A%84%E8%AF%8D%E5%88%87%E5%88%86%E5%92%8C%E6%A0%87%E6%B3%A8%E4%B8%80%E4%BD%93%E5%8C%96%E6%A8%A1%E5%9E%8B/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/nlp/2017-09-09-%E5%9F%BA%E4%BA%8E%E7%BB%9F%E8%AE%A1%E7%9A%84%E8%AF%8D%E5%88%87%E5%88%86%E5%92%8C%E6%A0%87%E6%B3%A8%E4%B8%80%E4%BD%93%E5%8C%96%E6%A8%A1%E5%9E%8B/</guid><description>基于统计的切记和标注一体化模型 假设$C=c_1,c_2 \dots c_m$为m个的字符串，$W=w_1,_2 \dots w_n$是把C切分后得到的由n个词组成的词序列，$T=t_1,t_2 \dots t_n$是对W进行标注后的标记序列。
+$$ P(W|C) = \frac{P(C|W)P(W)}{P(C)} $$ 可知P(C)是一个确定的值，P(C|W)是在给定词序列的情况下字符串的概率，可以认为是1。因此可得： $$ \max P(W|C) = \max P(W) $$ 即是说，分词的过程即是寻找概率最大词序列的过程。 我们再来考虑词序列与词序列与词性标注序列的关系。 $$ P(T|W) = \frac{P(W|T)P(T)}{P(W)} $$ 可推导出： $$ P(W) = \frac{P(W|T)P(T)}{P(T|W)} $$ 如果隐马尔可夫假设和独立输出假设 即： $$ P(T) = \prod_i^n P(t_i)P(t_{i-1}) \
+P(W|T) = \prod_i^n P(|w_i,t_i) \
+P(T|W) = \prod_i^n P(|t_i,w_i) $$
+计算方法：
+找到一条分词路径W 用记性标注的模型计算具有最大概率的记性标注序列，得到对应的标注路径T。 利用公式可得到W的概率 若干个健忘路径中，概率最大的W即为分词结果 引用： 白栓虎 - 基于统计的切记和标注一体化模型</description></item><item><title>堆排序算法</title><link>/post/algorithm/2017-03-26-%E5%A0%86%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/algorithm/2017-03-26-%E5%A0%86%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/</guid><description>堆排序的时间复杂度是nlong(n)，并且具有空间原址性。堆排序使用一种被称为堆的数据结构来进行信息管理。堆不仅用在堆排序中，而且它也可以构造一种有效的优先队列。
+堆 堆是一个数组，它可以被看成一个近似的完全二叉树。 二叉堆有两种形式，最大堆和最小堆。在堆排序算法中我们使用最大堆，最小堆常用于构造优先队列。</description></item><item><title>多模字符串匹配算法-Aho–Corasick</title><link>/post/algorithm/2017-04-16-%E5%A4%9A%E6%A8%A1%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95-ahocorasick/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/algorithm/2017-04-16-%E5%A4%9A%E6%A8%A1%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95-ahocorasick/</guid><description>背景 在做实际工作中，最简单也最常用的一种自然语言处理方法就是关键词匹配，例如我们要对n条文本进行过滤，那本身是一个过滤词表的，通常进行过滤的代码如下
+for (String document : documents) { for (String filterWord : filterWords) { if (document.contains(filterWord)) { //process ... } } } 如果文本的数量是n，过滤词的数量是k，那么复杂度为O(nk)；如果关键词的数量较多，那么支行效率是非常低的。
+计算机科学中，Aho–Corasick算法是由Alfred V. Aho和Margaret J.Corasick 发明的字符串搜索算法，用于在输入的一串字符串中匹配有限组“字典”中的子串。它与普通字符串匹配的不同点在于同时与所有字典串进行匹配。算法均摊情况下具有近似于线性的时间复杂度，约为字符串的长度加所有匹配的数量。然而由于需要找到所有匹配数，如果每个子串互相匹配（如字典为a，aa，aaa，aaaa，输入的字符串为aaaa），算法的时间复杂度会近似于匹配的二次函数。
+原理 在一般的情况下，针对一个文本进行关键词匹配，在匹配的过程中要与每个关键词一一进行计算。也就是说，每与一个关键词进行匹配，都要重新从文档的开始到结束进行扫描。AC自动机的思想是，在开始时先通过词表，对以下三种情况进行缓存：
+按照字符转移成功进行跳转（success表） 按照字符转移失败进行跳转（fail表） 匹配成功输出表（output表） 因此在匹配的过程中，无需从新从文档的开始进行匹配，而是通过缓存直接进行跳转，从而实现近似于线性的时间复杂度。
+构建 构建的过程分三个步骤，分别对success表，fail表，output表进行构建。其中output表在构建sucess和fail表进行都进行了补充。fail表是一对一的，output表是一对多的。
+按照字符转移成功进行跳转（success表） sucess表实际就是一棵trie树，构建的方式和trie树是一样的，这里就不赘述。
+按照字符转移失败进行跳转（fail表） 设这个节点上的字母为C，沿着他父亲的失败指针走，直到走到一个节点，他的儿子中也有字母为C的节点。然后把当前节点的失败指针指向那个字母也为C的儿子。如果一直走到了root都没找到，那就把失败指针指向root。 使用广度优先搜索BFS，层次遍历节点来处理，每一个节点的失败路径。
+匹配成功输出表（output表） 匹配 举例说明，按顺序先后添加关键词he，she，,his，hers。在匹配ushers过程中。先构建三个表，如下图，实线是sucess表，虚线是fail表，结点后的单词是ourput表。
+代码 gist 2fed6f4569d4da8029e7ef08458cad6b</description></item><item><title>字符编码演变史</title><link>/post/other/2016-10-22-%E5%AD%97%E7%AC%A6%E7%BC%96%E7%A0%81%E6%BC%94%E5%8F%98%E5%8F%B2/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/other/2016-10-22-%E5%AD%97%E7%AC%A6%E7%BC%96%E7%A0%81%E6%BC%94%E5%8F%98%E5%8F%B2/</guid><description>本文聊一聊各个国家是如何让计算机显示自己国家语言的。
+字符集（Charset） 字符(Character)是各种文字和符号的总称
+字符编码（Character Encoding） 因为计算机的存储方式毕竟是二进制，因此从二进制转换成字符的规则称为字符编码。
+美国 第一个遇到这个问题的自然而然就是计算机的发源地——美国。英文一共只有26个字母，加上一些标点和控制符（制表符、回车符等等），字符集较小，因此ASCII只使用了个128个字符就完美表示了英文。
+ASCII(1967) ASCII（American Standard Code for Information Interchange，美国信息交换标准代码）是基于拉丁字母的一套电脑编码系统。它主要用于显示现代英语。
+ASCII第一次以规范标准的型态发表是在1967年，最后一次更新则是在1986年，使用一个字节存储，注意ASCII只使用了一个字节中的7个比特，故ASCII定义的字符共128个；就这样英文完美解决。
+法国等西欧国家 说完了美国再来聊聊西欧国家。像英国就很开心，用的都是英文，问题已经被美国人解决了。但是像法国、德国等国家就比较郁闷了。比如法国人，“é”像这样符号我们怎么表示啊！但是问题不大，ASCII占一个字节的前七个比特，不是还剩一个呢吗，这个一个比特用上又能多表示128个字符，正好我拿来用。
+EASCII EASCII（Extended ASCII，延伸美国标准信息交换码）是将ASCII码由7位扩充为8位而成。EASCII的内码是由0到255共有256个符组成。EASCII码比ASCII码扩充出来的符号包括表格符号、计算符号、希腊字母和特殊的拉丁符号。
+ASCII足以给英语使用。但是，其他使用拉丁字母的语言（主要是欧洲国家的语言），都有一定数量的附加符号字母，因此每下的一个比特就发挥了作用，因此EASCII诞生了。但EASCII只是一种方式，具体的实现多种多样。由此也得知EASCII是兼容ASCII的。
+ISO8859系列(1985) ISO 8859，全称ISO/IEC 8859，是国际标准化组织（ISO）及国际电工委员会（IEC）联合制定的一系列8位元字符集的标准，现时定义了15个字符集。
+中文 无论是英文还是西欧等国家，它们的语言的文字较少，用一个字节就解决了问题，但是汉语、日语等语言就没这么容易了，他们的字符集要大得多，一个字节已经不能满足。因此必然要用多个字节来存储。
+GB2312(1981、6763) GB 2312 或 GB 2312–80 是中华人民共和国国家标准简体中文字符集，全称《信息交换用汉字编码字符集·基本集》，又称GB0，由中国国家标准总局发布，1981年5月1日实施。
+GBK(1995、20,902) 汉字内码扩展规范，称GBK，全名为《汉字内码扩展规范(GBK)》1.0版，由中华人民共和国全国信息技术标准化技术委员会1995年12月1日制订，国家技术监督局标准化司和电子工业部科技与质量监督司1995年12月15日联合以《技术标函[1995]229号》文件的形式公布。
+GB18030(2000、26000) GB 18030，全称：国家标准GB 18030-2005《信息技术　中文编码字符集》，是中华人民共和国现时最新的内码字集，是GB 18030-2000《信息技术　信息交换用汉字编码字符集　基本集的扩充》的修订版。与GB 2312-1980完全兼容，与GBK基本兼容；支持GB 13000（93版等同于Unicode 1.1；2010版等同于Unicode 4.0）及Unicode的全部统一汉字，共收录汉字70,244个。
+统一 以上的字符集只包括某个语言或某几个语言的字符。一但在不同国家间就会出现不兼容的情况，因此统一所有字符集大势所趋。
+UNICODE(1991) Unicode（中文：万国码、国际码、统一码、单一码）是计算机科学领域里的一项业界标准。它对世界上大部分的文字系统进行了整理、编码，使得电脑可以用更为简单的方式来呈现和处理文字。
+UTF-8 本着节约的精神，又出现了把Unicode编码转化为“可变长编码”的UTF-8编码。UTF-8编码把一个Unicode字符根据不同的数字大小编码成1-6个字节，常用的英文字母被编码成1个字节，汉字通常是3个字节，只有很生僻的字符才会被编码成4-6个字节。如果你要传输的文本包含大量英文字符，用UTF-8编码就能节省空间
+https://www.</description></item><item><title>感知机模型</title><link>/post/machine-learning/2017-02-12-%E6%84%9F%E7%9F%A5%E6%9C%BA%E6%A8%A1%E5%9E%8B/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/machine-learning/2017-02-12-%E6%84%9F%E7%9F%A5%E6%9C%BA%E6%A8%A1%E5%9E%8B/</guid><description>感知机使用的函数： $$ g(z) = \begin{cases} 1, &amp;amp; \text{if z ≥ 0} \
+0, &amp;amp; \text{if z &amp;lt; 0} \
+\end{cases} $$
+因此， $$ h(\theta) = g(\theta^Tx) $$
+学习算法和logistic一样 $$ \theta_j := \theta_j+ \alpha(y^i-h_\theta(x^i))x_j^i $$</description></item><item><title>拉格朗日乘数法</title><link>/post/machine-learning/2017-02-10-%E6%8B%89%E6%A0%BC%E6%9C%97%E6%97%A5%E5%AF%B9%E5%81%B6/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/machine-learning/2017-02-10-%E6%8B%89%E6%A0%BC%E6%9C%97%E6%97%A5%E5%AF%B9%E5%81%B6/</guid><description>求下面，约束最优化问题：
+$$ \underset{w}{min}f(w) \
+s.t. \ h_i(w) = 0,i=1&amp;hellip;l $$
+首先创建一个拉格朗日算子 $$ L(w,\beta)=f(w)+\sum_i\beta_ih_i(w) $$ 其中$\beta_i$被称为拉格朗日乘数
+然后令 $$ \frac{\partial L}{\partial w} = 0 \
+\frac{\partial L}{\partial \beta} = 0
+$$ 求方程组的解
+广义拉格朗日乘数法 求下面，约束最优化问题： $$ \underset{w}{min}f(w) \
+s.t. \ g_i(w) \le 0,i=1&amp;hellip;k \
+s.t. \ h_i(w) = 0,i=1&amp;hellip;l $$
+首先创建一个拉格朗日算子 $$ L(w,\alpha,\beta)=f(w)+\sum_{i=1}^k\alpha_ig_i(w) +\sum_{i=1}^l\beta_ih_i(w) $$
+定义 $$ \theta_p(w) = \underset{\alpha,\beta;\alpha_i&amp;gt;0}{max}L(w,\alpha,\beta) $$
+$$ p^*=\underset{w}{min}\ \underset{\alpha,\beta;\alpha_i&amp;gt;0}{max}L(w,\alpha,\beta) = \underset{w}{min}\ \theta_p(w) $$
+p代表primal，这类问题称为原始问题
+$$ \theta_p(w) = \begin{cases} f(w), &amp;amp; \text{符合约束条件} \</description></item><item><title>排序算法总结</title><link>/post/algorithm/2017-03-12-%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/algorithm/2017-03-12-%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93/</guid><description>排序算法分为比较排序算法与非比较排序算法，通过决策树可以证明，比较排序算法性能的下界为nlogn。但非比较排序算法就没有此限制，可以达到线性复杂度，但也会有一定的限制。本篇会先介绍常见的几种比较排序算法，然后再介绍几个非比较排序算法。
+比较排序算法 插入排序（INSERTION-SORT） 插入排序采用增量方法是一种原址排序，它的工作方式像排序一手扑克牌。我人每次从桌子上拿走一张牌将它插入左手中正确的位置。
+伪码 INSERTION-SORT(A) for j=2 to A.length key=A[j] //将A[j]插入到已排序的序列中 i=j-1 while i&amp;gt;0 and A[i]&amp;gt;key A[i+1]=A[i] i=i-1 A[i+j]=key 时间复杂度 插入排序的最坏情况运行时间为$\Theta(n^2)$，最好情况的运行时间为$\theta(n)$
+java代码 gist 60af1c98917c6bc6115e639d1d491f9c
+归并排序（MERGE-SORT） 归并排序采用分治方法，它需要额外的空间，所以不是原址排序的。归并排序的思想是，将数据分成两个子数组，分别对这两个子数组进行排序，最后再将其合并。
+伪码 MERGE-SORT(A,p,r) if p&amp;lt;r q=(p+r)/2//向下取整 MERGE-SORT(A,p,q) MERGE-SORT(A,q+1,r) MERGE(A,p,q,r) MERGE(A,p,q,r) 时间复杂度 归并排序的递归式为： $$ T(n) = \begin{cases} c, &amp;amp; \text{n=1} \
+2T(n/2)+cn, &amp;amp; \text{n&amp;gt;1} \
+\end{cases} $$ c代表求解规模为1的问题所需的时间以及在分解步骤与合并步骤处理每个数组元素所需的时间。 因此，它的时间复杂度为$\Theta(n\log n)$
+java代码 gist 0159937f2bc9a536f3685ebc5bfbbad1
+快度排序（QUICKSORT）（非随机） 快速排序也采用分治方法，是原址排序的。在比较排序中（本篇介绍），是最快的排序算法。快速排序的思想是，先找到一个主元，根据该主元将数组划分成两个子数组，左子数组中的数小于等于该主元，右数组的数大于主元，其实相当于每一次划分确定了这次划分该主元的位置。
+伪码 QUICKSORT(A,p,r) if p&amp;lt;r q=PARTITION(A,p,r) QUICKSORT(A,p,q-1) QUICKSORT(A,q+1,r) PARTITION(A,p,r) x=A[r] i=p-1 for j=p to r-1 if A[j]&amp;lt;=x i=i+1 exchange A[i] with A[j] exchange A[i+1] wotj A[r] return i+1 时间复杂度 最坏情况下，快速排序的时间复杂度为$\Theta(n^2)$，不过在使用随机数方法，通过指示器向量可以证明，随机版本的快速速排序的期望时间复杂度是$\Theta(nlgn)$ 递归式： $$ T(n)=2T(n/2)+\Theta(n) $$</description></item><item><title>散列表</title><link>/post/algorithm/2017-05-14-%E6%95%A3%E5%88%97%E8%A1%A8/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/algorithm/2017-05-14-%E6%95%A3%E5%88%97%E8%A1%A8/</guid><description>背影 散列表是普通数组概念的推广。由于对普通数组可以直接寻址，使得能在O(1)时间内访问数组中的任意位置。
+如果存储空间允许，我们可以提供一个数组，为每个关键字保留一个位置，以利用直接寻址的技术。
+当实际关键字数目比全部的可能关键字总数要小时，采用散列表就成为直接数组寻址的一种有效替代，因为散列表使用一个长度与实际存储的关键字数目成比例的数组来存储在散列表中，不是直接把关键字作为数组下标，而是根据关键字计算出相应的下标。
+当实际关键字数目比全部的可能关键字总数要小时，可能会导致多个关键字映射到同一个下标。解决这种冲突有以下三种方式：
+链接方法 利用散列函数 开放寻址法 当关键字集合是静态存储时（即关键字一但存入后不再改变）时，通过“完全散列”在最坏时间为O(1)的情况下完成关键字查找。
+直接寻址法 链接法 开放寻址法 完全散列 参考 《算法导论》</description></item><item><title>斜杠青年</title><link>/post/reading/2018-06-19-%E6%96%9C%E6%9D%A0%E9%9D%92%E5%B9%B4/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/reading/2018-06-19-%E6%96%9C%E6%9D%A0%E9%9D%92%E5%B9%B4/</guid><description>“斜杠青年”代表的是一种全新的人生价值观，它的核心不在于多重收，也不在于多重身份，而在于多元化的人生。
+我绝对没有想要否定上班这种生活方式，毕竟朝九晚五的上班生活是现在的主流生活方式，但我们需要意识到，它既不是赚钱的唯一方式，也不是实现自我价值的唯一方式。
+我们应该允许不一样的生活方式的存在，不去过分评判他人的人生选择，因为当我们把自己的价值观强加于他人时，我们也在限制自己，同时推动了本可以打拥有更多生活的可能性。
+当你的才华还撑不起你的野心的时候，你就应该静下心来学习；当你的能力还驾驭不了你的目标时，就应该沉下心来历练。梦想，不是浮躁，而是沉淀和积累。
+我们在工作中无法获得快乐最核心的原因之一，就在于我们被剥夺了独立自主的权利，因为根据美国心理学家德西和瑞安提出的自我决定理论，人类有自主、独立、寻求归属感的内在动机。
+价格实际上是实现将源高配的一种重要手段，价格反应了商品供求关系的变化。
+按照现代经济学理论，企业本质上只不过是一种将源配置机制，它能够按照一定的组织和管理方式实现整个社会经济资源的优化配置，降低整个社会的“交易成本”。尽管企业本身存在着管理成本，但只要管理成本低于交易成本，企业就有存在的价值。
+一个人的收入不是和他的劳动时间成正比，而是和他的劳动的不可替代性成正比。
+真正的自由不是“拥有”的自由而是“拒绝”的自由，当我们不再需要为了钱而去做自己不喜欢或者不愿意做的事情的时候，我们才获得了真正意义上的财务自由。
+在以后的日子里，当我再次遇到恶意的贬低和攻击时，我也不再以愤怒、反驳或者对抗来回应，而是大大方方承认：我的确不够好，但我在进步。
+内心和头脑的丰富让我越来越淡定和从容；自我认可让我不再在意别人对我的看法；而对自身价值和能力的肯定给了我足够的安全感。我不再害怕失去，因为我知道自己内在所拥有的是别人夺不走的，也不会因为外在的变化而有所增减。
+所有能够快速获得或者能够用金钱换来的都无法成为核心竞争力。</description></item><item><title>最小二乘回归</title><link>/post/machine-learning/2017-01-12-%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E5%9B%9E%E5%BD%92/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/machine-learning/2017-01-12-%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E5%9B%9E%E5%BD%92/</guid><description>最小二乘线性回归与梯度下降算法 线性回归 预测函数： $$ h_\theta(x)=\theta_0 + \theta_1x_1 + \theta_2x_2 $$
+将$x_0 = 1$
+$$ h_\theta(x) = \sum_{i=0}^n\theta_ix_i $$
+其中 $\theta$这参数，n表示特征数量
+成本函数： $$ J(\theta) = \frac{1}{2}\sum_{i=1}^m(h_\theta(x^{(i)}) - y^{(i)})^2 $$
+其中m表示样本数量，$(x^{(i)},y^{(i)})$表示第i个样本对儿，1/2是为了方便计算
+我们目标： $$ \min_\theta J(\theta) $$
+最小二乘成本函数的概率学解释（并不是唯一的解释） 假设该线性模型符合高斯分布 $$ p(y^{(i)}|x^{(i)};\theta) = \frac{1}{\sqrt{2\pi}\sigma}\exp\left(-\sqrt{(y^{(i)}-\theta^Tx^{(i)^2})}{2\sigma^2}\right) $$
+似然函数为： $$ L(\theta) = L(\theta;X,\vec{y}) = p(\vec{y}|X;θ) $$ 因此，线性回归的似然函数： $$ \begin{align} L(\theta) &amp;amp; = \prod_{i=1}^mp(y^{(i)}|x^{(i)};\theta) \
+&amp;amp; = \prod_{i=1}^m\frac{1}{\sqrt{2\pi}\sigma}\exp\left(-\frac{((y^{(i)}) - \theta^Tx^{(i)})^2}{2\sigma^2}\right) \end{align} $$
+对数似然度为 $$ \begin{align} l(\theta) &amp;amp; = \log L(\theta)\</description></item><item><title>朴素贝叶斯</title><link>/post/machine-learning/2017-03-12-%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/machine-learning/2017-03-12-%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/</guid><description>朴素贝叶斯是一种分类模型，属于生成模型。比较常见的应用是垃圾邮件分类；
+在垃圾邮件识别为例
+$$ y\in{0,1} $$ y=1表示垃圾邮件
+将每封邮件表示成一个向量，向量中每一维都是字典中的一个词的0/1值，1表示该词在邮件中出现，0表示未出现。 假设有一个50000个词的词表，一封邮件x可表示（多元伯努利时间模型） $$ x= \begin{bmatrix} 0 \
+1 \
+1 \
+… \
+\end{bmatrix} $$
+$$ x=\in{0,1}^n $$ n=50000
+假设 我们还是对P(X|Y)建模
+$$ \begin{aligned} &amp;amp; P(x_1,x_2,&amp;hellip;x_{50000}|y) \
+&amp;amp;= P(x_1|y)*P(x_2|y,x_1)*P(x_3|y,x_1,x_2)&amp;hellip; \
+&amp;amp;= P(x_1|y)*P(x_2|y)*P(x_3|y)&amp;hellip;P(x_50000|y) \
+&amp;amp;= \prod_{i=1}^{m}P(x_i|y) \end{aligned} $$ NLP中的n元语法模型有点类似，这里相当于一元文法unigram。
+这里有个假设，条件独立性假设，形式化表示为，（如果给定Z的情况下，X和Y条件独立）
+这里我们发现朴素贝叶斯假设是约束性很强的假设，“buy”从通常上讲与“price”是有关系，我们这里假设的是条件独立。
+模型参数 $$ \begin{aligned} \phi_{i|y=1} &amp;amp;= P(x_i=1|y=1) \
+\phi_{i|y=0} &amp;amp;= P(x_i=1|y=0) \
+\phi_y&amp;amp;=P(y=1) \end{aligned} $$
+joint似然函数为： $$ L(\phi_y,\phi_{i|y=0},\phi_{i|y=1})= \prod_{i=1}^{m}P(x^{(i)},y^{(i)}) $$
+求该 Joint似然最大化得： $$ \begin{aligned} \phi_{i|y=1} &amp;amp;= \frac{\sum_{i=1}^mI{x_j^{(i)}=1,y^{(i)}=1}}{\sum_{i=1}^mI{y^{(i)}=1}} \</description></item><item><title>模型简要总结</title><link>/post/machine-learning/2017-03-12-%E6%A8%A1%E5%9E%8B%E7%AE%80%E8%A6%81%E6%80%BB%E7%BB%93/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/machine-learning/2017-03-12-%E6%A8%A1%E5%9E%8B%E7%AE%80%E8%A6%81%E6%80%BB%E7%BB%93/</guid><description>模型简要总结 决策树 介绍 决策树是一种分类和回归方法。下面主要介绍分类部分。决策树模型呈树状结构，在分类问题中，表示基于特征对实例进行分类的过程。它也可以认为是if-then规则的集合。
+模型的学习 决策树的学习本质上是从训练数据中归纳出一组分类规则。能对训练数据进行正确分类的决策树可能有多个，我们需要的是一个与训练数据矛盾较少，同时具有很好的泛化能力。决策树学习通常需要3个步骤：
+特征选择 信息增益：特征对训练集的信息增益，等价于互信息。信息增益大的特征具有更强的分类能力。 $$ g(D,A)=H(D)-H(D \mid A) $$ 信息增益比：其信息增益与训练数据集关于特征A的值的熵$H_A(D)$之比 $$ g_R(D,A)=\frac{g(D,A)}{H_A(D)} $$ 决策树生成 决策树的剪枝 优缺点： logstic回归 最大熵 支持向量机 隐马尔可夫模型 条件随机场 关于熵 我们要搞清楚一件非常不确定的事，或是我们一无所知的事情，就需要了解大量的信息。相反，如果我们对某件事情已经有了较多的了解，那么不需要太多的信息就能把它搞清楚。所以，从这个角度来看，可以认为，信息量就等于不确定性的多少。
+熵 $$ H(X)=-\sum_{x \in X} P(x) \log P(x) $$
+条件熵 $$ H(X \mid Y)=-\sum_{x \in X,y \in Y} P(x,y) \log P(x \mid y) $$ 如果H(X)&amp;gt;=H(X|Y)，也就是说多了Y的信息，关于X的不确定性下降了。
+互信息 $$ H(X ; Y)= H(X) - H(X \mid Y) $$ 两件事相关性的量化度量。</description></item><item><title>活法</title><link>/post/reading/2018-10-01-%E6%B4%BB%E6%B3%95/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/reading/2018-10-01-%E6%B4%BB%E6%B3%95/</guid><description> 杰出的才能，由这才能创造的成果，属于我却不归我所有。才能和劳动不应由个人独占，而应该用来为世人社会谋利。就是说自己的才能用来为“公”是第一义，用来为“私”是第二义。我认为这就是谦虚这一美德的本质所在。
+死亡时的灵魂比出生时略有进步，就是心灵稍经磨炼的状态。
+深秋时节某一天，在落叶和寒风中，有位旅人行色匆匆，赶路回家。走到某处突然低头一看，脚下一片白乎乎的东西，仔细一瞧，竟是人骨。此处怎么会有如此大量的人骨呢？他不禁毛骨悚然，又不得其解。只顾往前奔走，抬头看时，迎面走来一只体格巨大的老虎，咆哮着向他逼近。旅人直惊得魂飞魄散：“啊！那么多人骨原来是老虎吃剩的残物。”他急忙调头逃命，然而慌不择路，一阵猛跑竟然跑上了悬崖峭壁，峭壁之下是怒涛汹涌的大海。前无去路，后有猛虎追逼，进退维谷之际，他爬上了崖边仅有的一棵松树，但那恶虎紧随其后，张开骇人的巨爪，也开始爬树。“今天我命休矣”，正当他万念俱灰时，忽然看见树上垂下一根藤条，他顺着藤条往下滑去，那藤条却不着底，旅人被悬在半空之中。上面是老虎伸着舌头、流着口水盯着他，正所谓“虎视眈眈”。再看下面，狂风大浪之中出现红、黑、蓝三条巨龙，正等着他掉下去时可一饱口福。忽又听到上方有窸窣之声，定睛一看，黑白两只老鼠正在交替啃咬那藤条的根部。藤条一旦被鼠牙咬断，旅人只好落入张开巨口的恶龙腹中。命悬一线之际，旅人想到将老鼠赶跑。于是拼命摇晃那根藤条，摇摆之下，有湿漉漉、暖烘烘的液体落到他脸上，用嘴一舔，是甜美的蜂蜜。原来藤条根部有一蜂巢，一经摇动，蜂蜜就掉落下来。舔着甘露般的蜂蜜，旅人居然陶醉起来，以致忘记了自己身处绝境——虎龙夹击，得以苟延残喘的藤条正被老鼠啃噬——还在一次又一次摇动救命的藤条，忘情地享用美味的蜂蜜。
+在这里，老虎暗喻死亡和疾病；松树代表世上的地位、财产和名誉；白黑两鼠表示白昼和黑夜，也就是时间的流逝。人在不断逼近的死亡的威胁中拼命求生，而维系生机的仅是一根藤条而已。 而这根藤条了随着时间的推移不断磨损。我们想逃离死亡，但死神却一年一年逼近我们。然而，即使折寿，哪怕缩短生命，也要去吸食“蜜汁”——切不断那可怜、可鄙又可悲的欲望。释迦告诉我们，这就是赤裸裸的人类本性。
+磨炼心声、提升以改，要点在于日常生活中的“精进”</description></item><item><title>深度神经网络</title><link>/post/deep-learning/2019-07-17-%E6%B7%B1%E5%BA%A6%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/deep-learning/2019-07-17-%E6%B7%B1%E5%BA%A6%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/</guid><description>全连接神经网络 neroun的输出 用 $a_i^l$ 表示，l表示layer，i表示第i个neuron，同一层output用 vector $a^l$表示
+两层网络之间的weit用$w_{ij}^l$表示l-1层的第i个neroun到l层的第j个neuron
+$\sigma$ 表示激活函数
+循环神经网络 基础网络架构 单层RNN $x^1、h^0、y^1、h^1$都是vector
+多层RNN 双向RNN $f_1、f_2、f_3$没有强制规定可以自己设计
+Native RNN LSTM c 的变化慢，可以记忆很久以前的数据
+GRU 李宏毅
+未完待续&amp;hellip;</description></item><item><title>混合朴素贝叶斯模型</title><link>/post/machine-learning/2017-03-12-%E6%B7%B7%E5%90%88%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF%E6%A8%A1%E5%9E%8B/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/machine-learning/2017-03-12-%E6%B7%B7%E5%90%88%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF%E6%A8%A1%E5%9E%8B/</guid><description>训练样本，${x_1,x_2,x_3 &amp;hellip; x_m}$ m个文本。 $$ x^{(i)} \in {0,1}^n \
+x^{(i)}_j = I{词j是否在文档x^{(i)}中 } \
+z^{(i)} \in {0,1} \
+z^{(i)} \sim 伯努利(\phi) $$ zi是隐含随机变量，也就是聚类类别，这里假设是两类，也因此分布为伯努利分布，也可以根据情况有更多类别。
+条件独立假设： $$ P(x^{(i)} \mid z^{(i)}) = \prod_i^n P(x^{(i)}_j \mid z^{(i)}) $$ 表示，在给定类别z生成文档x的概率。
+$$ P(x^{(i)}j=1 \mid z^{(i)} = 0) = \phi{j \mid z=0} $$ 对应高斯判别分析中的 $$ \begin{aligned} \phi_{i|y=1} &amp;amp;= P(x_i=1|y=1) \
+\phi_{i|y=0} &amp;amp;= P(x_i=1|y=0) \
+\phi_y&amp;amp;=P(y=1) \end{aligned} $$
+E-step: $$ w^{(i)} = P(z^{(i)}=1 \mid x^{(i)};\phi_{j \mid z},\phi) \</description></item><item><title>混合高斯模型</title><link>/post/machine-learning/2017-02-18-%E6%B7%B7%E5%90%88%E9%AB%98%E6%96%AF%E6%A8%A1%E5%9E%8B/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/machine-learning/2017-02-18-%E6%B7%B7%E5%90%88%E9%AB%98%E6%96%AF%E6%A8%A1%E5%9E%8B/</guid><description>混合高斯模型 假设z为隐变量，x,z存在如下关系。 $$ P(x^{(i)},z^{(i)}) = P(x^{(i)}|z^{(i)})P(z^{(i)}) $$ $$ z^{(i)} \sim Multinomial(\phi)$ \
+\phi_j=P(z^{(i)}=j)&amp;gt;0 \
+\sum_j\phi_j=1 \
+(x^{(i)} \mid {z^{(i)}=j} ) \sim N(\mu_j ,\Sigma_j) $$ 这里的j的聚类的一个类别之一。
+E-step: 对z的猜测 $$ \begin{aligned} w_j^{(i)} &amp;amp; := P(z^{(i)}_j \mid x^{(i)}=j;\phi,\mu_j,\Sigma_j) \
+&amp;amp;= \frac{ P(x^{(i)} \mid z^{(i)}_j=j)P(z^{(i)}_j=j)}{\sum_l^n P(x^{(i)} \mid z^{(i)}_j=l)P(z^{(i)}_j=l)} \end{aligned} $$
+其中，$P(z^{(i)}_j \mid x^{(i)}=j;\phi,\mu_j,\Sigma_j)$表示第i个样本生成z为类别j的概率。这里的n表示聚类总类别数。
+M-step: 对参数的估计 $$ \phi_j:=\frac{1}{m} \sum_{i=1}^m w_j^{(i)} \
+\mu_j:= \frac{\sum_{i=1}^m w_j^{(i)} x^{(i)} }{\sum_{i=1}^m w_j^{(i)}} \
+\Sigma_j:=\frac{ \sum_{i=1}^m w_j^{(i)} (x^{(i)} - \mu_j) (x^{(i)} - \mu_j)^T }{\sum_{i=1}^n w_j^{(i)}} $$</description></item><item><title>生成模型与高斯判别分析</title><link>/post/machine-learning/2017-03-12-%E7%94%9F%E6%88%90%E6%A8%A1%E5%9E%8B%E4%B8%8E%E9%AB%98%E6%96%AF%E5%88%A4%E5%88%AB%E5%88%86%E6%9E%90/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/machine-learning/2017-03-12-%E7%94%9F%E6%88%90%E6%A8%A1%E5%9E%8B%E4%B8%8E%E9%AB%98%E6%96%AF%E5%88%A4%E5%88%AB%E5%88%86%E6%9E%90/</guid><description>生成模型与判别模型 判别模型 判别模型对P(y|x)或者说对y建模，直接学习得到y。 常见的判别模型有线性回归、对数回归、线性判别分析、支持向量机、boosting、条件随机场、神经网络等。
+生成模型 生成模型对P(x|y)或者说对x建模，通过计算 $$ \begin{aligned} \arg\max\limits_{y}p(y\vert x) &amp;amp;= \arg\max\limits_y\frac{p(x\vert y)p(y)}{p(x)} \
+&amp;amp;= \arg\max\limits_y p(x\vert y)p(y) \end{aligned} $$ 得到y。 因此给定x进行比较时，P(x)为固定值，所以P(x)可省略。 常见的生产模型有隐马尔科夫模型、朴素贝叶斯模型、高斯混合模型、LDA、Restricted Boltzmann Machine等。
+高斯分布 若随机变量 X, X服从一个位置参数为 $\mu$ 、尺度参数为$\sigma$ 的概率分布，记为： $$ \displaystyle X \sim N(\mu ,\sigma ^{2}) $$ 则其概率密度函数为 $$ \displaystyle f(x)={1 \over \sigma {\sqrt {2\pi }}},e^{-{(x-\mu )^{2} \over 2\sigma ^{2}}} $$
+多元高斯分布 $$ X ∼ N(\mu,\Sigma) $$
+$$ \begin{aligned} E[X] &amp;amp;= \mu \
+Cov(X) &amp;amp;= \Sigma \end{aligned} $$ 概率密度函数为 $$ \begin{equation} p(x;\mu,\Sigma) = \frac{1}{(2\pi)^{\frac{n}{2}}\big\vert\Sigma\big\vert^{\frac{1}{2}}}e^{-\frac{1}{2}(x-\mu)^T\Sigma^{-1}(x-\mu)} \end{equation} $$ 其中$|\Sigma|$是$\Sigma$的行列式，$\Sigma$是协方差矩阵，而且是对称半正定的。</description></item><item><title>程序员的数据-概率统计</title><link>/post/mathematics/2017-01-12-%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E6%95%B0%E6%8D%AE-%E6%A6%82%E7%8E%87%E7%BB%9F%E8%AE%A1/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/mathematics/2017-01-12-%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E6%95%B0%E6%8D%AE-%E6%A6%82%E7%8E%87%E7%BB%9F%E8%AE%A1/</guid><description>概率的定义 上帝视角 $\Omega$：平行世界的集合
+$\omega$：具体某一个世界 A：$\Omega$的子集 P(A)：A的面积，即A的概率
+随机变量 通俗来讲它是一种会随机改变的不确定量。
+从上帝视角来看，随机变量只是$\Omega$中的函数而已。对于$\Omega$中的各元素$\omega$，函数$f(\omega)$将返回相应的整数，这些整数值即为随机变量。 $$ X(u,v)\equiv \begin{cases} 中选\ (0\leq &amp;lt; 1/4)\
+落选\ (1/4\leq v &amp;lt;1)\
+\end{cases} $$ 需要注意的是，随机变量并不等同于程序中的变量，它蕴含的是一种函数，$随机变量的值=f(\omega)$。
+概率分布 随机变量涉及具体的平行世界。与这相对地，概率分布的概念更为宽泛，它只考虑面积，不涉及具体的平行世界。 对于随机变量，哪一个世界中将得到哪一个值都已确定，而概率分布不涉及具体发生在哪一个世界。 只要得到随机变量的X，我们就能求出相应的概率分布，但反过来却并不成立，仅凭概率分布我们无法求出随机变量的值。 $$ P(X=k)=``X(\omega)=k时区域\omega的面积,即是说满足f(\omega)=k的所有\omega的面积&amp;quot; $$
+多个随机变量之间的关系 联合概率与边缘概率 联合概率：多个随机变量，包含多个条件且所有条件同时成立的概率称为联合概率。 边缘概率：单个随机变量有关的概率称为边缘概率。边缘概率是一个相对概念。
+通过联合概率分布可以计算联合概率分布，然而，如果只知道边缘分布，无法求得相应的联合概率分布。
+条件概率 在研究理工科问题时，我们学会采用控制变量法分析变量之间的关系，讨论变量X取特定值时变量Y的取值情况。如果没有误差，我们可以用函数Y=f(X)来表示它们的关系。不过在现实中，我们很难去除所有影响因素，测量到绝对精确的值。所以，即使X的测定值不变，Y的测定值也会发生细微变化，此时我们需要研究在X为某个特定值时Y的概率分布。也就是说，我们将研究条件概率P(Y=b,|X=a),而不是函数Y=f(x)。+ 0000000000000000000</description></item><item><title>精进</title><link>/post/reading/2017-03-18-%E7%B2%BE%E8%BF%9B/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/reading/2017-03-18-%E7%B2%BE%E8%BF%9B/</guid><description>第一章 时间之尺——我们应该怎样对待时间 一、 活在“全部的现在” （从当下出发，联结过去与未来）
+向孩子学习“郑重”的态度 郑重是这样一种态度：因恪守配以而知事情轻重缓急，因尽全力无保留而使其事竟成、光阴未曾虚度。 不同场合，不同的时间视角 五种时间视角 1、积极过去视角 2、消极过去视角 3、享乐主义视角 4、宿命论视角 5、未来视角 建议 最好采用平衡和折中的方式，根据不同的现实场景加以灵活选择 由当下向过去与未来延伸 多瑞典心理学家林德沃（Lindvall）提出，具有平衡式时间视角的人，在内心具有一种“延伸的当下感”（extendednow），既可以“从当下来审视过去”，也可以“视未来存在于当下”，他应具有囊括“过和“未来”的包容性。 二、 对五年后的自己提问 （如何解决远期与近期未来的冲突？）
+对人 生来 说，“ 五年” 意味着 什么？ 五年的时间通常会越过人生的“下一个阶段”，进入“下下个阶段”。 如果把五年作为做成一件事的时间跨度，那么也意味着你需要忍受头几年的挫败、煎熬和孤独，乃至别人的误解、嘲笑和攻击。 未来 远期未来 远期未来的视角下，人们倾向于用抽象、概括的方式去思考。 近期未来 而在近期未来视角下，人们更容易到具体的情境中去考虑，想得更多的不是“要不要做”，而是“怎么去做”。 拖延症：当近期未来遇到了阻碍，而产生了对远期未来焦虑的放大和大量的负面情绪，因而发生了关注点偏倚 三、 我们总是在重复地抓起沙子 （把时间花在值得做的事情上）
+如何判断一件事情是否值得做 两个因素 收益值 收益半衰期 少做短半衰期事件 长半衰期的事件，可以累积和叠加 我们为什么要读经典 超长半衰期 经典的价值，就在于你总是会从中找到新的东西，所以经典是怎么读都读不尽的。 一部经典作品必然包含了某种接近“带我本质”的东西，也就是某种根源性的东西。 辨别生活中的信息噪音 调整评估信息价值的时间尺度 法国历史学家布罗代尔提出记述历史的三个时间尺度，其中最长的时间尺度，关注的是一个地区的地理和气候环境；中等的时间惊讶，关注的是社会和文化层面的因素；而短时间尺度，才是传统的历史学所关注的具体的出现。布罗代尔认为，具体的历史事件的出现，往往具有有随机性，在表面现象背后，是更深刻和稳定 的导致该事件发生的中、长时间尺度的因素，这些因素才是更值得历史学家记述的。 四、 “快”与“慢”的自由切换 （为什么我们的时间永远不够用？）
+时间管理，让我们越来越快 我们原本就是因为快而痛苦，可时间管理却教我们如何更快。 侯世达定律：实际做事花费的时间总是比预期的要长，即使预期中考虑了侯世达定律 工作要快，生活要慢 有快有慢便是节奏 提升时间的使用深度 时间悖论：半个世纪以来，人们可自由支配 的闲暇时间总体上一直呈增加的趋势，但人们主观上却觉得自己的闲暇时间在减少，也就是说人们实际拥有的赶时间越来越多，主观感受拥有的时间却越少 从闲暇时间中获得放松和满足的程序并不取决于闲暇时间的长度，而是取决于质量。 事业与生活的秘诀无外乎是处理好时间的快与慢，深与浅的关系 第二章 寻找心中的“巴拿马”——如何做出比好更好的选择 一、 从终极问题出发 （以人生终极目标作为首要原则）</description></item><item><title>统计学习方法</title><link>/post/machine-learning/2017-01-07-%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/machine-learning/2017-01-07-%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95/</guid><description>统计学习 如果一个系统能够通过执行某个过程改进它的性能，这就是学习。
+统计学习的前提 统计学习关于数据的基本假设是同类数据具有一定的统计规律性，这就是统计学习的前提。
+统计学习方法组成 统计计算由监督学习，非监督学习，半监督学习和强化学习等组成。
+监督学习概括 从给定的、有限的、用于学习的训练数据集合出发，假设数据是独立同分布产生的；并且假设要学习模型属于某个函数集合，称为假设空间；应用某个评价准则，从假设空间中选取一个最优的模型，使它对已知训练数据及未知测试数据在给定的评价准则下有最优的预测；最优模型的选取由算法实现。
+统计学习方法的三要素 模型 策略 算法 实现统计学习方法的步骤 得到一个有限的训练数据集合 确定包含所有可能模型的假设空间，即学习模型的集合 确定模型选择的准则，即学习的策略 实现求解最优模型的算法，取出学习的算法 通过学习方法选择最做强模型 利用学习的最优模型对新数据进行预测和分析 基本概念 输入空间 输入所有可能的空间
+输出空间 输出所有可能的空间
+特征空间 每个具体的输入是一个实例，通常由特征向量表示。这时所有特征向量存在的空间称为特征空间。
+样本 输入输出对又称为样本或样本点。
+问题的分类 回归问题 输入变量与输出变量均为连续变量的预测问题称为回归问题。
+分类问题 输出变量为有限个离散变量的预测问题称为分类问题。
+标注问题 输入变量与输出变量均为变量序列的预测问题称为标注问题。
+联合概率分布 监督学习假设输入与输出的随机变量X与Y遵循联合概率分布。训练数据与测试数据被看作是依联合概率分布P(X,Y)独立同分布产生的。
+假设空间 模型属于由输入空间到输出空间的映射的集合，这个集合就是假设空间。
+监督学习的模型可以是概率模型或非概率模型，由条件概率分布P(Y|X)或决策函数Y=f(X)表示，随具体学习方法而定。
+统计学习的三要素 方法=模型+策略+算法
+模型 策略 损失函数:度量一次预测的好坏 风险函数：度量平均意义下模型预测的好坏</description></item><item><title>统计学习方法概论</title><link>/post/machine-learning/2017-06-04-%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95%E6%A6%82%E8%AE%BA/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/machine-learning/2017-06-04-%E7%BB%9F%E8%AE%A1%E5%AD%A6%E4%B9%A0%E6%96%B9%E6%B3%95%E6%A6%82%E8%AE%BA/</guid><description>统计学习的基本概念 学习的定义 如果一个系统能够通过执行某个过程改进它的性能，这就是学习。统计学习的对象是数据；统计学习关于数据的基本假设是同类数据具有一定的统计规律，这是统计学习的前提。统计学习的上的是对未知数据进行预测和分析；对数据的预测可以使计算机更加智能化；对数据的分析可以让人们获取新的知识，给人们带来新的发现。
+监督学习的学习方法 从给定的、有限的、用于学习的训练数据集合出发，假设数据是独立同分布产生的；并且假设学习的模型属于某个函数集合，称为假设空间；应用某个评价准则，从假设空间中选取一个最优的模型，使它对已知训练数据及未知测试数据在给定的评价准则下有最优的预测；最优模型的选取由算法实现。
+实现统计学习方法的步骤 得到一个有限的训练数据集合 确定包含所有可能模型的假设空间，即学习模型的集合 确定模型选择的准则，即学习的策略 实现求解最优模型的算法，取出学习的算法 通过学习方法选择最做强模型 利用学习的最优模型对新数据进行预测和分析 不同的预测任务名称 输入变量与输出变量均为连续变量的预测问题称为回归问题。 输出变量为有限个离散变量的预测问题称为分类问题。 输入变量与输出变量均为变量序列的预测问题称为标注问题。 联合概率分布 监督学习假设输入与输出的随机变量X和Y遵循联合概率分布P(X,Y)，P(X,Y)表示分布函数，或分布密度函数。训练数据与测试数据被看作是依联合概率分布P(X,Y)独立同分布产生的。
+判别模型 判别模型对P(y|x)或者说对y建模，直接学习得到y。 在计算学习算法时，一般使用candidation似然 就是直接用的P(y|x) 常见的判别模型有线性回归、对数回归、线性判别分析、支持向量机、boosting、条件随机场、神经网络等。
+生成模型 生成模型对P(x|y)或者说对x建模（从下面的公式可以看到），通过如下计算得到 y。 $$ \begin{aligned} \arg\max\limits_{y}p(y\vert x) &amp;amp;= \arg\max\limits_y\frac{p(x,y)}{p(x)} \
+&amp;amp;= \arg\max\limits_y\frac{p(x\vert y)p(y)}{p(x)} \
+&amp;amp;= \arg\max\limits_y p(x\vert y)p(y) \end{aligned} $$ 在给定x进行比较时，P(x)为固定值，所以P(x)可省略。在计算学习算法时，一般使用joint似然，就是用的P(x,y)=P(x|y)*P(y)，其实和P(y|x) 一样的。 生成模型表示的是数据生成的方式 ，就是P(x,y) x和y的联合概率。一般来说数据的生成方式是比较复杂的，所以一般都会对数据的生成方式做一定的假设（比如隐马尔科夫模型、朴素贝叶斯模型）。 常见的生产模型有隐马尔科夫模型、朴素贝叶斯模型、高斯混合模型、LDA、Restricted Boltzmann Machine等
+统计学习的三要素 统计学习方法包括模型的假设空间、模型选择的准则以及模型的学习算法，称其为统计学习方法的三要素，简称为模型、策略、算法。
+模型 在监督学习过程中，模型就是所要学习的条件概率分布或决策函数。模型的假设空间包含所有可能的条件概率分布或决策函数。 假设空间用F表示，假设空间可以定义为决策函数的集合 $$ F={f|Y=f(x)} $$ 假设空间也可以定义为条件概率的集合 $$ F={P|P(Y|X)} $$
+策略 首先引入损失函数与风险函数的概念。损失函数度量模型一次预测的好坏，风险函数度量平均意义下模型预测的好坏。
+常用的损失函数 **0-1损失函数 ** $$ L(Y,f(X))= \begin{cases} 1,Y \neq f(X)\</description></item><item><title>通过Tensorflow2使用Bert预训练模型的两种方式</title><link>/post/deep-learning/2020-07-16-%E9%80%9A%E8%BF%87tensorflow2%E4%BD%BF%E7%94%A8bert%E9%A2%84%E8%AE%AD%E7%BB%83%E6%A8%A1%E5%9E%8B%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E5%BC%8F/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/deep-learning/2020-07-16-%E9%80%9A%E8%BF%87tensorflow2%E4%BD%BF%E7%94%A8bert%E9%A2%84%E8%AE%AD%E7%BB%83%E6%A8%A1%E5%9E%8B%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E5%BC%8F/</guid><description>以中文Bert为例
+下面的例子均以中文Bert预训练模型为例
+方式1：使用Tensorflow Hub import tensorflow as tf import tensorflow_hub as hub hub_url_or_local_path = &amp;#34;https://tfhub.dev/tensorflow/bert_zh_L-12_H-768_A-12/2&amp;#34; # 或者将模型下载到本地 # !wget &amp;#34;https://storage.googleapis.com/tfhub-modules/tensorflow/bert_zh_L-12_H-768_A-12/2.tar.gz&amp;#34; # !tar -xzvf 2.tar.gz -C bert_zh_L-12_H-768_A-12 # hub_url_or_local_path = &amp;#34;./bert_zh_L-12_H-768_A-12&amp;#34; def build_model(): input_word_ids = tf.keras.layers.Input(shape=(max_seq_length,), dtype=tf.int32, name=&amp;#34;input_word_ids&amp;#34;) input_mask = tf.keras.layers.Input(shape=(max_seq_length,), dtype=tf.int32, name=&amp;#34;input_mask&amp;#34;) segment_ids = tf.keras.layers.Input(shape=(max_seq_length,), dtype=tf.int32, name=&amp;#34;segment_ids&amp;#34;) bert_layer = hub.KerasLayer(hub_url_or_local_path, name=&amp;#39;bert&amp;#39;, trainable=True) pooled_output, sequence_output = bert_layer([input_word_ids, input_mask, segment_ids]) model = tf.keras.Model(inputs=[input_word_ids, input_mask, segment_ids], outputs=sequence_output) return model model = build_model() model.summary() 使用这种方式的时候在执行build_model时bert的参数已经被加载进来了。</description></item><item><title>隐马尔可夫模型</title><link>/post/machine-learning/2016-11-25-%E9%9A%90%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E6%A8%A1%E5%9E%8B/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/machine-learning/2016-11-25-%E9%9A%90%E9%A9%AC%E5%B0%94%E5%8F%AF%E5%A4%AB%E6%A8%A1%E5%9E%8B/</guid><description>隐马尔可夫模型解决的序列标注问题，它是一个生成模型。本文先介绍显马尔可夫模型（或者叫马尔可夫链），然后介绍显马尔可夫模型的扩展，即隐马尔可夫模型。显与隐指的是状态序列是否可观测。
+显（可视）马尔可夫模型 显马尔可夫模型、可视马尔可夫模型、马尔可夫链都是指马尔可夫模型。
+随机过程又称随机函数，是随时间而随机变化的过程。马尔可夫模型描述了一类（这些随机变量并非相互独立，每个随机变量的值依赖于这个序列前面的状态）重要的随机过程。 随机过程有两层含义：
+它是一个时间的函数，随着时间的改变可改变。 每个时刻上的函数值是不确定的，是随机的，也就是说，每一时刻上的函数值按照一定的概率而分布。 马尔可夫模型与有限状态机 马尔可夫模型又可视为随机的有限状态机，更准确的说马尔可夫模型和隐马尔可夫模型都是有限自动机的扩充。
+马尔可夫模型与n元文法模型 前面提到在马尔可夫模型中每个随机变量受这个序列前面的状态影响的，如果我们只考虑前面一个状态对后面一个状态出现的概率的影响，这样的链叫做一重马尔可夫链，也就量二元文法模型，如果考虑前面两个状态，这样的叫二重马可尔可夫链，也就是三元文法模型，依此类推，n重马尔可夫链对应n-1元文法模型。
+隐马尔可夫模型 马尔可夫模型是关于时序的概率模型，描述由一个隐藏的马尔可夫链随机生成不可可观测 的状态随机序列，再由各个状态生成一个观测而产生观测 随机序列的过程。 马尔可夫模型是一个生成模型，因此它也是学习
+$$ p(y \vert x) = \frac{p(x,y)}{p(x)} = \frac{p(x \vert y)p(y)}{p(x)} $$
+相关符号 高Q是所有可能状态集合，V是所有可能的观测集合。 $$ Q={q_1,q_2, &amp;hellip; q_N },V={v_1,v_2, &amp;hellip; v_M } $$ N是可能的状态数，M是可能的观测数。 I是长度为T的状态序列，O是对应的观测序列。 $$ I={i_1,i_2, &amp;hellip; i_T },O={o_1,o_2, &amp;hellip; o_T } $$ A是状态转移矩阵： $$ A=[a_{ij}]_{M \times N} $$ 其中 $$ a_{ij}=P(i_{t+1}=q_j|i_t=q_i), \qquad i=1,2&amp;hellip;N;j=1,2&amp;hellip;N $$ 表示在时刻t处于状态qi的状态下在时刻t+1转移到状态qj的概率。
+B是观测概率矩阵： $$ B=[b_j(k)]_{N \times M} $$</description></item><item><title>集成学习简单介绍</title><link>/post/machine-learning/2017-07-15-%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/machine-learning/2017-07-15-%E9%9B%86%E6%88%90%E5%AD%A6%E4%B9%A0%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8D/</guid><description>背景 目前在kaggle中，GBDT和RF都是非常流行的算法，在一些比赛中，排名先前的算法都有这两种算法的身影。这两种算法都属于Ensemble算法，因此，本文将介绍介绍下Ensemble的思想，以及实现Ensemble的两种方法。
+什么是集成学习 Ensemble通过构建多个学习器来完成学习任务，直觉上来说，由于不再是单一的模型进行预测，所以模型有了“集思广益”的能力，也就不容易产生过拟合现象。但并不是说，随机进行组合就能得到好的效果，各个子模型应该“好而不同”，即个体学习器要有一定的“准确性”又要有“互补性”。
+根据个体学习器的生成方式，目前的集成学习方法大致可分为两大类，即
+个体学习器间存在强依赖关系、必须串行生成的序列化算法。 个体学习器间不存在依赖关系、可同时生成的并行化算法。 前者的代表是Bossting，后者的代表是Bagging。从偏差-方差的角度看Bossting主要关注降低偏差，因此Bossting能基于泛化性能相当弱的学习器构建出很强的学习器，比如一棵只有5层的决策树。而Bagging主要关注降低方差，因此它在不剪枝层次较深的决策树、神经网络等易样本干扰的学习器上效用更加明显。 要获得好的集成，个体学习器应“好而不同”，即个体学习器要有一定的“准确性”，即学习器不能太坏，并且要有“多样性”，即学习器间具有差异。
+Bostting Bostting是一族可将弱学习器提升为强学习器的算法，这族算法的工作机制类似：先从初始训练集训练出一个基学习器，再根据基学习器的表现对训练样本分布进行调整，使得先前基学习器做错的训练样本在后续受到更多的关注，然后基于调整后的样本来训练下一个基学习器；如此重复进行，直至基学习器数目达到事先指定的值T，最终将这个T个基学习器进行加权结合。
+Bagging 如上所述，一个可行的集成学习算法，要满足两个要点，一是“多样性”二是“准确性”。一个可行的做法是对训练样本进行采样，产生出若干个不同的子集，再从每个数据集中训练出一个学习器，这样就满足了“多样性”。然而，采样的每个子集都完全不同，则每个学习器只用到了一个小部分训练数据，甚至不足以进行有效学习，这显然无法确保产生出比较好的基学习器，为了解决这个问题可以采用自助采样法。
+《机器学习》 周志华 https://www.zhihu.com/question/29036379</description></item><item><title>静态博客搭建</title><link>/post/other/2017-05-09-%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/other/2017-05-09-%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/</guid><description>为什么要写博客 能够获得反馈，然后你可以继续做出更复杂、更优秀的产品。
+如何写博客 下文会先介绍较流行的几种书写博客的方式，然后重点介绍通过静态网页生成器的方式如何来搭建博客。首先通过静态页面托管平台来简易搭建博客，并推荐一些实用的博客组件，最后简单介绍将博客搭建在服务器上的思路。
+书写博客的几种方式 目前比较地的方式主要有两种：
+在线博客平台 例如：CSDN 博客中国 简书
+WordPress wordpress样例
+WordPress是个人博客系统，并逐步演化成一款内容管理系统软件，它是使用PHP语言和MySQL数据库开发的。用户可以在支持 PHP 和 MySQL数据库的服务器上使用自己的博客。
+在线博客平台的优点的简单，除了书写博客内容，不需要关心与网站有关的任何事情。缺点是有广告，死板，不geek。WordPress，则正好相反，操作麻烦，学习成本较高，对硬件资源有一定要求。优点是高度自由化。
+静态博客生成器介绍 静态博客生成器使用Markdown（或其他渲染引擎）解析文章，可利用靓丽的主题生成静态网页。
+Jekyll hexo
+hexo 样例 Jekyll 样例
+通过静态页面托管平台（github pages）极速搭建 github pages介绍
+Github Pages 是面向用户、组织和项目开放的公共静态页面搭建托管服务，站点可以被免费托管在Github 上，你可以选择使用Github Pages 默认提供的域名github.io 或者自定义域名来发布站点。
+搭建的过程分如下几个步骤：
+搜索theme 搜索
+fork
+设置github pages Your site is published at https://hwyoung.github.io/minimal-mistakes/
+预览 https://hwyoung.github.io/minimal-mistakes/
+写博客 minimal-mistakes/_posts/2016-07-20-helloworld.md hello world!!!</description></item></channel></rss>

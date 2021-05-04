@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>Git on Writing Lite</title><link>/tags/git/</link><description>Recent content in Git on Writing Lite</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Sat, 18 May 2019 19:36:15 +0000</lastBuildDate><atom:link href="/tags/git/index.xml" rel="self" type="application/rss+xml"/><item><title>Git 常用命令</title><link>/post/other/2019-05-18-git-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</link><pubDate>Sat, 18 May 2019 19:36:15 +0000</pubDate><guid>/post/other/2019-05-18-git-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</guid><description>1、删除文件
+rm test.txt git rm test.txt git commit -m &amp;#34;remove test.txt&amp;#34; git push 2、git更换远程仓库Ur
+git remote set-url origin [url] 3、把误删的文件恢复到最新版本：
+git checkout -- test.txt 4、创建新分支：
+git branch branchName 5、分支合并
+# 切换到Master分支 git checkout master # 对Develop分支进行合并 git merge --no-ff develo 6、切换到新分支：
+git checkout branchName 7、添加远程仓库
+git remote add origin &amp;lt;your_github_repo_url&amp;gt; 8、删除远程分支
+git push origin :branchname 9、查找删除的文件
+# 通过git log可查找到文件的commitid git checkout commit_id -- file_name 10、.git目录清理-删除git中的大文件
+# 1.使用以下命令可以查看占用空间最多的五个文件： git rev-list --objects --all | grep &amp;#34;$(git verify-pack -v .</description></item></channel></rss>

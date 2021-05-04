@@ -1,0 +1,169 @@
+<!doctype html><html class=no-js lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="IE=edge"><title>朴素贝叶斯 - Writing Lite</title><script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script><meta name=description content><meta property="og:title" content="朴素贝叶斯"><meta property="og:description" content="朴素贝叶斯是一种分类模型，属于生成模型。比较常见的应用是垃圾邮件分类；
+在垃圾邮件识别为例
+$$ y\in{0,1} $$ y=1表示垃圾邮件
+将每封邮件表示成一个向量，向量中每一维都是字典中的一个词的0/1值，1表示该词在邮件中出现，0表示未出现。 假设有一个50000个词的词表，一封邮件x可表示（多元伯努利时间模型） $$ x= \begin{bmatrix} 0 \
+1 \
+1 \
+… \
+\end{bmatrix} $$
+$$ x=\in{0,1}^n $$ n=50000
+假设 我们还是对P(X|Y)建模
+$$ \begin{aligned} & P(x_1,x_2,&mldr;x_{50000}|y) \
+&= P(x_1|y)*P(x_2|y,x_1)*P(x_3|y,x_1,x_2)&mldr; \
+&= P(x_1|y)*P(x_2|y)*P(x_3|y)&mldr;P(x_50000|y) \
+&= \prod_{i=1}^{m}P(x_i|y) \end{aligned} $$ NLP中的n元语法模型有点类似，这里相当于一元文法unigram。
+这里有个假设，条件独立性假设，形式化表示为，（如果给定Z的情况下，X和Y条件独立）
+这里我们发现朴素贝叶斯假设是约束性很强的假设，“buy”从通常上讲与“price”是有关系，我们这里假设的是条件独立。
+模型参数 $$ \begin{aligned} \phi_{i|y=1} &= P(x_i=1|y=1) \
+\phi_{i|y=0} &= P(x_i=1|y=0) \
+\phi_y&=P(y=1) \end{aligned} $$
+joint似然函数为： $$ L(\phi_y,\phi_{i|y=0},\phi_{i|y=1})= \prod_{i=1}^{m}P(x^{(i)},y^{(i)}) $$
+求该 Joint似然最大化得： $$ \begin{aligned} \phi_{i|y=1} &= \frac{\sum_{i=1}^mI{x_j^{(i)}=1,y^{(i)}=1}}{\sum_{i=1}^mI{y^{(i)}=1}} \"><meta property="og:type" content="article"><meta property="og:url" content="/post/machine-learning/2017-03-12-%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF/"><meta property="article:section" content="post"><meta itemprop=name content="朴素贝叶斯"><meta itemprop=description content="朴素贝叶斯是一种分类模型，属于生成模型。比较常见的应用是垃圾邮件分类；
+在垃圾邮件识别为例
+$$ y\in{0,1} $$ y=1表示垃圾邮件
+将每封邮件表示成一个向量，向量中每一维都是字典中的一个词的0/1值，1表示该词在邮件中出现，0表示未出现。 假设有一个50000个词的词表，一封邮件x可表示（多元伯努利时间模型） $$ x= \begin{bmatrix} 0 \
+1 \
+1 \
+… \
+\end{bmatrix} $$
+$$ x=\in{0,1}^n $$ n=50000
+假设 我们还是对P(X|Y)建模
+$$ \begin{aligned} & P(x_1,x_2,&mldr;x_{50000}|y) \
+&= P(x_1|y)*P(x_2|y,x_1)*P(x_3|y,x_1,x_2)&mldr; \
+&= P(x_1|y)*P(x_2|y)*P(x_3|y)&mldr;P(x_50000|y) \
+&= \prod_{i=1}^{m}P(x_i|y) \end{aligned} $$ NLP中的n元语法模型有点类似，这里相当于一元文法unigram。
+这里有个假设，条件独立性假设，形式化表示为，（如果给定Z的情况下，X和Y条件独立）
+这里我们发现朴素贝叶斯假设是约束性很强的假设，“buy”从通常上讲与“price”是有关系，我们这里假设的是条件独立。
+模型参数 $$ \begin{aligned} \phi_{i|y=1} &= P(x_i=1|y=1) \
+\phi_{i|y=0} &= P(x_i=1|y=0) \
+\phi_y&=P(y=1) \end{aligned} $$
+joint似然函数为： $$ L(\phi_y,\phi_{i|y=0},\phi_{i|y=1})= \prod_{i=1}^{m}P(x^{(i)},y^{(i)}) $$
+求该 Joint似然最大化得： $$ \begin{aligned} \phi_{i|y=1} &= \frac{\sum_{i=1}^mI{x_j^{(i)}=1,y^{(i)}=1}}{\sum_{i=1}^mI{y^{(i)}=1}} \"><meta itemprop=wordCount content="297"><meta itemprop=keywords content><meta name=twitter:card content="summary"><meta name=twitter:title content="朴素贝叶斯"><meta name=twitter:description content="朴素贝叶斯是一种分类模型，属于生成模型。比较常见的应用是垃圾邮件分类；
+在垃圾邮件识别为例
+$$ y\in{0,1} $$ y=1表示垃圾邮件
+将每封邮件表示成一个向量，向量中每一维都是字典中的一个词的0/1值，1表示该词在邮件中出现，0表示未出现。 假设有一个50000个词的词表，一封邮件x可表示（多元伯努利时间模型） $$ x= \begin{bmatrix} 0 \
+1 \
+1 \
+… \
+\end{bmatrix} $$
+$$ x=\in{0,1}^n $$ n=50000
+假设 我们还是对P(X|Y)建模
+$$ \begin{aligned} & P(x_1,x_2,&mldr;x_{50000}|y) \
+&= P(x_1|y)*P(x_2|y,x_1)*P(x_3|y,x_1,x_2)&mldr; \
+&= P(x_1|y)*P(x_2|y)*P(x_3|y)&mldr;P(x_50000|y) \
+&= \prod_{i=1}^{m}P(x_i|y) \end{aligned} $$ NLP中的n元语法模型有点类似，这里相当于一元文法unigram。
+这里有个假设，条件独立性假设，形式化表示为，（如果给定Z的情况下，X和Y条件独立）
+这里我们发现朴素贝叶斯假设是约束性很强的假设，“buy”从通常上讲与“price”是有关系，我们这里假设的是条件独立。
+模型参数 $$ \begin{aligned} \phi_{i|y=1} &= P(x_i=1|y=1) \
+\phi_{i|y=0} &= P(x_i=1|y=0) \
+\phi_y&=P(y=1) \end{aligned} $$
+joint似然函数为： $$ L(\phi_y,\phi_{i|y=0},\phi_{i|y=1})= \prod_{i=1}^{m}P(x^{(i)},y^{(i)}) $$
+求该 Joint似然最大化得： $$ \begin{aligned} \phi_{i|y=1} &= \frac{\sum_{i=1}^mI{x_j^{(i)}=1,y^{(i)}=1}}{\sum_{i=1}^mI{y^{(i)}=1}} \"><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=dns-prefetch href=//fonts.googleapis.com><link rel=dns-prefetch href=//fonts.gstatic.com><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700"><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/custom.css><link rel="shortcut icon" href=/favicon.ico></head><body class=body><div class="container container--outer"><header class=header><div class="container header__container"><div class=logo><a class=logo__link href=/ title="Writing Lite" rel=home><div class="logo__item logo__text"><div class=logo__title>Writing Lite</div><div class=logo__tagline>Just writing a lite blog</div></div></a></div><div class=divider></div></div></header><div class="wrapper flex"><div class=primary><main class=main role=main><article class=post><header class=post__header><h1 class=post__title>朴素贝叶斯</h1><div class="post__meta meta"><div class="meta__item-author meta__item"><svg class="meta__icon icon icon-author" width="16" height="16" viewBox="0 0 12 16"><path d="M6 1c2.2.0 3.5 2 3.5 4.5C9.5 7 8.9 8.2 8 9c2.9.8 4 2.5 4 5v1H0v-1c0-2.5 1.1-4.2 4-5-.9-.8-1.5-2-1.5-3.5C2.5 3 3.8 1 6 1z"/></svg><span class=meta__text>hwyang</span></div></div></header><div class="post__toc toc"><div class=toc__title>Page content</div><div class=toc__menu><nav id=TableOfContents><ul><li><a href=#假设>假设</a></li><li><a href=#模型参数>模型参数</a></li><li><a href=#拉普斯平滑>拉普斯平滑</a></li><li><a href=#朴素贝叶斯事件模型>朴素贝叶斯事件模型</a><ul><li><a href=#模型参数-1>模型参数</a></li></ul></li><li><a href=#极大似然估计的推导>极大似然估计的推导</a></li></ul></nav></div></div><div class="content post__content clearfix"><p>朴素贝叶斯是一种分类模型，属于生成模型。比较常见的应用是垃圾邮件分类；</p><p>在垃圾邮件识别为例</p><p>$$
+y\in{0,1}
+$$
+y=1表示垃圾邮件</p><p>将每封邮件表示成一个向量，向量中每一维都是字典中的一个词的0/1值，1表示该词在邮件中出现，0表示未出现。
+假设有一个50000个词的词表，一封邮件x可表示（多元伯努利时间模型）
+$$
+x=
+\begin{bmatrix}
+0 \<br>1 \<br>1 \<br>… \<br>\end{bmatrix}
+$$</p><p>$$
+x=\in{0,1}^n
+$$
+n=50000</p><h2 id=假设>假设</h2><p>我们还是对P(X|Y)建模</p><p>$$
+\begin{aligned}
+& P(x_1,x_2,&mldr;x_{50000}|y) \<br>&= P(x_1|y)*P(x_2|y,x_1)*P(x_3|y,x_1,x_2)&mldr; \<br>&= P(x_1|y)*P(x_2|y)*P(x_3|y)&mldr;P(x_50000|y) \<br>&= \prod_{i=1}^{m}P(x_i|y)
+\end{aligned}
+$$
+NLP中的n元语法模型有点类似，这里相当于一元文法unigram。</p><p>这里有个假设，条件独立性假设，形式化表示为，（如果给定Z的情况下，X和Y条件独立）</p><p>这里我们发现朴素贝叶斯假设是约束性很强的假设，“buy”从通常上讲与“price”是有关系，我们这里假设的是条件独立。</p><h2 id=模型参数>模型参数</h2><p>$$
+\begin{aligned}
+\phi_{i|y=1} &= P(x_i=1|y=1) \<br>\phi_{i|y=0} &= P(x_i=1|y=0) \<br>\phi_y&=P(y=1)
+\end{aligned}
+$$</p><p>joint似然函数为：
+$$
+L(\phi_y,\phi_{i|y=0},\phi_{i|y=1})= \prod_{i=1}^{m}P(x^{(i)},y^{(i)})
+$$</p><p>求该 Joint似然最大化得：
+$$
+\begin{aligned}
+\phi_{i|y=1} &= \frac{\sum_{i=1}^mI{x_j^{(i)}=1,y^{(i)}=1}}{\sum_{i=1}^mI{y^{(i)}=1}} \<br>\phi_y &= \frac{\sum_{i=1}^mI{y^{(i)}=1}}{m}
+\end{aligned}
+$$
+二个式子分别表示在y=1或0的样本中，特征Xj=1的比例和y=1的样本数占全部样本数的比例。</p><hr><h2 id=拉普斯平滑>拉普斯平滑</h2><p>假设一个单词从未出现过，例如该词是第3500个词，也就是
+$$
+P(x_{3500}|y=0)=0
+P(x_{3500}|y=1)=0
+$$
+当计算
+$$
+P(y=1|x) = \frac{P(x|y=1)*P(y=1)}{P(x|y=1)*P(y=1) + P(x|y=0)*P(y=0)}
+$$
+又因为,$P(x_{3500}|y=1) = 0$，因此
+$$
+P(x|y=1)*P(y=1) = \prod_{i=1}^{m}P(x_i|y) = 0
+$$
+所以，之前的等式
+$$
+P(y=1|x) = \frac{P(x|y=1)*P(y=1)}{P(x|y=1)*P(y=1) + P(x|y=0)*P(y=0)} = \frac{0}{0+0}
+$$
+这里存在的问题是认为$P(x_{3500}|y=1)=0$不是个好主意。可以认为一件事不太可能发生，但不能认为不会发生。</p><p>那么拉普斯
+$$
+P(y=1) = \frac{#&ldquo;1&rdquo;}{#&ldquo;1&rdquo; + #&ldquo;0&rdquo;} = \frac{#&ldquo;1&rdquo; + 1}{#&ldquo;1&rdquo; + 1 + #&ldquo;0&rdquo; + 1}
+$$</p><p>如果$y \in {1,2,3&mldr;k}$，那么
+$$
+P(y=j) = \frac{\sum_{j=1}^m I(y^{(i)}=j)}{m}
+$$
+对它使用拉普斯平滑
+$$
+P(y=j) = \frac{\sum_{j=1}^m I(y^{(i)}=j) + 1}{m+k}
+$$</p><p>将拉普斯平滑应用到朴素贝叶斯，就是
+$$
+\begin{aligned}
+\phi_{i|y=1} &= \frac{\sum_{i=1}^mI{x_j^{(i)}=1,y^{(i)}=1}+1}{\sum_{i=1}^mI{y^{(i)}=1}+2}
+\end{aligned}
+$$</p><hr><h2 id=朴素贝叶斯事件模型>朴素贝叶斯事件模型</h2><p>另一种将文档表现为特征向量的方式
+$$
+x^{(i)}={x^{(i)}_1,x^{(i)}<em>2,x^{(i)}<em>2 &mldr; x^{(i)}</em>{n_i}}
+$$
+ni为文档的总词数，$x_j \in {1,2,3 &mldr; 50000}$为词典中的索引。那么
+$$
+P(x,y) = \left( \prod</em>{i=1}^{n}P(x_i|y) \right) P(y)
+$$
+在这里，认为写邮件时，先选择了邮件的类型（是否为垃圾邮件）然后按照一定的比例选择用词来生成文档。所以是生成模型。</p><h3 id=模型参数-1>模型参数</h3><p>$$
+\phi_{k|y=1}=P(x_i=k|y=1) \<br>\phi_{k|y=1}=P(x_i=k|y=0) \<br>\phi_y=P(y=1)
+$$
+第一个式表示在给定y=1的情况下，选择词K的概率。</p><p>对这些参数进行极大似然估计，
+$$
+\begin{aligned}
+& l(\phi_{k|y=1},\phi_{k|y=1},\phi_y) \<br>& = \log \prod_i^m P(x^{(i)},y^{(i)};\phi_{k|y=1},\phi_{k|y=1},\phi_y) \<br>& = \log \prod_i^m \prod_{j=1}^{n_i}P(x^{(i)}_j|y^{(i)};\phi_{k|y=1},\phi_{k|y=1}) * P(y^{(i)};\phi_y)
+\end{aligned}
+$$
+可得
+$$
+\phi_{k|y=1} = \frac{\sum_{i=1}^m I(y^{(i)}=1) \sum_j^{n_i} I(x_j^{(i)}=k)}{\sum_{i=1}^m I(y^{(i)}=1)*n_i}
+$$
+分子的意思是，对所有垃圾邮件中词K出现的次数。分母的意思是，所有垃圾邮件的总词数。
+如果对上面的式子进行拉普斯平滑的话则为
+$$
+\phi_{k|y=1} = \frac{\sum_{i=1}^m I(y^{(i)}=1) \sum_j^{n_i} I(x_j^{(i)}=k)+1}{\sum_{i=1}^m I(y^{(i)}=1)*n_i+50000}
+$$</p><p>其实拉普斯是
+$$
+x \in { 1,2,3&mldr;l }\<br>P(x=k) = \frac{#&ldquo;k&rdquo; + 1}{#&ldquo;1&rdquo; + #&ldquo;2&rdquo; + #&ldquo;3&rdquo; + &mldr; + #&ldquo;l&rdquo; + l}
+$$</p><hr><h2 id=极大似然估计的推导>极大似然估计的推导</h2><p>假设
+$$
+y \in { 1,2,3&mldr;k } \<br>$$
+那么
+$$
+P(y)=\prod_{1}^K P(y=c_k)^I(y=c_k)
+$$
+当y=ck，文档x的概率为：
+$$
+\begin{aligned}
+P(x|y=c_k)=\prod_{j=1}^{n_i} P(x_j|y=c_k)
+\end{aligned}
+$$
+$$
+\begin{aligned}
+& l(\phi_{k|y=1},\phi_{k|y=1},\phi_y) \<br>& = \log \prod_i^m P(x^{(i)},y^{(i)};\phi_{k|y=1},\phi_{k|y=1},\phi_y) \<br>& = \log \prod_i^m \prod_{j=1}^{n_i}P(x^{(i)}_j|y^{(i)};\phi_{k|y=1},\phi_{k|y=1}) * P(y^{(i)};\phi_y) \<br>& =
+\end{aligned}
+$$</p></div></article></main><nav class="pager flex"><div class="pager__item pager__item--prev"><a class=pager__link href=/post/machine-learning/2017-03-12-%E6%A8%A1%E5%9E%8B%E7%AE%80%E8%A6%81%E6%80%BB%E7%BB%93/ rel=prev><span class=pager__subtitle>«&#8201;Previous</span><p class=pager__title>模型简要总结</p></a></div><div class="pager__item pager__item--next"><a class=pager__link href=/post/machine-learning/2017-01-12-%E6%9C%80%E5%B0%8F%E4%BA%8C%E4%B9%98%E5%9B%9E%E5%BD%92/ rel=next><span class=pager__subtitle>Next&#8201;»</span><p class=pager__title>最小二乘回归</p></a></div></nav></div></div><footer class=footer><div class="container footer__container flex"><div class=footer__copyright>&copy; 2021 Writing Lite.
+<span class=footer__copyright-credits>Generated with <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> and <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> theme.</span></div></div></footer></div><script async defer src=/js/menu.js></script><script src=/js/custom.js></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script></body></html>

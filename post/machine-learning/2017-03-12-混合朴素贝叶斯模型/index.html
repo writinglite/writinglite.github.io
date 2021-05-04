@@ -1,0 +1,48 @@
+<!doctype html><html class=no-js lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="IE=edge"><title>混合朴素贝叶斯模型 - Writing Lite</title><script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script><meta name=description content><meta property="og:title" content="混合朴素贝叶斯模型"><meta property="og:description" content="训练样本，${x_1,x_2,x_3 &mldr; x_m}$ m个文本。 $$ x^{(i)} \in {0,1}^n \
+x^{(i)}_j = I{词j是否在文档x^{(i)}中 } \
+z^{(i)} \in {0,1} \
+z^{(i)} \sim 伯努利(\phi) $$ zi是隐含随机变量，也就是聚类类别，这里假设是两类，也因此分布为伯努利分布，也可以根据情况有更多类别。
+条件独立假设： $$ P(x^{(i)} \mid z^{(i)}) = \prod_i^n P(x^{(i)}_j \mid z^{(i)}) $$ 表示，在给定类别z生成文档x的概率。
+$$ P(x^{(i)}j=1 \mid z^{(i)} = 0) = \phi{j \mid z=0} $$ 对应高斯判别分析中的 $$ \begin{aligned} \phi_{i|y=1} &= P(x_i=1|y=1) \
+\phi_{i|y=0} &= P(x_i=1|y=0) \
+\phi_y&=P(y=1) \end{aligned} $$
+E-step: $$ w^{(i)} = P(z^{(i)}=1 \mid x^{(i)};\phi_{j \mid z},\phi) \"><meta property="og:type" content="article"><meta property="og:url" content="/post/machine-learning/2017-03-12-%E6%B7%B7%E5%90%88%E6%9C%B4%E7%B4%A0%E8%B4%9D%E5%8F%B6%E6%96%AF%E6%A8%A1%E5%9E%8B/"><meta property="article:section" content="post"><meta itemprop=name content="混合朴素贝叶斯模型"><meta itemprop=description content="训练样本，${x_1,x_2,x_3 &mldr; x_m}$ m个文本。 $$ x^{(i)} \in {0,1}^n \
+x^{(i)}_j = I{词j是否在文档x^{(i)}中 } \
+z^{(i)} \in {0,1} \
+z^{(i)} \sim 伯努利(\phi) $$ zi是隐含随机变量，也就是聚类类别，这里假设是两类，也因此分布为伯努利分布，也可以根据情况有更多类别。
+条件独立假设： $$ P(x^{(i)} \mid z^{(i)}) = \prod_i^n P(x^{(i)}_j \mid z^{(i)}) $$ 表示，在给定类别z生成文档x的概率。
+$$ P(x^{(i)}j=1 \mid z^{(i)} = 0) = \phi{j \mid z=0} $$ 对应高斯判别分析中的 $$ \begin{aligned} \phi_{i|y=1} &= P(x_i=1|y=1) \
+\phi_{i|y=0} &= P(x_i=1|y=0) \
+\phi_y&=P(y=1) \end{aligned} $$
+E-step: $$ w^{(i)} = P(z^{(i)}=1 \mid x^{(i)};\phi_{j \mid z},\phi) \"><meta itemprop=wordCount content="102"><meta itemprop=keywords content><meta name=twitter:card content="summary"><meta name=twitter:title content="混合朴素贝叶斯模型"><meta name=twitter:description content="训练样本，${x_1,x_2,x_3 &mldr; x_m}$ m个文本。 $$ x^{(i)} \in {0,1}^n \
+x^{(i)}_j = I{词j是否在文档x^{(i)}中 } \
+z^{(i)} \in {0,1} \
+z^{(i)} \sim 伯努利(\phi) $$ zi是隐含随机变量，也就是聚类类别，这里假设是两类，也因此分布为伯努利分布，也可以根据情况有更多类别。
+条件独立假设： $$ P(x^{(i)} \mid z^{(i)}) = \prod_i^n P(x^{(i)}_j \mid z^{(i)}) $$ 表示，在给定类别z生成文档x的概率。
+$$ P(x^{(i)}j=1 \mid z^{(i)} = 0) = \phi{j \mid z=0} $$ 对应高斯判别分析中的 $$ \begin{aligned} \phi_{i|y=1} &= P(x_i=1|y=1) \
+\phi_{i|y=0} &= P(x_i=1|y=0) \
+\phi_y&=P(y=1) \end{aligned} $$
+E-step: $$ w^{(i)} = P(z^{(i)}=1 \mid x^{(i)};\phi_{j \mid z},\phi) \"><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=dns-prefetch href=//fonts.googleapis.com><link rel=dns-prefetch href=//fonts.gstatic.com><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700"><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/custom.css><link rel="shortcut icon" href=/favicon.ico></head><body class=body><div class="container container--outer"><header class=header><div class="container header__container"><div class=logo><a class=logo__link href=/ title="Writing Lite" rel=home><div class="logo__item logo__text"><div class=logo__title>Writing Lite</div><div class=logo__tagline>Just writing a lite blog</div></div></a></div><div class=divider></div></div></header><div class="wrapper flex"><div class=primary><main class=main role=main><article class=post><header class=post__header><h1 class=post__title>混合朴素贝叶斯模型</h1><div class="post__meta meta"><div class="meta__item-author meta__item"><svg class="meta__icon icon icon-author" width="16" height="16" viewBox="0 0 12 16"><path d="M6 1c2.2.0 3.5 2 3.5 4.5C9.5 7 8.9 8.2 8 9c2.9.8 4 2.5 4 5v1H0v-1c0-2.5 1.1-4.2 4-5-.9-.8-1.5-2-1.5-3.5C2.5 3 3.8 1 6 1z"/></svg><span class=meta__text>hwyang</span></div></div></header><div class="content post__content clearfix"><p>训练样本，${x_1,x_2,x_3 &mldr; x_m}$ m个文本。
+$$
+x^{(i)} \in {0,1}^n \<br>x^{(i)}_j = I{词j是否在文档x^{(i)}中 } \<br>z^{(i)} \in {0,1} \<br>z^{(i)} \sim 伯努利(\phi)
+$$
+zi是隐含随机变量，也就是聚类类别，这里假设是两类，也因此分布为伯努利分布，也可以根据情况有更多类别。</p><p>条件独立假设：
+$$
+P(x^{(i)} \mid z^{(i)}) = \prod_i^n P(x^{(i)}_j \mid z^{(i)})
+$$
+表示，在给定类别z生成文档x的概率。</p><p>$$
+P(x^{(i)}<em>j=1 \mid z^{(i)} = 0) = \phi</em>{j \mid z=0}
+$$
+对应高斯判别分析中的
+$$
+\begin{aligned}
+\phi_{i|y=1} &= P(x_i=1|y=1) \<br>\phi_{i|y=0} &= P(x_i=1|y=0) \<br>\phi_y&=P(y=1)
+\end{aligned}
+$$</p><p>E-step:
+$$
+w^{(i)} = P(z^{(i)}=1 \mid x^{(i)};\phi_{j \mid z},\phi) \<br>$$
+注意这里的$\phi_{j \mid z}$和$\phi$是不一样的。</p><p>M-step:
+$$
+\phi_{j \mid z=1} = \frac{\sum_{i=1}^m w^{(i) }I(x^{(i)}_j = 1)}{\sum_{i=1}^n w^{(i)}} \<br>\phi_{j \mid z=0} = \frac{\sum_{i=1}^m (1- w^{(i)) }I(x^{(i)}_j = 1)}{\sum_{i=1}^n (1- w^{(i)})} \<br>\phi_z=\frac{\sum_iw^{(i)})}{m}
+$$</p></div></article></main><nav class="pager flex"><div class="pager__item pager__item--prev"><a class=pager__link href=/post/machine-learning/2017-02-18-%E6%B7%B7%E5%90%88%E9%AB%98%E6%96%AF%E6%A8%A1%E5%9E%8B/ rel=prev><span class=pager__subtitle>«&#8201;Previous</span><p class=pager__title>混合高斯模型</p></a></div><div class="pager__item pager__item--next"><a class=pager__link href=/post/deep-learning/2019-07-17-%E6%B7%B1%E5%BA%A6%E7%A5%9E%E7%BB%8F%E7%BD%91%E7%BB%9C/ rel=next><span class=pager__subtitle>Next&#8201;»</span><p class=pager__title>深度神经网络</p></a></div></nav></div></div><footer class=footer><div class="container footer__container flex"><div class=footer__copyright>&copy; 2021 Writing Lite.
+<span class=footer__copyright-credits>Generated with <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> and <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> theme.</span></div></div></footer></div><script async defer src=/js/menu.js></script><script src=/js/custom.js></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script></body></html>

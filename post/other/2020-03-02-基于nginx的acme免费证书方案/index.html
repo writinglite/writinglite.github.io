@@ -1,0 +1,71 @@
+<!doctype html><html class=no-js lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="IE=edge"><title>2020-03-02-基于nginx的acme免费证书方案 - Writing Lite</title><script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script><meta name=description content><meta property="og:title" content="2020-03-02-基于nginx的acme免费证书方案"><meta property="og:description" content="为了保护用户信息使网站更加安全，需要给网站添加https协议。搭建一个https网站的前提是要先拥有一个证书，当然一般的证书是需要收费，文本提供一个免费的解决方案。
+我们使用的github上开源的免费证书工具ACME.SH，网站地址：https://github.com/acmesh-official/acme.sh，
+在其github主页上已经有了一些很好的入门说明。这里根据实际情况进行操作。
+依赖安装 apt-get install cron socat -y 安装ACME.sh curl https://get.acme.sh | sh 安装成功后会提示Install success!，这个命令会将acme命令写到batchrc里，为了方便使用需要 ：
+source ~/.bashrc 申请证书 acme.sh --issue -d example.com --standalone 生成的证书被放在 /root/.acme.sh/
+复制证书到nginx acme.sh --installcert -d freegoooovideos.ml \  --key-file /etc/nginx/ssl/freegoooovideos.key \  --fullchain-file /etc/nginx/ssl/fullchain.cer \  --reloadcmd &#34;systemctl force-reload nginx.service&#34; #或sudo service nginx force-reload reloadcmd 会记住让nginx重新加载的方式 ，这样证书更新的时候就可以让你nginx重新加载了。
+这个命令不只是复制，它会把信息记录到本地中（.acme/example.com/example.com.conf），这样在更新证书的时候会自动将文件复制到容器中，并让其重新加载配置。
+附：nginx的配置文件（/etc/nginx/nginx.conf 默认位置）
+user nginx; worker_processes 1; error_log /var/log/nginx/error.log warn; pid /var/run/nginx.pid; events { worker_connections 1024; } http { map $http_upgrade $connection_upgrade { default upgrade; '' close; } server{ listen 443 ssl; ssl on; proxy_redirect off; ssl_certificate /etc/nginx/ssl/fullchain."><meta property="og:type" content="article"><meta property="og:url" content="/post/other/2020-03-02-%E5%9F%BA%E4%BA%8Enginx%E7%9A%84acme%E5%85%8D%E8%B4%B9%E8%AF%81%E4%B9%A6%E6%96%B9%E6%A1%88/"><meta property="article:section" content="post"><meta property="article:published_time" content="2020-03-02T17:36:15+00:00"><meta property="article:modified_time" content="2020-03-02T17:36:15+00:00"><meta itemprop=name content="2020-03-02-基于nginx的acme免费证书方案"><meta itemprop=description content="为了保护用户信息使网站更加安全，需要给网站添加https协议。搭建一个https网站的前提是要先拥有一个证书，当然一般的证书是需要收费，文本提供一个免费的解决方案。
+我们使用的github上开源的免费证书工具ACME.SH，网站地址：https://github.com/acmesh-official/acme.sh，
+在其github主页上已经有了一些很好的入门说明。这里根据实际情况进行操作。
+依赖安装 apt-get install cron socat -y 安装ACME.sh curl https://get.acme.sh | sh 安装成功后会提示Install success!，这个命令会将acme命令写到batchrc里，为了方便使用需要 ：
+source ~/.bashrc 申请证书 acme.sh --issue -d example.com --standalone 生成的证书被放在 /root/.acme.sh/
+复制证书到nginx acme.sh --installcert -d freegoooovideos.ml \  --key-file /etc/nginx/ssl/freegoooovideos.key \  --fullchain-file /etc/nginx/ssl/fullchain.cer \  --reloadcmd &#34;systemctl force-reload nginx.service&#34; #或sudo service nginx force-reload reloadcmd 会记住让nginx重新加载的方式 ，这样证书更新的时候就可以让你nginx重新加载了。
+这个命令不只是复制，它会把信息记录到本地中（.acme/example.com/example.com.conf），这样在更新证书的时候会自动将文件复制到容器中，并让其重新加载配置。
+附：nginx的配置文件（/etc/nginx/nginx.conf 默认位置）
+user nginx; worker_processes 1; error_log /var/log/nginx/error.log warn; pid /var/run/nginx.pid; events { worker_connections 1024; } http { map $http_upgrade $connection_upgrade { default upgrade; '' close; } server{ listen 443 ssl; ssl on; proxy_redirect off; ssl_certificate /etc/nginx/ssl/fullchain."><meta itemprop=datePublished content="2020-03-02T17:36:15+00:00"><meta itemprop=dateModified content="2020-03-02T17:36:15+00:00"><meta itemprop=wordCount content="125"><meta itemprop=keywords content="nginx,acme,"><meta name=twitter:card content="summary"><meta name=twitter:title content="2020-03-02-基于nginx的acme免费证书方案"><meta name=twitter:description content="为了保护用户信息使网站更加安全，需要给网站添加https协议。搭建一个https网站的前提是要先拥有一个证书，当然一般的证书是需要收费，文本提供一个免费的解决方案。
+我们使用的github上开源的免费证书工具ACME.SH，网站地址：https://github.com/acmesh-official/acme.sh，
+在其github主页上已经有了一些很好的入门说明。这里根据实际情况进行操作。
+依赖安装 apt-get install cron socat -y 安装ACME.sh curl https://get.acme.sh | sh 安装成功后会提示Install success!，这个命令会将acme命令写到batchrc里，为了方便使用需要 ：
+source ~/.bashrc 申请证书 acme.sh --issue -d example.com --standalone 生成的证书被放在 /root/.acme.sh/
+复制证书到nginx acme.sh --installcert -d freegoooovideos.ml \  --key-file /etc/nginx/ssl/freegoooovideos.key \  --fullchain-file /etc/nginx/ssl/fullchain.cer \  --reloadcmd &#34;systemctl force-reload nginx.service&#34; #或sudo service nginx force-reload reloadcmd 会记住让nginx重新加载的方式 ，这样证书更新的时候就可以让你nginx重新加载了。
+这个命令不只是复制，它会把信息记录到本地中（.acme/example.com/example.com.conf），这样在更新证书的时候会自动将文件复制到容器中，并让其重新加载配置。
+附：nginx的配置文件（/etc/nginx/nginx.conf 默认位置）
+user nginx; worker_processes 1; error_log /var/log/nginx/error.log warn; pid /var/run/nginx.pid; events { worker_connections 1024; } http { map $http_upgrade $connection_upgrade { default upgrade; '' close; } server{ listen 443 ssl; ssl on; proxy_redirect off; ssl_certificate /etc/nginx/ssl/fullchain."><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=dns-prefetch href=//fonts.googleapis.com><link rel=dns-prefetch href=//fonts.gstatic.com><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700"><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/custom.css><link rel="shortcut icon" href=/favicon.ico></head><body class=body><div class="container container--outer"><header class=header><div class="container header__container"><div class=logo><a class=logo__link href=/ title="Writing Lite" rel=home><div class="logo__item logo__text"><div class=logo__title>Writing Lite</div><div class=logo__tagline>Just writing a lite blog</div></div></a></div><div class=divider></div></div></header><div class="wrapper flex"><div class=primary><main class=main role=main><article class=post><header class=post__header><h1 class=post__title>2020-03-02-基于nginx的acme免费证书方案</h1><div class="post__meta meta"><div class="meta__item-author meta__item"><svg class="meta__icon icon icon-author" width="16" height="16" viewBox="0 0 12 16"><path d="M6 1c2.2.0 3.5 2 3.5 4.5C9.5 7 8.9 8.2 8 9c2.9.8 4 2.5 4 5v1H0v-1c0-2.5 1.1-4.2 4-5-.9-.8-1.5-2-1.5-3.5C2.5 3 3.8 1 6 1z"/></svg><span class=meta__text>hwyang</span></div><div class="meta__item-datetime meta__item"><svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2020-03-02T17:36:15Z>2020-03-02</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/web/ rel=category>web</a></span></div></div></header><div class="post__toc toc"><div class=toc__title>Page content</div><div class=toc__menu><nav id=TableOfContents><ul><li><ul><li><a href=#依赖安装>依赖安装</a></li><li><a href=#安装acmesh>安装ACME.sh</a></li><li><a href=#申请证书>申请证书</a></li><li><a href=#复制证书到nginx>复制证书到nginx</a></li></ul></li></ul></nav></div></div><div class="content post__content clearfix"><p>为了保护用户信息使网站更加安全，需要给网站添加https协议。搭建一个https网站的前提是要先拥有一个<strong>证书</strong>，当然一般的证书是需要收费，文本提供一个免费的解决方案。</p><p>我们使用的github上开源的免费证书工具ACME.SH，网站地址：https://github.com/acmesh-official/acme.sh，</p><p>在其github主页上已经有了一些很好的入门说明。这里根据实际情况进行操作。</p><h3 id=依赖安装>依赖安装</h3><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>apt-get install cron socat -y
+</code></pre></div><h3 id=安装acmesh>安装ACME.sh</h3><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>curl https://get.acme.sh | sh 
+</code></pre></div><p>安装成功后会提示<code>Install success!</code>，这个命令会将acme命令写到<code>batchrc里</code>，为了方便使用需要 ：</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>source ~/.bashrc 
+</code></pre></div><h3 id=申请证书>申请证书</h3><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>acme.sh --issue -d example.com --standalone
+</code></pre></div><p>生成的证书被放在 <code>/root/.acme.sh/</code></p><h3 id=复制证书到nginx>复制证书到nginx</h3><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-shell data-lang=shell>acme.sh --installcert -d freegoooovideos.ml <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>        --key-file /etc/nginx/ssl/freegoooovideos.key <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>        --fullchain-file /etc/nginx/ssl/fullchain.cer <span style=color:#ae81ff>\
+</span><span style=color:#ae81ff></span>        --reloadcmd <span style=color:#e6db74>&#34;systemctl force-reload nginx.service&#34;</span>  <span style=color:#75715e>#或sudo service nginx force-reload</span>
+
+</code></pre></div><p><code>reloadcmd</code> 会记住让nginx重新加载的方式 ，这样证书更新的时候就可以让你nginx重新加载了。</p><p>这个命令不只是复制，它会把信息记录到本地中（<code>.acme/example.com/example.com.conf</code>），这样在更新证书的时候会自动将文件复制到容器中，并让其重新加载配置。</p><p>附：nginx的配置文件（/etc/nginx/nginx.conf 默认位置）</p><div class=highlight><pre style=color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4><code class=language-nginx data-lang=nginx><span style=color:#66d9ef>user</span>  <span style=color:#e6db74>nginx</span>;
+<span style=color:#66d9ef>worker_processes</span>  <span style=color:#ae81ff>1</span>;
+
+<span style=color:#66d9ef>error_log</span>  <span style=color:#e6db74>/var/log/nginx/error.log</span> <span style=color:#e6db74>warn</span>;
+<span style=color:#66d9ef>pid</span>        <span style=color:#e6db74>/var/run/nginx.pid</span>;
+
+<span style=color:#66d9ef>events</span> {
+    <span style=color:#f92672>worker_connections</span>  <span style=color:#ae81ff>1024</span>;
+}
+
+<span style=color:#66d9ef>http</span> {
+  <span style=color:#f92672>map</span> $http_upgrade $connection_upgrade {
+    <span style=color:#f92672>default</span> <span style=color:#e6db74>upgrade</span>;
+    <span style=color:#f92672>&#39;&#39;</span> <span style=color:#e6db74>close</span>;
+  }
+  <span style=color:#f92672>server{</span>
+    <span style=color:#e6db74>listen</span> <span style=color:#ae81ff>443</span> <span style=color:#e6db74>ssl</span>;
+    <span style=color:#f92672>ssl</span> <span style=color:#66d9ef>on</span>;
+    <span style=color:#f92672>proxy_redirect</span> <span style=color:#66d9ef>off</span>;
+    <span style=color:#f92672>ssl_certificate</span>       <span style=color:#e6db74>/etc/nginx/ssl/fullchain.cer</span>;
+    <span style=color:#f92672>ssl_certificate_key</span>   <span style=color:#e6db74>/etc/nginx/ssl/</span>{<span style=color:#f92672>example}.key</span>;
+    <span style=color:#f92672>ssl_protocols</span>         <span style=color:#e6db74>TLSv1</span> <span style=color:#e6db74>TLSv1.1</span> <span style=color:#e6db74>TLSv1.2</span>;
+    <span style=color:#f92672>ssl_ciphers</span>           <span style=color:#e6db74>HIGH:!aNULL:!MD5</span>;
+    <span style=color:#f92672>server_name</span>           {<span style=color:#f92672>exanoke.com}</span>;
+    <span style=color:#f92672>location</span> <span style=color:#e6db74>/freevideos</span> {
+      <span style=color:#f92672>access_log</span> <span style=color:#e6db74>/var/log/nginx/access.log</span>;
+      <span style=color:#f92672>proxy_pass</span> <span style=color:#e6db74>http://127.0.0.1:4433</span>;
+      <span style=color:#f92672>proxy_http_version</span> <span style=color:#ae81ff>1</span><span style=color:#e6db74>.1</span>;
+      <span style=color:#f92672>proxy_set_header</span> <span style=color:#e6db74>Upgrade</span> $http_upgrade;
+      <span style=color:#f92672>proxy_set_header</span> <span style=color:#e6db74>Connection</span> $connection_upgrade;
+      <span style=color:#f92672>proxy_set_header</span> <span style=color:#e6db74>Host</span> $host;
+      <span style=color:#f92672>proxy_set_header</span> <span style=color:#e6db74>X-Real-IP</span> $remote_addr;
+      <span style=color:#f92672>proxy_set_header</span> <span style=color:#e6db74>X-Forwarded-For</span> $proxy_add_x_forwarded_for;
+    }
+  }
+}
+</code></pre></div></div><footer class=post__footer><div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg><ul class=tags__list><li class=tags__item><a class="tags__link btn" href=/tags/nginx/ rel=tag>nginx</a></li><li class=tags__item><a class="tags__link btn" href=/tags/acme/ rel=tag>acme</a></li></ul></div></footer></article></main><nav class="pager flex"><div class="pager__item pager__item--prev"><a class=pager__link href=/post/other/2019-11-04-%E5%85%8D%E8%B4%B9%E8%AF%81%E4%B9%A6%E5%AE%89%E8%A3%85-certbot/ rel=prev><span class=pager__subtitle>«&#8201;Previous</span><p class=pager__title>免费证书安装-certbot</p></a></div></nav></div></div><footer class=footer><div class="container footer__container flex"><div class=footer__copyright>&copy; 2021 Writing Lite.
+<span class=footer__copyright-credits>Generated with <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> and <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> theme.</span></div></div></footer></div><script async defer src=/js/menu.js></script><script src=/js/custom.js></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script></body></html>

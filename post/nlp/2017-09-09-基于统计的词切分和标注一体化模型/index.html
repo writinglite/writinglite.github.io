@@ -1,0 +1,38 @@
+<!doctype html><html class=no-js lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="IE=edge"><title>基于统计的词切分和标注一体化模型 - Writing Lite</title><script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script><meta name=description content><meta property="og:title" content="基于统计的词切分和标注一体化模型"><meta property="og:description" content="基于统计的切记和标注一体化模型 假设$C=c_1,c_2 \dots c_m$为m个的字符串，$W=w_1,_2 \dots w_n$是把C切分后得到的由n个词组成的词序列，$T=t_1,t_2 \dots t_n$是对W进行标注后的标记序列。
+$$ P(W|C) = \frac{P(C|W)P(W)}{P(C)} $$ 可知P(C)是一个确定的值，P(C|W)是在给定词序列的情况下字符串的概率，可以认为是1。因此可得： $$ \max P(W|C) = \max P(W) $$ 即是说，分词的过程即是寻找概率最大词序列的过程。 我们再来考虑词序列与词序列与词性标注序列的关系。 $$ P(T|W) = \frac{P(W|T)P(T)}{P(W)} $$ 可推导出： $$ P(W) = \frac{P(W|T)P(T)}{P(T|W)} $$ 如果隐马尔可夫假设和独立输出假设 即： $$ P(T) = \prod_i^n P(t_i)P(t_{i-1}) \
+P(W|T) = \prod_i^n P(|w_i,t_i) \
+P(T|W) = \prod_i^n P(|t_i,w_i) $$
+计算方法：
+ 找到一条分词路径W 用记性标注的模型计算具有最大概率的记性标注序列，得到对应的标注路径T。 利用公式可得到W的概率 若干个健忘路径中，概率最大的W即为分词结果   引用： 白栓虎 - 基于统计的切记和标注一体化模型"><meta property="og:type" content="article"><meta property="og:url" content="/post/nlp/2017-09-09-%E5%9F%BA%E4%BA%8E%E7%BB%9F%E8%AE%A1%E7%9A%84%E8%AF%8D%E5%88%87%E5%88%86%E5%92%8C%E6%A0%87%E6%B3%A8%E4%B8%80%E4%BD%93%E5%8C%96%E6%A8%A1%E5%9E%8B/"><meta property="article:section" content="post"><meta itemprop=name content="基于统计的词切分和标注一体化模型"><meta itemprop=description content="基于统计的切记和标注一体化模型 假设$C=c_1,c_2 \dots c_m$为m个的字符串，$W=w_1,_2 \dots w_n$是把C切分后得到的由n个词组成的词序列，$T=t_1,t_2 \dots t_n$是对W进行标注后的标记序列。
+$$ P(W|C) = \frac{P(C|W)P(W)}{P(C)} $$ 可知P(C)是一个确定的值，P(C|W)是在给定词序列的情况下字符串的概率，可以认为是1。因此可得： $$ \max P(W|C) = \max P(W) $$ 即是说，分词的过程即是寻找概率最大词序列的过程。 我们再来考虑词序列与词序列与词性标注序列的关系。 $$ P(T|W) = \frac{P(W|T)P(T)}{P(W)} $$ 可推导出： $$ P(W) = \frac{P(W|T)P(T)}{P(T|W)} $$ 如果隐马尔可夫假设和独立输出假设 即： $$ P(T) = \prod_i^n P(t_i)P(t_{i-1}) \
+P(W|T) = \prod_i^n P(|w_i,t_i) \
+P(T|W) = \prod_i^n P(|t_i,w_i) $$
+计算方法：
+ 找到一条分词路径W 用记性标注的模型计算具有最大概率的记性标注序列，得到对应的标注路径T。 利用公式可得到W的概率 若干个健忘路径中，概率最大的W即为分词结果   引用： 白栓虎 - 基于统计的切记和标注一体化模型"><meta itemprop=wordCount content="61"><meta itemprop=keywords content="自然语言处理,分词,"><meta name=twitter:card content="summary"><meta name=twitter:title content="基于统计的词切分和标注一体化模型"><meta name=twitter:description content="基于统计的切记和标注一体化模型 假设$C=c_1,c_2 \dots c_m$为m个的字符串，$W=w_1,_2 \dots w_n$是把C切分后得到的由n个词组成的词序列，$T=t_1,t_2 \dots t_n$是对W进行标注后的标记序列。
+$$ P(W|C) = \frac{P(C|W)P(W)}{P(C)} $$ 可知P(C)是一个确定的值，P(C|W)是在给定词序列的情况下字符串的概率，可以认为是1。因此可得： $$ \max P(W|C) = \max P(W) $$ 即是说，分词的过程即是寻找概率最大词序列的过程。 我们再来考虑词序列与词序列与词性标注序列的关系。 $$ P(T|W) = \frac{P(W|T)P(T)}{P(W)} $$ 可推导出： $$ P(W) = \frac{P(W|T)P(T)}{P(T|W)} $$ 如果隐马尔可夫假设和独立输出假设 即： $$ P(T) = \prod_i^n P(t_i)P(t_{i-1}) \
+P(W|T) = \prod_i^n P(|w_i,t_i) \
+P(T|W) = \prod_i^n P(|t_i,w_i) $$
+计算方法：
+ 找到一条分词路径W 用记性标注的模型计算具有最大概率的记性标注序列，得到对应的标注路径T。 利用公式可得到W的概率 若干个健忘路径中，概率最大的W即为分词结果   引用： 白栓虎 - 基于统计的切记和标注一体化模型"><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=dns-prefetch href=//fonts.googleapis.com><link rel=dns-prefetch href=//fonts.gstatic.com><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700"><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/custom.css><link rel="shortcut icon" href=/favicon.ico></head><body class=body><div class="container container--outer"><header class=header><div class="container header__container"><div class=logo><a class=logo__link href=/ title="Writing Lite" rel=home><div class="logo__item logo__text"><div class=logo__title>Writing Lite</div><div class=logo__tagline>Just writing a lite blog</div></div></a></div><div class=divider></div></div></header><div class="wrapper flex"><div class=primary><main class=main role=main><article class=post><header class=post__header><h1 class=post__title>基于统计的词切分和标注一体化模型</h1><div class="post__meta meta"><div class="meta__item-author meta__item"><svg class="meta__icon icon icon-author" width="16" height="16" viewBox="0 0 12 16"><path d="M6 1c2.2.0 3.5 2 3.5 4.5C9.5 7 8.9 8.2 8 9c2.9.8 4 2.5 4 5v1H0v-1c0-2.5 1.1-4.2 4-5-.9-.8-1.5-2-1.5-3.5C2.5 3 3.8 1 6 1z"/></svg><span class=meta__text>hwyang</span></div></div></header><div class="post__toc toc"><div class=toc__title>Page content</div><div class=toc__menu><nav id=TableOfContents><ul><li><a href=#基于统计的切记和标注一体化模型>基于统计的切记和标注一体化模型</a></li></ul></nav></div></div><div class="content post__content clearfix"><h2 id=基于统计的切记和标注一体化模型>基于统计的切记和标注一体化模型</h2><p>假设$C=c_1,c_2 \dots c_m$为m个的字符串，$W=w_1,_2 \dots w_n$是把C切分后得到的由n个词组成的词序列，$T=t_1,t_2 \dots t_n$是对W进行标注后的标记序列。</p><p>$$
+P(W|C) = \frac{P(C|W)P(W)}{P(C)}
+$$
+可知P(C)是一个确定的值，P(C|W)是在给定词序列的情况下字符串的概率，可以认为是1。因此可得：
+$$
+\max P(W|C) = \max P(W)
+$$
+即是说，分词的过程即是寻找概率最大词序列的过程。
+我们再来考虑词序列与词序列与词性标注序列的关系。
+$$
+P(T|W) = \frac{P(W|T)P(T)}{P(W)}
+$$
+可推导出：
+$$
+P(W) = \frac{P(W|T)P(T)}{P(T|W)}
+$$
+如果隐马尔可夫假设和独立输出假设
+即：
+$$
+P(T) = \prod_i^n P(t_i)P(t_{i-1}) \<br>P(W|T) = \prod_i^n P(|w_i,t_i) \<br>P(T|W) = \prod_i^n P(|t_i,w_i)
+$$</p><p>计算方法：</p><ol><li>找到一条分词路径W</li><li>用记性标注的模型计算具有最大概率的记性标注序列，得到对应的标注路径T。</li><li>利用公式可得到W的概率</li><li>若干个健忘路径中，概率最大的W即为分词结果</li></ol><hr><p>引用：
+白栓虎 - 基于统计的切记和标注一体化模型</p></div><footer class=post__footer><div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg><ul class=tags__list><li class=tags__item><a class="tags__link btn" href=/tags/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86/ rel=tag>自然语言处理</a></li><li class=tags__item><a class="tags__link btn" href=/tags/%E5%88%86%E8%AF%8D/ rel=tag>分词</a></li></ul></div></footer></article></main><nav class="pager flex"><div class="pager__item pager__item--prev"><a class=pager__link href=/post/algorithm/2017-03-26-%E5%A0%86%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95/ rel=prev><span class=pager__subtitle>«&#8201;Previous</span><p class=pager__title>堆排序算法</p></a></div><div class="pager__item pager__item--next"><a class=pager__link href=/post/deep-learning/2017-07-11-%E5%9C%A8kaggle%E4%B8%AD%E4%BD%BF%E7%94%A8keras%E5%81%9A%E6%95%B0%E5%AD%97%E8%AF%86%E5%88%AB/ rel=next><span class=pager__subtitle>Next&#8201;»</span><p class=pager__title>在kaggle中使用keras做数字识别</p></a></div></nav></div></div><footer class=footer><div class="container footer__container flex"><div class=footer__copyright>&copy; 2021 Writing Lite.
+<span class=footer__copyright-credits>Generated with <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> and <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> theme.</span></div></div></footer></div><script async defer src=/js/menu.js></script><script src=/js/custom.js></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script></body></html>
