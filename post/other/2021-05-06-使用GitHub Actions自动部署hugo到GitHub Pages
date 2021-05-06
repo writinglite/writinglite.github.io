@@ -1,7 +1,7 @@
 ---
 title: "使用GitHub Actions自动部署hugo到GitHub Pages"
 date: 2021-05-06T14:16:16+08:00
-draft: true
+draft: false
 categories: 
  - other
 tags:
@@ -10,4 +10,97 @@ tags:
  - github actions
  - github pages
 ---
+
+
+
+
+
+之前一直使用`Bitcron `来搭建人个博客，但是最近`Bitcron `的官网显示，未来`Bitcron `将升级到`FarBox 2.0`，22年底就不再支持`Bitcron `了，并且不再支持几十元一年的套餐了。因此打算寻找其它方案来替代`Bitcron`。对于新方案的要求主要有几下几个：
+
+1. 支持将原有博客进行迁移
+2. 对系统环境要求低，部署方便
+3. 支持自定义域名
+4. 对`Markdown`支持良好，支持数学公式
+
+经过各种权衡，选择了`hugo + Github Actions + Github Pages`作为最终的方案。`hugo` 作为博客生成工具，`Github Actions`将`hugo`生成的博客发布到`Github Pages`。我们要做的只是在Client将新建的博客`push`到`Github`的私有仓库，剩下的工作`Github`会帮助我们自动完成。下面介绍该方案的具体实现。
+
+
+
+### 需要准备的环境
+
+* hugo 安装（非必需）
+* Github 私有仓库（用来放Blog文件）
+* Github Pages 仓库（用来存放静态页面）
+
+
+
+### Step 1 , 生成hugo文件
+
+假设上面提到的环境已经准备好，那么第一步是通过hugo生成一个hugo网站的文件夹。下面的命令可以生成一个`blog`的文件夹；
+
+```shell
+hugo new blog
+```
+
+如果没有安装`hugo`的话，可以在github上clone一个hugo网站的项目。
+
+
+
+### Step 2，设置`Blog`仓库
+
+这里假设我们的Github私有仓库的名称也是`blog`，那么首先，将本地`blog`文件夹与`blog`仓库进行关联；然后开始设置Github Actions，方式是在`blog`目录下新建文件`.github/workflows/hugo_deploy.yml`，具体内容如下：
+
+```yaml
+name: Deploy Blog
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build: # 一项叫做build的任务
+
+    runs-on: ubuntu-18.04 # 在最新版的Ubuntu系统下运行
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true  # Fetch Hugo themes (true OR recursive)
+          fetch-depth: 0    # Fetch all history for .GitInfo and .Lastmod
+
+      - name: Setup Hugo
+        uses: peaceiris/actions-hugo@v2
+        with:
+          hugo-version: '0.81.0'
+          # extended: true
+
+      - name: Build 
+        run: hugo --minify
+
+      - name: Deploy # 生成静态网页文件到public文件夹下
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          
+      - name: Pushes to another repository # 将public文件夹下的文件发布到Github Pages仓库下
+        uses: cpina/github-action-push-to-another-repository@main
+        env:
+          API_TOKEN_GITHUB: ${{ secrets.API_TOKEN_GITHUB }}
+        with:
+          source-directory: 'public'
+          destination-github-username: '<github-username>' # github 用户名
+          destination-repository-name: '<repository-name>.github.io' # Github Pages 仓库名
+          user-email: <your-email> # 邮箱地址
+          target-branch: main
+
+```
+
+这里需要说明的是`peaceiris/actions-gh-pages`是支持将生成的静态页面直接发布到Github Pages仓库的；但是这里使用的是`cpina/github-action-push-to-another-repository`这个action，因此这是一个更通用的方案，如果是以后替换hugo，这个action依然可以使用。
+
+
+
+
+
+
 
