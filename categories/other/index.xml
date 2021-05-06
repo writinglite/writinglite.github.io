@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>other on Writing Lite</title><link>/categories/other/</link><description>Recent content in other on Writing Lite</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Mon, 02 Mar 2020 17:36:15 +0000</lastBuildDate><atom:link href="/categories/other/index.xml" rel="self" type="application/rss+xml"/><item><title>基于nginx的acme免费证书方案</title><link>/post/other/2020-03-02-%E5%9F%BA%E4%BA%8Enginx%E7%9A%84acme%E5%85%8D%E8%B4%B9%E8%AF%81%E4%B9%A6%E6%96%B9%E6%A1%88/</link><pubDate>Mon, 02 Mar 2020 17:36:15 +0000</pubDate><guid>/post/other/2020-03-02-%E5%9F%BA%E4%BA%8Enginx%E7%9A%84acme%E5%85%8D%E8%B4%B9%E8%AF%81%E4%B9%A6%E6%96%B9%E6%A1%88/</guid><description>为了保护用户信息使网站更加安全，需要给网站添加https协议。搭建一个https网站的前提是要先拥有一个证书，当然一般的证书是需要收费，文本提供一个免费的解决方案。
+我们使用的github上开源的免费证书工具ACME.SH，网站地址：https://github.com/acmesh-official/acme.sh，
+在其github主页上已经有了一些很好的入门说明。这里根据实际情况进行操作。
+依赖安装 apt-get install cron socat -y 安装ACME.sh curl https://get.acme.sh | sh 安装成功后会提示Install success!，这个命令会将acme命令写到batchrc里，为了方便使用需要 ：
+source ~/.bashrc 申请证书 acme.sh --issue -d example.com --standalone 生成的证书被放在 /root/.acme.sh/
+复制证书到nginx acme.sh --installcert -d freegoooovideos.ml \ --key-file /etc/nginx/ssl/freegoooovideos.key \ --fullchain-file /etc/nginx/ssl/fullchain.cer \ --reloadcmd &amp;#34;systemctl force-reload nginx.service&amp;#34; #或sudo service nginx force-reload reloadcmd 会记住让nginx重新加载的方式 ，这样证书更新的时候就可以让你nginx重新加载了。
+这个命令不只是复制，它会把信息记录到本地中（.acme/example.com/example.com.conf），这样在更新证书的时候会自动将文件复制到容器中，并让其重新加载配置。
+附：nginx的配置文件（/etc/nginx/nginx.conf 默认位置）
+user nginx; worker_processes 1; error_log /var/log/nginx/error.log warn; pid /var/run/nginx.pid; events { worker_connections 1024; } http { map $http_upgrade $connection_upgrade { default upgrade; &amp;#39;&amp;#39; close; } server{ listen 443 ssl; ssl on; proxy_redirect off; ssl_certificate /etc/nginx/ssl/fullchain.</description></item><item><title>免费证书安装-certbot</title><link>/post/other/2019-11-04-%E5%85%8D%E8%B4%B9%E8%AF%81%E4%B9%A6%E5%AE%89%E8%A3%85-certbot/</link><pubDate>Mon, 04 Nov 2019 17:36:15 +0000</pubDate><guid>/post/other/2019-11-04-%E5%85%8D%E8%B4%B9%E8%AF%81%E4%B9%A6%E5%AE%89%E8%A3%85-certbot/</guid><description>为了给网站添加https协议，本文记录了如何免费获取证书。
+免费的证书颁发机构：letsencrypt
+为了能使用证书还需要一个可以操作letsencrypt的客户端，这里使用官网推荐的工具certbot
+certbot的安装根据不同的系统安装方式不同，可以根据官网来操作。
+这里给出Debain10的安装方式：
+sudo apt-get install certbot 安装好之后就可以获取证书了，如果想把证书安装到nginx或apache等上，可以安装相应的插件。这里给出的是standalone方式：
+sudo certbot certonly --standalone -d yourdomain.me 输入命令之后，会提示输入email之类的，IMPORTANT NOTES:会提示获取的证书最终的输出位置。
+关于证书的更新
+需要注意的是，现在获取的证书的有效期是90天，90后证书就是过期，因此需要更新证书。
+正常安装certbot之后，证书是自动更新的，可参看官方文档
+可通过systemctl list-timers查看或查看 crotab
+例如在debian中在/etc/cron.d/certbot可以找到
+0 */12 * * * root test -x /usr/bin/certbot -a \! -d /run/systemd/system &amp;amp;&amp;amp; perl -e &amp;#39;sleep int(rand(43200))&amp;#39; &amp;amp;&amp;amp; certbot -q renew 在renew中，我们可以添加 ：
+certbot renew -q --pre-hook &amp;#34;nginx -s stop&amp;#34; --post-hook &amp;#34;nginx&amp;#34; -q：不进行输出
+--pre-hook、--post-hook如果证书可以更新（只有快过期时才会更新），则执行前后的命令。</description></item><item><title>树莓派3b+安装openwrt 18.06.4</title><link>/post/other/2019-07-27-%E6%A0%91%E8%8E%93%E6%B4%BE3b+-%E5%AE%89%E8%A3%85openwrt/</link><pubDate>Sat, 27 Jul 2019 22:36:15 +0000</pubDate><guid>/post/other/2019-07-27-%E6%A0%91%E8%8E%93%E6%B4%BE3b+-%E5%AE%89%E8%A3%85openwrt/</guid><description>本文的连接方式是，将树莓派连唯一的网口作为wan口连接到上级路由lan口上，然后通过树莓派无线来访问网络。
+刷固件 目前openwrt官方Stable Release版本是18.06.4，但是对于树莓派3b+开发版是不支持无线wifi的（unsupported functions：Country Code setting, WiFi 2.4GHz WiFi 5GHz , WIP）官方树莓派网页 ；不过snapshot版本支持，因此咱们刷这个版本；
+下载
+(下载地址)[https://downloads.openwrt.org/snapshots/targets/brcm2708/bcm2710/ ] 点击 rpi-3-ext4-factory.img.gz 下载
+格式化树莓派存储卡
+将img文件写到树莓派存储卡中
+设置树莓派网络 将树莓派连接电源，并将树莓派通过网线连接到电脑上 通过ssh连接树莓派（树莓派默认的ip是192.168.1.1） ssh root@192.168.1.1 修改树莓派的网络设置 vi /etc/config/network 此处有两处修改，一是将 config interface 'lan'下的option ifname 'eth0'注释掉，二是添加一个wan的interface，具体如下：
+config interface &amp;#39;lan&amp;#39; option type &amp;#39;bridge&amp;#39; # option ifname &amp;#39;eth0&amp;#39; option proto &amp;#39;static&amp;#39; option ipaddr &amp;#39;192.168.1.1&amp;#39; option netmask &amp;#39;255.255.255.0&amp;#39; option ip6assign &amp;#39;60&amp;#39; config interface &amp;#39;wan&amp;#39; option proto &amp;#39;dhcp&amp;#39; option ifname &amp;#39;eth0&amp;#39; option ipv6 &amp;#39;auto&amp;#39; 在将无线的配置修改掉</description></item><item><title>Git 常用命令</title><link>/post/other/2019-05-18-git-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</link><pubDate>Sat, 18 May 2019 19:36:15 +0000</pubDate><guid>/post/other/2019-05-18-git-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</guid><description>1、删除文件
+rm test.txt git rm test.txt git commit -m &amp;#34;remove test.txt&amp;#34; git push 2、git更换远程仓库Ur
+git remote set-url origin [url] 3、把误删的文件恢复到最新版本：
+git checkout -- test.txt 4、创建新分支：
+git branch branchName 5、分支合并
+# 切换到Master分支 git checkout master # 对Develop分支进行合并 git merge --no-ff develo 6、切换到新分支：
+git checkout branchName 7、添加远程仓库
+git remote add origin &amp;lt;your_github_repo_url&amp;gt; 8、删除远程分支
+git push origin :branchname 9、查找删除的文件
+# 通过git log可查找到文件的commitid git checkout commit_id -- file_name 10、.git目录清理-删除git中的大文件
+# 1.使用以下命令可以查看占用空间最多的五个文件： git rev-list --objects --all | grep &amp;#34;$(git verify-pack -v .</description></item><item><title>Linux 常用命令</title><link>/post/other/2019-05-18-linux-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</link><pubDate>Sat, 18 May 2019 19:36:15 +0000</pubDate><guid>/post/other/2019-05-18-linux-%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4/</guid><description>1、scp
+scp -r /home/xxx/xxx.txt root@192.168.1.122:/home/xxx/xxx 2、 磁盘空间
+du -h --max-depth=0 ./ du sh * 3、当前文件夹大小：
+du -sm 4、查看文档多少行
+cat **.txt | wc -l 5、解压
+tar -xzvf .tar.gz 6、压缩
+tar –czf jpg.tar.gz *.jpg 7、给file的属主增加执行权限
+chmod u+x file 8、zip 解压
+unzip mydata.zip -d mydatabak 9、zip 压缩：
+zip -r xx.zip dir 10、进行压缩，但不要.git目录下的所有文件（包含data目录）
+zip -r yasuo.zip * -x *.git* 11、查看 zip 文件列表
+unzip -l xx.zip</description></item><item><title>linux下lighttd安装，部署hexo</title><link>/post/other/2016-11-25-linux%E4%B8%8Blighttd%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2hexo/</link><pubDate>Fri, 25 Nov 2016 01:14:57 +0000</pubDate><guid>/post/other/2016-11-25-linux%E4%B8%8Blighttd%E5%AE%89%E8%A3%85%E9%83%A8%E7%BD%B2hexo/</guid><description>安装第三方软件包 下载第三方软件包 64位
+wget http://epel.mirror.net.in/epel/6/x86_64/epel-release-6-8.noarch.rpm
+32位
+wget http://epel.mirror.net.in/epel/6/i386/epel-release-6-8.noarch.rpm
+安装第三方软件包
+rpm -ivh epel-release-6-8.noarch.rpm
+安装lighttpd yum install lighttpd
+lighttpd部署hexo 新建lighttpd.conf配置文件
+touch lighttpd.conf
+输入如下内容
+server.document-root = &amp;quot;/root/blog/public&amp;quot; server.port = 80 mimetype.assign = ( &amp;quot;.pdf&amp;quot; =&amp;gt; &amp;quot;application/pdf&amp;quot;, &amp;quot;.sig&amp;quot; =&amp;gt; &amp;quot;application/pgp-signature&amp;quot;, &amp;quot;.spl&amp;quot; =&amp;gt; &amp;quot;application/futuresplash&amp;quot;, &amp;quot;.class&amp;quot; =&amp;gt; &amp;quot;application/octet-stream&amp;quot;, &amp;quot;.ps&amp;quot; =&amp;gt; &amp;quot;application/postscript&amp;quot;, &amp;quot;.torrent&amp;quot; =&amp;gt; &amp;quot;application/x-bittorrent&amp;quot;, &amp;quot;.dvi&amp;quot; =&amp;gt; &amp;quot;application/x-dvi&amp;quot;, &amp;quot;.gz&amp;quot; =&amp;gt; &amp;quot;application/x-gzip&amp;quot;, &amp;quot;.pac&amp;quot; =&amp;gt; &amp;quot;application/x-ns-proxy-autoconfig&amp;quot;, &amp;quot;.swf&amp;quot; =&amp;gt; &amp;quot;application/x-shockwave-flash&amp;quot;, &amp;quot;.tar.gz&amp;quot; =&amp;gt; &amp;quot;application/x-tgz&amp;quot;, &amp;quot;.tgz&amp;quot; =&amp;gt; &amp;quot;application/x-tgz&amp;quot;, &amp;quot;.tar&amp;quot; =&amp;gt; &amp;quot;application/x-tar&amp;quot;, &amp;quot;.zip&amp;quot; =&amp;gt; &amp;quot;application/zip&amp;quot;, &amp;quot;.</description></item><item><title>linux安装dropx</title><link>/post/other/2016-11-25-linux%E5%AE%89%E8%A3%85dropx/</link><pubDate>Fri, 25 Nov 2016 00:44:52 +0000</pubDate><guid>/post/other/2016-11-25-linux%E5%AE%89%E8%A3%85dropx/</guid><description>本文内容来自dropbox官网，最新内容以官网为主，原文地址https://www.dropbox.com/zh_CN/install-linux
+下载安装 32-bit:
+cd ~ &amp;amp;&amp;amp; wget -O - &amp;quot;https://www.dropbox.com/download?plat=lnx.x86&amp;quot; | tar xzf -
+64-bit:
+cd ~ &amp;amp;&amp;amp; wget -O - &amp;quot;https://www.dropbox.com/download?plat=lnx.x86_64&amp;quot; | tar xzf -
+运行 接着，从新建的 .dropbox-dist 文件夹运行 Dropbox 守护程序。
+~/.dropbox-dist/dropboxd
+关联 如果是首次在服务器上运行 Dropbox，系统会要求您将链接复制并粘贴到运行的浏览器中，以便创建一个新的帐户或将服务器附加到现有帐户上。操作完成后，系统会在您的主目录中创建 Dropbox 文件夹。下载这个 Python 脚本，通过命令行控制 Dropbox。为了方便访问，请在 PATH 中的任何地方放入此脚本的符号链接。</description></item><item><title>“醒言”</title><link>/post/other/2016-11-24-%E9%86%92%E8%A8%80/</link><pubDate>Thu, 24 Nov 2016 23:51:05 +0000</pubDate><guid>/post/other/2016-11-24-%E9%86%92%E8%A8%80/</guid><description> 此时此刻就是上帝对你最好的安排。 人生苦难重重。这是个伟大的真理，是世界上最伟大的真理之一。它的伟大，在于我们一旦想通了它，便也超越了它。 勇气不是不害怕，而是明明很害怕却依然去做。</description></item><item><title>ubuntu14.4-server控制台中文乱码问题解决</title><link>/post/other/2016-04-09-ubuntu14-4-server%E6%8E%A7%E5%88%B6%E5%8F%B0%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/</link><pubDate>Sat, 09 Apr 2016 10:42:36 +0000</pubDate><guid>/post/other/2016-04-09-ubuntu14-4-server%E6%8E%A7%E5%88%B6%E5%8F%B0%E4%B8%AD%E6%96%87%E4%B9%B1%E7%A0%81%E9%97%AE%E9%A2%98%E8%A7%A3%E5%86%B3/</guid><description>问题 今天在安装ubuntu14.4 server版本后，出现了乱码问题。
+解决方法 修改/etc/default/local文件
+LANG=&amp;quot;en_US.UTF-8&amp;quot; LANGUAGE=&amp;quot;en_US:en&amp;quot; 问题原因分析 大概是我在安装系统的时候选择了中文，所以控制台想打印的中文字符，但解码时出现了问题。该解决方法也只是将中文还原成了英文并没有根本解决问题。PS:话说，其实还是看英文的比较习惯吧。</description></item><item><title>hexo与githubpages搭建个人博客</title><link>/post/other/2016-04-08-hexo%E4%B8%8Egithubpages%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</link><pubDate>Fri, 08 Apr 2016 21:45:15 +0000</pubDate><guid>/post/other/2016-04-08-hexo%E4%B8%8Egithubpages%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2/</guid><description>软件环境 操作系统：windows node.js hexo github 原理简介 这所以能搭建这样一个免费的博客，是因为我们使用了Github的Pages功能，它提供了免费的空间来可以展示你的网站。而hexo一个博客框架提供了对博客相关一系列功能。有了以上两个前提我们就可以在本地用hexo写博客再将hexo生成的html上传到github，这样就完成了博客的搭建。
+大致步骤 安装git 安装node.js 安装hexo 配置hexo 安装next主题 配置next git与node.js是安装hexo的前提。
+安装Hexo\ 可参考hexo官方文档 git和node.js均可以windows下安装。 node安装成功可以使用node -v判断。 hexo安装成功可以使用hexo -v判断。 鼠标右键Git Bash使用如下命令安装hexo
+npm install -g hexo-cli 新建一个目录，比如这里就用hexo_dir右键这个目录 Git Bash，使用如下命令：
+hexo init &amp;lt;dir&amp;gt; 通过命令hexo server使用如下命令就可以在连接查看到其首页了。 以上hexo就已经安装完成了。
+配置github 新建repository命名为&amp;lt;username&amp;gt;.github.io
+初步配置Hexo hexo的配置文件在hexo_dir/_config.yml在此我使用的也是在网上找到的资源略作修改
+## 配置信息：后必须有一个空格 ## Site title: Charlotte's Blog ## 网站标题 subtitle: 随心 随笔 ## 简介 description: 随心 随笔 ## 描述 author: Charlotte ## 网站作者 language: default ## 网站语言 email: yhw1813@gmail.</description></item><item><title>Git版本控制</title><link>/post/other/2017-11-18-git%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/other/2017-11-18-git%E7%89%88%E6%9C%AC%E6%8E%A7%E5%88%B6/</guid><description>git是日常工作常用的开发工具，本篇文章将粗略讲解关于git的两部分内容，一是git中的基本概念这将有助于了解git命令的具体含义，二是日常工作中常用到的一些git命令和git的开发流程。
+Git中的基础概念 git中比较重要的两个概念是空间和版本（commit），git中的命令都是对这两个概念的操作。了解了这两个概念，就可以感知到git中可以支持哪些操作，即使有些命令我们没有学过，也可以通过到搜索了解到。
+第一个概念：空间 git中有三种空间
+工作区（Word Space） 储存库（Repo） 暂存区（Staged Area，Index） 工作区就是git所在目录，就是文件系统中的一个普通目录。
+暂存区指.git目录下的index文件，通过git add命令可以将工作区目录下的文件添加到暂存区中。同时它也有索引作用，它对应到储存库中的文件（索引理解的还不是很透彻可能有错误）。
+储存库指工作区下的.git目录（应该是里面的某个目录），里面记录了各个版本的所有内容，只有commit的内容才是真正会保存到储存库中。
+第二个概念：版本（commit） 我理解的版本就是每一次commit的内容。各个版本之间是一种增量并且依赖的关系，新的版本会依赖旧的版本。每一个版本都有一个key来唯一标识这个commit。
+通过commit可以引出分支的概念，每个分支其实是其实就是指向了一个commit，HEAD指向的就是当前的commit。
+Git日常开发 git命令比较多，但日常开发中实际用到的比较小，下面会通过一些实际场景介绍一些常用的git命令。
+git配置 $ git config --global user.name &amp;quot;John Doe&amp;quot; $ git config --global user.email johndoe@example.com git提交时会注明提交人的姓名和邮箱，当多个协同工作时以标名操作人。
+git初始化 git的初始化分为两种场景，一是git库已经有了，要在这个git库基本上进行开发；另外一种是，我们先在本地进行的开发，然后想上传到服务器上。
+第一种的话可以使用git clone命令：
+$ git clone git://github.com/schacon/grit.git 第二种话，要先添加远程git然后将自己的代码提交上去。
+$ git remote add origin git@github.xxx.cn:xxx/xxx.git $ git push -u origin master 程序开发 git有不同的工作的流（gitflow），但共同的特点是，对于先功能的开发，要先新建分支开发完成后再merge回master分支。
+$ git branch &amp;lt;branch name&amp;gt; $ git checkout &amp;lt;branch name&amp;gt; ...开发 $ git checkout master $ git merge &amp;lt;branch name&amp;gt; 其它 git的分支是一种指标，指向commit</description></item><item><title>java开源字符串处理工具</title><link>/post/other/2016-11-27-java%E5%BC%80%E6%BA%90%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/other/2016-11-27-java%E5%BC%80%E6%BA%90%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7/</guid><description>字符串多模匹配
+字符串相似度计算
+guava
+Type Parser</description></item><item><title>shadowsocks服务端服务安装</title><link>/post/other/2018-8-11-shadowsocks%E6%9C%8D%E5%8A%A1%E7%AB%AF%E6%9C%8D%E5%8A%A1%E5%AE%89%E8%A3%85/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/other/2018-8-11-shadowsocks%E6%9C%8D%E5%8A%A1%E7%AB%AF%E6%9C%8D%E5%8A%A1%E5%AE%89%E8%A3%85/</guid><description>Shadowsocks服务端服务安装 环境：centos
+安装 安装python pip环境
+sudo yum install python-setuptools &amp;amp;&amp;amp; easy_install pip 通过pip安装shadowsocks
+sudo pip install shadowsocks 配置 sudo vi /etc/shadowsocks.json { &amp;#34;server&amp;#34;:&amp;#34;0.0.0.0&amp;#34;, &amp;#34;local_address&amp;#34;: &amp;#34;127.0.0.1&amp;#34;, &amp;#34;local_port&amp;#34;:1080, &amp;#34;server_port&amp;#34;:my_server_port, &amp;#34;password&amp;#34;:&amp;#34;my_password&amp;#34;, &amp;#34;timeout&amp;#34;:300, &amp;#34;method&amp;#34;:&amp;#34;aes-256-cfb&amp;#34; } 防火墙设置 firewall-cmd --permanent --add-port=my_server_port/tcp firewall-cmd --permanent --add-port=my_server_port/udp firewall-cmd --reload 服务启动 ssserver -c /etc/shadowsocks.json -d start</description></item><item><title>字符编码演变史</title><link>/post/other/2016-10-22-%E5%AD%97%E7%AC%A6%E7%BC%96%E7%A0%81%E6%BC%94%E5%8F%98%E5%8F%B2/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/other/2016-10-22-%E5%AD%97%E7%AC%A6%E7%BC%96%E7%A0%81%E6%BC%94%E5%8F%98%E5%8F%B2/</guid><description>本文聊一聊各个国家是如何让计算机显示自己国家语言的。
+字符集（Charset） 字符(Character)是各种文字和符号的总称
+字符编码（Character Encoding） 因为计算机的存储方式毕竟是二进制，因此从二进制转换成字符的规则称为字符编码。
+美国 第一个遇到这个问题的自然而然就是计算机的发源地——美国。英文一共只有26个字母，加上一些标点和控制符（制表符、回车符等等），字符集较小，因此ASCII只使用了个128个字符就完美表示了英文。
+ASCII(1967) ASCII（American Standard Code for Information Interchange，美国信息交换标准代码）是基于拉丁字母的一套电脑编码系统。它主要用于显示现代英语。
+ASCII第一次以规范标准的型态发表是在1967年，最后一次更新则是在1986年，使用一个字节存储，注意ASCII只使用了一个字节中的7个比特，故ASCII定义的字符共128个；就这样英文完美解决。
+法国等西欧国家 说完了美国再来聊聊西欧国家。像英国就很开心，用的都是英文，问题已经被美国人解决了。但是像法国、德国等国家就比较郁闷了。比如法国人，“é”像这样符号我们怎么表示啊！但是问题不大，ASCII占一个字节的前七个比特，不是还剩一个呢吗，这个一个比特用上又能多表示128个字符，正好我拿来用。
+EASCII EASCII（Extended ASCII，延伸美国标准信息交换码）是将ASCII码由7位扩充为8位而成。EASCII的内码是由0到255共有256个符组成。EASCII码比ASCII码扩充出来的符号包括表格符号、计算符号、希腊字母和特殊的拉丁符号。
+ASCII足以给英语使用。但是，其他使用拉丁字母的语言（主要是欧洲国家的语言），都有一定数量的附加符号字母，因此每下的一个比特就发挥了作用，因此EASCII诞生了。但EASCII只是一种方式，具体的实现多种多样。由此也得知EASCII是兼容ASCII的。
+ISO8859系列(1985) ISO 8859，全称ISO/IEC 8859，是国际标准化组织（ISO）及国际电工委员会（IEC）联合制定的一系列8位元字符集的标准，现时定义了15个字符集。
+中文 无论是英文还是西欧等国家，它们的语言的文字较少，用一个字节就解决了问题，但是汉语、日语等语言就没这么容易了，他们的字符集要大得多，一个字节已经不能满足。因此必然要用多个字节来存储。
+GB2312(1981、6763) GB 2312 或 GB 2312–80 是中华人民共和国国家标准简体中文字符集，全称《信息交换用汉字编码字符集·基本集》，又称GB0，由中国国家标准总局发布，1981年5月1日实施。
+GBK(1995、20,902) 汉字内码扩展规范，称GBK，全名为《汉字内码扩展规范(GBK)》1.0版，由中华人民共和国全国信息技术标准化技术委员会1995年12月1日制订，国家技术监督局标准化司和电子工业部科技与质量监督司1995年12月15日联合以《技术标函[1995]229号》文件的形式公布。
+GB18030(2000、26000) GB 18030，全称：国家标准GB 18030-2005《信息技术　中文编码字符集》，是中华人民共和国现时最新的内码字集，是GB 18030-2000《信息技术　信息交换用汉字编码字符集　基本集的扩充》的修订版。与GB 2312-1980完全兼容，与GBK基本兼容；支持GB 13000（93版等同于Unicode 1.1；2010版等同于Unicode 4.0）及Unicode的全部统一汉字，共收录汉字70,244个。
+统一 以上的字符集只包括某个语言或某几个语言的字符。一但在不同国家间就会出现不兼容的情况，因此统一所有字符集大势所趋。
+UNICODE(1991) Unicode（中文：万国码、国际码、统一码、单一码）是计算机科学领域里的一项业界标准。它对世界上大部分的文字系统进行了整理、编码，使得电脑可以用更为简单的方式来呈现和处理文字。
+UTF-8 本着节约的精神，又出现了把Unicode编码转化为“可变长编码”的UTF-8编码。UTF-8编码把一个Unicode字符根据不同的数字大小编码成1-6个字节，常用的英文字母被编码成1个字节，汉字通常是3个字节，只有很生僻的字符才会被编码成4-6个字节。如果你要传输的文本包含大量英文字符，用UTF-8编码就能节省空间
+https://www.</description></item><item><title>静态博客搭建</title><link>/post/other/2017-05-09-%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/other/2017-05-09-%E9%9D%99%E6%80%81%E5%8D%9A%E5%AE%A2%E6%90%AD%E5%BB%BA/</guid><description>为什么要写博客 能够获得反馈，然后你可以继续做出更复杂、更优秀的产品。
+如何写博客 下文会先介绍较流行的几种书写博客的方式，然后重点介绍通过静态网页生成器的方式如何来搭建博客。首先通过静态页面托管平台来简易搭建博客，并推荐一些实用的博客组件，最后简单介绍将博客搭建在服务器上的思路。
+书写博客的几种方式 目前比较地的方式主要有两种：
+在线博客平台 例如：CSDN 博客中国 简书
+WordPress wordpress样例
+WordPress是个人博客系统，并逐步演化成一款内容管理系统软件，它是使用PHP语言和MySQL数据库开发的。用户可以在支持 PHP 和 MySQL数据库的服务器上使用自己的博客。
+在线博客平台的优点的简单，除了书写博客内容，不需要关心与网站有关的任何事情。缺点是有广告，死板，不geek。WordPress，则正好相反，操作麻烦，学习成本较高，对硬件资源有一定要求。优点是高度自由化。
+静态博客生成器介绍 静态博客生成器使用Markdown（或其他渲染引擎）解析文章，可利用靓丽的主题生成静态网页。
+Jekyll hexo
+hexo 样例 Jekyll 样例
+通过静态页面托管平台（github pages）极速搭建 github pages介绍
+Github Pages 是面向用户、组织和项目开放的公共静态页面搭建托管服务，站点可以被免费托管在Github 上，你可以选择使用Github Pages 默认提供的域名github.io 或者自定义域名来发布站点。
+搭建的过程分如下几个步骤：
+搜索theme 搜索
+fork
+设置github pages Your site is published at https://hwyoung.github.io/minimal-mistakes/
+预览 https://hwyoung.github.io/minimal-mistakes/
+写博客 minimal-mistakes/_posts/2016-07-20-helloworld.md hello world!!!</description></item></channel></rss>
