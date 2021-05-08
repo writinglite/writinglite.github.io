@@ -1,8 +1,17 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>hexo on Writing Lite</title><link>/tags/hexo.html</link><description>Recent content in hexo on Writing Lite</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Fri, 08 Apr 2016 21:45:15 +0000</lastBuildDate><atom:link href="/tags/hexo/index.xml" rel="self" type="application/rss+xml"/><item><title>hexo与githubpages搭建个人博客</title><link>/post/other/2016-04-08-hexo%E4%B8%8Egithubpages%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2.html</link><pubDate>Fri, 08 Apr 2016 21:45:15 +0000</pubDate><guid>/post/other/2016-04-08-hexo%E4%B8%8Egithubpages%E6%90%AD%E5%BB%BA%E4%B8%AA%E4%BA%BA%E5%8D%9A%E5%AE%A2.html</guid><description>软件环境 操作系统：windows node.js hexo github 原理简介 这所以能搭建这样一个免费的博客，是因为我们使用了Github的Pages功能，它提供了免费的空间来可以展示你的网站。而hexo一个博客框架提供了对博客相关一系列功能。有了以上两个前提我们就可以在本地用hexo写博客再将hexo生成的html上传到github，这样就完成了博客的搭建。
 大致步骤 安装git 安装node.js 安装hexo 配置hexo 安装next主题 配置next git与node.js是安装hexo的前提。
 安装Hexo\ 可参考hexo官方文档 git和node.js均可以windows下安装。 node安装成功可以使用node -v判断。 hexo安装成功可以使用hexo -v判断。 鼠标右键Git Bash使用如下命令安装hexo
-npm install -g hexo-cli 新建一个目录，比如这里就用hexo_dir右键这个目录 Git Bash，使用如下命令：
-hexo init &amp;lt;dir&amp;gt; 通过命令hexo server使用如下命令就可以在连接查看到其首页了。 以上hexo就已经安装完成了。
+npm install -g hexo-cli
+新建一个目录，比如这里就用hexo_dir右键这个目录 Git Bash，使用如下命令：
+hexo init &amp;lt;dir&amp;gt;
+通过命令hexo server使用如下命令就可以在连接查看到其首页了。 以上hexo就已经安装完成了。
 配置github 新建repository命名为&amp;lt;username&amp;gt;.github.io
 初步配置Hexo hexo的配置文件在hexo_dir/_config.yml在此我使用的也是在网上找到的资源略作修改
-## 配置信息：后必须有一个空格 ## Site title: Charlotte's Blog ## 网站标题 subtitle: 随心 随笔 ## 简介 description: 随心 随笔 ## 描述 author: Charlotte ## 网站作者 language: default ## 网站语言 email: yhw1813@gmail.</description></item></channel></rss>
+## 配置信息：后必须有一个空格
+## Site
+title: Charlotte's Blog ## 网站标题
+subtitle: 随心 随笔 ## 简介
+description: 随心 随笔 ## 描述
+author: Charlotte ## 网站作者
+language: default ## 网站语言
+email: yhw1813@gmail.</description></item></channel></rss>

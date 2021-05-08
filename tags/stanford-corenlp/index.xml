@@ -5,8 +5,10 @@
 &amp;lt;dependencies&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;edu.stanford.nlp&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;stanford-corenlp&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;3.7.0&amp;lt;/version&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;edu.stanford.nlp&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;stanford-corenlp&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;3.7.0&amp;lt;/version&amp;gt; &amp;lt;classifier&amp;gt;models&amp;lt;/classifier&amp;gt; &amp;lt;/dependency&amp;gt; &amp;lt;/dependencies&amp;gt; 如果你想从阿拉伯语，中文，德语或西班牙语中获得Maven的语言模型，请将其添加到您的pom.xml：
 &amp;lt;dependency&amp;gt; &amp;lt;groupId&amp;gt;edu.stanford.nlp&amp;lt;/groupId&amp;gt; &amp;lt;artifactId&amp;gt;stanford-corenlp&amp;lt;/artifactId&amp;gt; &amp;lt;version&amp;gt;3.7.0&amp;lt;/version&amp;gt; &amp;lt;classifier&amp;gt;models-chinese&amp;lt;/classifier&amp;gt; &amp;lt;/dependency&amp;gt; 将“models-chinese”替换为“models-english”，“models-chinese-kbp”，“models-arabic”，“models-french”，“models-german”或“models-spanish”为其他语言！
 由于Stanford CoreNLP的模型文件太大（中文的模型就几百M），建议到官网下载。如果使用MAVEN的话，最好使用阿里的MAVEN仓库，这样速度更快些。
-通过命令行使用 Quick Start java -cp &amp;quot;*&amp;quot; -Xmx2g edu.stanford.nlp.pipeline.StanfordCoreNLP -annotators tokenize,ssplit,pos,lemma,ner,parse,dcoref -file input.txt -cp &amp;quot;*&amp;quot;是加载当前路径下的所有文件（主要是JAR包）
+通过命令行使用 Quick Start java -cp &amp;quot;*&amp;quot; -Xmx2g edu.stanford.nlp.pipeline.StanfordCoreNLP -annotators tokenize,ssplit,pos,lemma,ner,parse,dcoref -file input.txt
+-cp &amp;quot;*&amp;quot;是加载当前路径下的所有文件（主要是JAR包）
 该-props参数是可选的。默认情况下，Stanford CoreNLP将在您的类路径中搜索StanfordCoreNLP.properties，并使用分发中包含的默认值。
 该-annotators参数实际上是可选的。如果你离开它，代码使用一个内建的属性文件，它可以使用以下注释器：标记化和句子分割，POS标记，缩小，NER，解析和关联解析（也就是我们在这些例子中使用的）。
 如果要使用其它语言的话，
-java -mx3g -cp &amp;quot;*&amp;quot; edu.stanford.nlp.pipeline.StanfordCoreNLP -props StanfordCoreNLP-chinese.properties -file chinese.txt -outputFormat text 参考： https://stanfordnlp.</description></item></channel></rss>
+java -mx3g -cp &amp;quot;*&amp;quot; edu.stanford.nlp.pipeline.StanfordCoreNLP -props StanfordCoreNLP-chinese.properties -file chinese.txt -outputFormat text
+参考： https://stanfordnlp.</description></item></channel></rss>

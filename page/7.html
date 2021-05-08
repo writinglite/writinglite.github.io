@@ -75,7 +75,24 @@ rpm -ivh epel-release-6-8.noarch.rpm
 lighttpd部署hexo 新建lighttpd.conf配置文件
 touch lighttpd.conf
 输入如下内容
-server.document-root = "/root/blog/public" server.port = 80 mimetype.assign = ( ".pdf" => "application/pdf", ".sig" => "application/pgp-signature", ".spl" => "application/futuresplash", ".class" => "application/octet-stream", ".ps" => "application/postscript", ".torrent" => "application/x-bittorrent", ".dvi" => "application/x-dvi", ".gz" => "application/x-gzip", ".pac" => "application/x-ns-proxy-autoconfig", ".swf" => "application/x-shockwave-flash", ".tar.gz" => "application/x-tgz", ".tgz" => "application/x-tgz", ".tar" => "application/x-tar", ".zip" => "application/zip", ".</div></article><article class="list__item post"><header class=list__header><h2 class="list__title post__title"><a href=/post/other/2016-11-25-linux%E5%AE%89%E8%A3%85dropx.html rel=bookmark>linux安装dropx</a></h2><div class="list__meta meta"><div class="meta__item-author meta__item"><svg class="meta__icon icon icon-author" width="16" height="16" viewBox="0 0 12 16"><path d="M6 1c2.2.0 3.5 2 3.5 4.5C9.5 7 8.9 8.2 8 9c2.9.8 4 2.5 4 5v1H0v-1c0-2.5 1.1-4.2 4-5-.9-.8-1.5-2-1.5-3.5C2.5 3 3.8 1 6 1z"/></svg><span class=meta__text>hwyang</span></div><div class="meta__item-datetime meta__item"><svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2016-11-25T00:44:52Z>2016-11-25</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/other.html rel=category>other</a></span></div></div></header><div class="content list__excerpt post__content clearfix">本文内容来自dropbox官网，最新内容以官网为主，原文地址https://www.dropbox.com/zh_CN/install-linux
+server.document-root = "/root/blog/public"
+server.port = 80
+mimetype.assign = (
+".pdf" => "application/pdf",
+".sig" => "application/pgp-signature",
+".spl" => "application/futuresplash",
+".class" => "application/octet-stream",
+".ps" => "application/postscript",
+".torrent" => "application/x-bittorrent",
+".dvi" => "application/x-dvi",
+".gz" => "application/x-gzip",
+".pac" => "application/x-ns-proxy-autoconfig",
+".swf" => "application/x-shockwave-flash",
+".tar.gz" => "application/x-tgz",
+".tgz" => "application/x-tgz",
+".tar" => "application/x-tar",
+".zip" => "application/zip",
+".</div></article><article class="list__item post"><header class=list__header><h2 class="list__title post__title"><a href=/post/other/2016-11-25-linux%E5%AE%89%E8%A3%85dropx.html rel=bookmark>linux安装dropx</a></h2><div class="list__meta meta"><div class="meta__item-author meta__item"><svg class="meta__icon icon icon-author" width="16" height="16" viewBox="0 0 12 16"><path d="M6 1c2.2.0 3.5 2 3.5 4.5C9.5 7 8.9 8.2 8 9c2.9.8 4 2.5 4 5v1H0v-1c0-2.5 1.1-4.2 4-5-.9-.8-1.5-2-1.5-3.5C2.5 3 3.8 1 6 1z"/></svg><span class=meta__text>hwyang</span></div><div class="meta__item-datetime meta__item"><svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2016-11-25T00:44:52Z>2016-11-25</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/other.html rel=category>other</a></span></div></div></header><div class="content list__excerpt post__content clearfix">本文内容来自dropbox官网，最新内容以官网为主，原文地址https://www.dropbox.com/zh_CN/install-linux
 下载安装 32-bit:
 cd ~ && wget -O - "https://www.dropbox.com/download?plat=lnx.x86" | tar xzf -
 64-bit:

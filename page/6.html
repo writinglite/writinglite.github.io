@@ -48,15 +48,45 @@ E-step: $$ w^{(i)} = P(z^{(i)}=1 \mid x^{(i)};\phi_{j \mid z},\phi) \</div></art
 条件熵 $$ H(X \mid Y)=-\sum_{x \in X,y \in Y} P(x,y) \log P(x \mid y) $$ 如果H(X)>=H(X|Y)，也就是说多了Y的信息，关于X的不确定性下降了。
 互信息 $$ H(X ; Y)= H(X) - H(X \mid Y) $$ 两件事相关性的量化度量。</div></article><article class="list__item post"><header class=list__header><h2 class="list__title post__title"><a href=/post/algorithm/2017-03-12-%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93.html rel=bookmark>排序算法总结</a></h2><div class="list__meta meta"><div class="meta__item-author meta__item"><svg class="meta__icon icon icon-author" width="16" height="16" viewBox="0 0 12 16"><path d="M6 1c2.2.0 3.5 2 3.5 4.5C9.5 7 8.9 8.2 8 9c2.9.8 4 2.5 4 5v1H0v-1c0-2.5 1.1-4.2 4-5-.9-.8-1.5-2-1.5-3.5C2.5 3 3.8 1 6 1z"/></svg><span class=meta__text>hwyang</span></div><div class="meta__item-datetime meta__item"><svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2017-03-12T10:50:00Z>2017-03-12</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/algorithm.html rel=category>algorithm</a></span></div></div></header><div class="content list__excerpt post__content clearfix">排序算法分为比较排序算法与非比较排序算法，通过决策树可以证明，比较排序算法性能的下界为nlogn。但非比较排序算法就没有此限制，可以达到线性复杂度，但也会有一定的限制。本篇会先介绍常见的几种比较排序算法，然后再介绍几个非比较排序算法。
 比较排序算法 插入排序（INSERTION-SORT） 插入排序采用增量方法是一种原址排序，它的工作方式像排序一手扑克牌。我人每次从桌子上拿走一张牌将它插入左手中正确的位置。
-伪码 INSERTION-SORT(A) for j=2 to A.length key=A[j] //将A[j]插入到已排序的序列中 i=j-1 while i>0 and A[i]>key A[i+1]=A[i] i=i-1 A[i+j]=key 时间复杂度 插入排序的最坏情况运行时间为$\Theta(n^2)$，最好情况的运行时间为$\theta(n)$
+伪码 INSERTION-SORT(A)
+for j=2 to A.length
+key=A[j]
+//将A[j]插入到已排序的序列中
+i=j-1
+while i>0 and A[i]>key
+A[i+1]=A[i]
+i=i-1
+A[i+j]=key
+时间复杂度 插入排序的最坏情况运行时间为$\Theta(n^2)$，最好情况的运行时间为$\theta(n)$
 java代码 gist 60af1c98917c6bc6115e639d1d491f9c
 归并排序（MERGE-SORT） 归并排序采用分治方法，它需要额外的空间，所以不是原址排序的。归并排序的思想是，将数据分成两个子数组，分别对这两个子数组进行排序，最后再将其合并。
-伪码 MERGE-SORT(A,p,r) if p&lt;r q=(p+r)/2//向下取整 MERGE-SORT(A,p,q) MERGE-SORT(A,q+1,r) MERGE(A,p,q,r) MERGE(A,p,q,r) 时间复杂度 归并排序的递归式为： $$ T(n) = \begin{cases} c, & \text{n=1} \
+伪码 MERGE-SORT(A,p,r)
+if p&lt;r
+q=(p+r)/2//向下取整
+MERGE-SORT(A,p,q)
+MERGE-SORT(A,q+1,r)
+MERGE(A,p,q,r)
+MERGE(A,p,q,r)
+时间复杂度 归并排序的递归式为： $$ T(n) = \begin{cases} c, & \text{n=1} \
 2T(n/2)+cn, & \text{n>1} \
 \end{cases} $$ c代表求解规模为1的问题所需的时间以及在分解步骤与合并步骤处理每个数组元素所需的时间。 因此，它的时间复杂度为$\Theta(n\log n)$
 java代码 gist 0159937f2bc9a536f3685ebc5bfbbad1
 快度排序（QUICKSORT）（非随机） 快速排序也采用分治方法，是原址排序的。在比较排序中（本篇介绍），是最快的排序算法。快速排序的思想是，先找到一个主元，根据该主元将数组划分成两个子数组，左子数组中的数小于等于该主元，右数组的数大于主元，其实相当于每一次划分确定了这次划分该主元的位置。
-伪码 QUICKSORT(A,p,r) if p&lt;r q=PARTITION(A,p,r) QUICKSORT(A,p,q-1) QUICKSORT(A,q+1,r) PARTITION(A,p,r) x=A[r] i=p-1 for j=p to r-1 if A[j]&lt;=x i=i+1 exchange A[i] with A[j] exchange A[i+1] wotj A[r] return i+1 时间复杂度 最坏情况下，快速排序的时间复杂度为$\Theta(n^2)$，不过在使用随机数方法，通过指示器向量可以证明，随机版本的快速速排序的期望时间复杂度是$\Theta(nlgn)$ 递归式： $$ T(n)=2T(n/2)+\Theta(n) $$</div></article><article class="list__item post"><header class=list__header><h2 class="list__title post__title"><a href=/post/machine-learning/2017-02-18-%E6%B7%B7%E5%90%88%E9%AB%98%E6%96%AF%E6%A8%A1%E5%9E%8B.html rel=bookmark>混合高斯模型</a></h2><div class="list__meta meta"><div class="meta__item-author meta__item"><svg class="meta__icon icon icon-author" width="16" height="16" viewBox="0 0 12 16"><path d="M6 1c2.2.0 3.5 2 3.5 4.5C9.5 7 8.9 8.2 8 9c2.9.8 4 2.5 4 5v1H0v-1c0-2.5 1.1-4.2 4-5-.9-.8-1.5-2-1.5-3.5C2.5 3 3.8 1 6 1z"/></svg><span class=meta__text>hwyang</span></div><div class="meta__item-datetime meta__item"><svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2017-02-18T11:47:00Z>2017-02-18</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/machine-learning.html rel=category>machine learning</a></span></div></div></header><div class="content list__excerpt post__content clearfix">混合高斯模型 假设z为隐变量，x,z存在如下关系。 $$ P(x^{(i)},z^{(i)}) = P(x^{(i)}|z^{(i)})P(z^{(i)}) $$ $$ z^{(i)} \sim Multinomial(\phi)$ \
+伪码 QUICKSORT(A,p,r)
+if p&lt;r
+q=PARTITION(A,p,r)
+QUICKSORT(A,p,q-1)
+QUICKSORT(A,q+1,r)
+PARTITION(A,p,r)
+x=A[r]
+i=p-1
+for j=p to r-1
+if A[j]&lt;=x
+i=i+1
+exchange A[i] with A[j]
+exchange A[i+1] wotj A[r]
+return i+1
+时间复杂度 最坏情况下，快速排序的时间复杂度为$\Theta(n^2)$，不过在使用随机数方法，通过指示器向量可以证明，随机版本的快速速排序的期望时间复杂度是$\Theta(nlgn)$ 递归式： $$ T(n)=2T(n/2)+\Theta(n) $$</div></article><article class="list__item post"><header class=list__header><h2 class="list__title post__title"><a href=/post/machine-learning/2017-02-18-%E6%B7%B7%E5%90%88%E9%AB%98%E6%96%AF%E6%A8%A1%E5%9E%8B.html rel=bookmark>混合高斯模型</a></h2><div class="list__meta meta"><div class="meta__item-author meta__item"><svg class="meta__icon icon icon-author" width="16" height="16" viewBox="0 0 12 16"><path d="M6 1c2.2.0 3.5 2 3.5 4.5C9.5 7 8.9 8.2 8 9c2.9.8 4 2.5 4 5v1H0v-1c0-2.5 1.1-4.2 4-5-.9-.8-1.5-2-1.5-3.5C2.5 3 3.8 1 6 1z"/></svg><span class=meta__text>hwyang</span></div><div class="meta__item-datetime meta__item"><svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2017-02-18T11:47:00Z>2017-02-18</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/machine-learning.html rel=category>machine learning</a></span></div></div></header><div class="content list__excerpt post__content clearfix">混合高斯模型 假设z为隐变量，x,z存在如下关系。 $$ P(x^{(i)},z^{(i)}) = P(x^{(i)}|z^{(i)})P(z^{(i)}) $$ $$ z^{(i)} \sim Multinomial(\phi)$ \
 \phi_j=P(z^{(i)}=j)>0 \
 \sum_j\phi_j=1 \
 (x^{(i)} \mid {z^{(i)}=j} ) \sim N(\mu_j ,\Sigma_j) $$ 这里的j的聚类的一个类别之一。
