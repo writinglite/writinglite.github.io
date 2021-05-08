@@ -1,0 +1,84 @@
+<!doctype html><html class=no-js lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="IE=edge"><title>EM算法 - Writing Lite</title><script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script><meta name=description content><meta property="og:title" content="EM算法"><meta property="og:description" content="EM算法和最大似然估计一样是一种参数估计方法，与最大似然估计不同的是EM算法可以对着包含隐变量的数据进行参数估计。EM算法的思想是：若参数$\Theta$已知，则可根据训练数据推断出隐变量Z的值（E步）；反之，若Z的值已知，则可方便地对参数$\Theta$做极大似然估计（M步）。
+Jensen不等式 令f(x)是一个凸函数(e.g f''(x)>=0,二阶导数大于0)，令x为随机变量。 那么， $$ f(E[x])<=E[f(x)] $$ 用一句话表达Jensen不等式，当函数是凸函数，那么该函数的期望大于等于期望的函数值。当X=E(X),当X为常量概率为1，E[f(x)] = f(E[x])。
+如图，有0.5的概率是a，有0.5的概率是b。（就像掷硬币一样）。X的期望值就是a和b的中值了。
+同理，对于凹函数，f''<=0,$f(E[x])>=E[f(x)]$。
+##EM算法 假定有训练数据集 $$ { x^{(1)} , x^{(2)} , x^{(3)} \dots x^{(m)} } $$ 样本相互独立，我们想找到每个样例隐含的类别z。 模型$P(x,z;\theta)$,只能观测到x，对数似然函数， $$ \begin{align} l(\theta) &= \sum^m_{i=1}\log P(x^i;\theta) \
+&= \sum^m_{i=1}\log \sum_{z^i} P(x^i,z^i;\theta) \end{align} $$ 然后我们求极大似然 $$ \begin{align} \sum^m_{i=1}\log \sum_{z^i} P(x^i,z^i;\theta) & = \sum_i\log\sum_{z^{(i)}}P(x^{(i)},z^{(i)};\theta) \
+& = \sum_i \log \sum_{z^{(i)}} Q(z^{(i)}) \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})} \
+& \ge \sum_i \sum_{z^{(i)}} Q(z^{(i)}) \log \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})} \end{align} $$ 最后一步用到了Jensen不等式，f(x)的f对应log函数，x对应$ \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})}$，p(x)对应$Q(z^{(i)})$。那么$f(E[x])$对应$\log \sum_{z^{(i)}} Q(z^{(i)}) \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})}$，$E[f(x)]$对应$\sum_{z^{(i)}} Q(z^{(i)}) \log \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})}$。 因此$Q(z^{(i)})$代表的是p(x)也就是概率，所以显然 $$ \sum_{z^{(i)}} Q(z^{(i)}) = 1 , Q(z^{(i)})>0 $$"><meta property="og:type" content="article"><meta property="og:url" content="/post/machine-learning/2016-11-27-em%E7%AE%97%E6%B3%95.html"><meta property="article:section" content="post"><meta property="article:published_time" content="2016-11-27T09:03:00+00:00"><meta property="article:modified_time" content="2016-11-27T09:03:00+00:00"><meta itemprop=name content="EM算法"><meta itemprop=description content="EM算法和最大似然估计一样是一种参数估计方法，与最大似然估计不同的是EM算法可以对着包含隐变量的数据进行参数估计。EM算法的思想是：若参数$\Theta$已知，则可根据训练数据推断出隐变量Z的值（E步）；反之，若Z的值已知，则可方便地对参数$\Theta$做极大似然估计（M步）。
+Jensen不等式 令f(x)是一个凸函数(e.g f''(x)>=0,二阶导数大于0)，令x为随机变量。 那么， $$ f(E[x])<=E[f(x)] $$ 用一句话表达Jensen不等式，当函数是凸函数，那么该函数的期望大于等于期望的函数值。当X=E(X),当X为常量概率为1，E[f(x)] = f(E[x])。
+如图，有0.5的概率是a，有0.5的概率是b。（就像掷硬币一样）。X的期望值就是a和b的中值了。
+同理，对于凹函数，f''<=0,$f(E[x])>=E[f(x)]$。
+##EM算法 假定有训练数据集 $$ { x^{(1)} , x^{(2)} , x^{(3)} \dots x^{(m)} } $$ 样本相互独立，我们想找到每个样例隐含的类别z。 模型$P(x,z;\theta)$,只能观测到x，对数似然函数， $$ \begin{align} l(\theta) &= \sum^m_{i=1}\log P(x^i;\theta) \
+&= \sum^m_{i=1}\log \sum_{z^i} P(x^i,z^i;\theta) \end{align} $$ 然后我们求极大似然 $$ \begin{align} \sum^m_{i=1}\log \sum_{z^i} P(x^i,z^i;\theta) & = \sum_i\log\sum_{z^{(i)}}P(x^{(i)},z^{(i)};\theta) \
+& = \sum_i \log \sum_{z^{(i)}} Q(z^{(i)}) \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})} \
+& \ge \sum_i \sum_{z^{(i)}} Q(z^{(i)}) \log \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})} \end{align} $$ 最后一步用到了Jensen不等式，f(x)的f对应log函数，x对应$ \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})}$，p(x)对应$Q(z^{(i)})$。那么$f(E[x])$对应$\log \sum_{z^{(i)}} Q(z^{(i)}) \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})}$，$E[f(x)]$对应$\sum_{z^{(i)}} Q(z^{(i)}) \log \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})}$。 因此$Q(z^{(i)})$代表的是p(x)也就是概率，所以显然 $$ \sum_{z^{(i)}} Q(z^{(i)}) = 1 , Q(z^{(i)})>0 $$"><meta itemprop=datePublished content="2016-11-27T09:03:00+00:00"><meta itemprop=dateModified content="2016-11-27T09:03:00+00:00"><meta itemprop=wordCount content="149"><meta itemprop=keywords content="机器学习,无监督,"><meta name=twitter:card content="summary"><meta name=twitter:title content="EM算法"><meta name=twitter:description content="EM算法和最大似然估计一样是一种参数估计方法，与最大似然估计不同的是EM算法可以对着包含隐变量的数据进行参数估计。EM算法的思想是：若参数$\Theta$已知，则可根据训练数据推断出隐变量Z的值（E步）；反之，若Z的值已知，则可方便地对参数$\Theta$做极大似然估计（M步）。
+Jensen不等式 令f(x)是一个凸函数(e.g f''(x)>=0,二阶导数大于0)，令x为随机变量。 那么， $$ f(E[x])<=E[f(x)] $$ 用一句话表达Jensen不等式，当函数是凸函数，那么该函数的期望大于等于期望的函数值。当X=E(X),当X为常量概率为1，E[f(x)] = f(E[x])。
+如图，有0.5的概率是a，有0.5的概率是b。（就像掷硬币一样）。X的期望值就是a和b的中值了。
+同理，对于凹函数，f''<=0,$f(E[x])>=E[f(x)]$。
+##EM算法 假定有训练数据集 $$ { x^{(1)} , x^{(2)} , x^{(3)} \dots x^{(m)} } $$ 样本相互独立，我们想找到每个样例隐含的类别z。 模型$P(x,z;\theta)$,只能观测到x，对数似然函数， $$ \begin{align} l(\theta) &= \sum^m_{i=1}\log P(x^i;\theta) \
+&= \sum^m_{i=1}\log \sum_{z^i} P(x^i,z^i;\theta) \end{align} $$ 然后我们求极大似然 $$ \begin{align} \sum^m_{i=1}\log \sum_{z^i} P(x^i,z^i;\theta) & = \sum_i\log\sum_{z^{(i)}}P(x^{(i)},z^{(i)};\theta) \
+& = \sum_i \log \sum_{z^{(i)}} Q(z^{(i)}) \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})} \
+& \ge \sum_i \sum_{z^{(i)}} Q(z^{(i)}) \log \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})} \end{align} $$ 最后一步用到了Jensen不等式，f(x)的f对应log函数，x对应$ \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})}$，p(x)对应$Q(z^{(i)})$。那么$f(E[x])$对应$\log \sum_{z^{(i)}} Q(z^{(i)}) \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})}$，$E[f(x)]$对应$\sum_{z^{(i)}} Q(z^{(i)}) \log \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})}$。 因此$Q(z^{(i)})$代表的是p(x)也就是概率，所以显然 $$ \sum_{z^{(i)}} Q(z^{(i)}) = 1 , Q(z^{(i)})>0 $$"><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=dns-prefetch href=//fonts.googleapis.com><link rel=dns-prefetch href=//fonts.gstatic.com><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700"><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/custom.css><link rel="shortcut icon" href=/favicon.ico></head><body class=body><div class="container container--outer"><header class=header><div class="container header__container"><div class=logo><a class=logo__link href=/ title="Writing Lite" rel=home><div class="logo__item logo__text"><div class=logo__title>Writing Lite</div><div class=logo__tagline>Just writing a lite blog</div></div></a></div><div class=divider></div></div></header><div class="wrapper flex"><div class=primary><main class=main role=main><article class=post><header class=post__header><h1 class=post__title>EM算法</h1><div class="post__meta meta"><div class="meta__item-author meta__item"><svg class="meta__icon icon icon-author" width="16" height="16" viewBox="0 0 12 16"><path d="M6 1c2.2.0 3.5 2 3.5 4.5C9.5 7 8.9 8.2 8 9c2.9.8 4 2.5 4 5v1H0v-1c0-2.5 1.1-4.2 4-5-.9-.8-1.5-2-1.5-3.5C2.5 3 3.8 1 6 1z"/></svg><span class=meta__text>hwyang</span></div><div class="meta__item-datetime meta__item"><svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2016-11-27T09:03:00Z>2016-11-27</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/machine-learning.html rel=category>machine learning</a></span></div></div></header><div class="post__toc toc"><div class=toc__title>Page content</div><div class=toc__menu><nav id=TableOfContents><ul><li><a href=#jensen不等式>Jensen不等式</a></li></ul></nav></div></div><div class="content post__content clearfix"><p>EM算法和最大似然估计一样是一种参数估计方法，与最大似然估计不同的是EM算法可以对着包含隐变量的数据进行参数估计。<strong>EM算法的思想是：若参数$\Theta$已知，则可根据训练数据推断出隐变量Z的值（E步）；反之，若Z的值已知，则可方便地对参数$\Theta$做极大似然估计（M步）。</strong></p><h2 id=jensen不等式>Jensen不等式</h2><p>令f(x)是一个凸函数(e.g f''(x)>=0,二阶导数大于0)，令x为随机变量。
+那么，
+$$
+f(E[x])&lt;=E[f(x)]
+$$
+用一句话表达Jensen不等式，当函数是凸函数，那么该函数的期望大于等于期望的函数值。当X=E(X),当X为常量概率为1，E[f(x)] = f(E[x])。</p><p><img src=./_image/201104061615564890.png alt>
+如图，有0.5的概率是a，有0.5的概率是b。（就像掷硬币一样）。X的期望值就是a和b的中值了。</p><p>同理，对于凹函数，f''&lt;=0,$f(E[x])>=E[f(x)]$。</p><p>##EM算法
+假定有训练数据集
+$$
+{ x^{(1)} , x^{(2)} , x^{(3)} \dots x^{(m)} }
+$$
+样本相互独立，我们想找到每个样例隐含的类别z。
+模型$P(x,z;\theta)$,只能观测到x，对数似然函数，
+$$
+\begin{align}
+l(\theta)
+&= \sum^m_{i=1}\log P(x^i;\theta) \<br>&= \sum^m_{i=1}\log \sum_{z^i} P(x^i,z^i;\theta)
+\end{align}
+$$
+然后我们求极大似然
+$$
+\begin{align}
+\sum^m_{i=1}\log \sum_{z^i} P(x^i,z^i;\theta) & = \sum_i\log\sum_{z^{(i)}}P(x^{(i)},z^{(i)};\theta) \<br>& = \sum_i \log \sum_{z^{(i)}} Q(z^{(i)}) \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})} \<br>& \ge \sum_i \sum_{z^{(i)}} Q(z^{(i)}) \log \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})}
+\end{align}
+$$
+最后一步用到了Jensen不等式，f(x)的f对应log函数，x对应$ \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})}$，p(x)对应$Q(z^{(i)})$。那么$f(E[x])$对应$\log \sum_{z^{(i)}} Q(z^{(i)}) \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})}$，$E[f(x)]$对应$\sum_{z^{(i)}} Q(z^{(i)}) \log \frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})}$。
+因此$Q(z^{(i)})$代表的是p(x)也就是概率，所以显然
+$$
+\sum_{z^{(i)}} Q(z^{(i)}) = 1 , Q(z^{(i)})>0
+$$</p><p>log函数为凸函数
+$$
+l(\theta)>=\sum_i\sum_{z^{(i)}}Q_i(z^{(i)}) \log\frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})}
+$$
+为对数似然函数的下界，现在想让
+$$
+l(\theta)=\sum_i\sum_{z^{(i)}}Q_i(z^{(i)}) \log\frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})}
+$$
+根据jesen不等式，也就是想让
+$$
+\log\frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})}=constant
+$$
+也就是说不管$z^{(i)}$为什么值，值函数的值相同。</p><p>当然，同时也要保证
+$$
+\sum_{z^{(i)}}Q_i(z^{(i)})=1
+$$</p><p>为了满足上述条件，经过相关推导，
+$$
+\begin{align}
+Q_i(z^{(i)}) & = \frac{P(x^{(i)},z^{(i)};\theta)}{\sum_{z^{(i)}}P(x^{(i)},z^{(i)};\theta)} \\<br>& = \frac{P(x^{(i)},z^{(i)};\theta)}{P(x^{(i)};\theta)} \\<br>& = P( z^{(i)} | x^{(i)};\theta)
+\end{align}
+$$</p><hr><p>上面推导的结果其实就是EM算法的E步，所以
+E步为：
+对于每一个i计算
+$$
+set \ Q_i(z^{(i)}) = P( z^{(i)} | x^{(i)};\theta)
+$$
+注意这里的Q函数是用前一次的参数计算出来的值 。</p><p>M步为
+$$
+\theta:=\mathop{argmax}<em>{\theta} \sum_i\sum</em>{z^{(i)}}Q_i(z^{(i)}) \log\frac{P(x^{(i)},z^{(i)};\theta)}{Q(z^{(i)})}
+$$
+这里的$P(x^{(i)},z^{(i)})$是指分布。
+在迭代的过程中$Q_i(z^{(i)})$一直在改变，$\theta$也一直在改变。整个EM的过程可以通过如下图理解。</p><p><img src=./_image/EM%E7%AE%97%E6%B3%95/1359004484_7944.jpg alt></p><hr><p>参考：
+<a href=http://www.cnblogs.com/jerrylead/archive/2011/04/06/2006936.html>http://www.cnblogs.com/jerrylead/archive/2011/04/06/2006936.html</a></p></div><footer class=post__footer><div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg><ul class=tags__list><li class=tags__item><a class="tags__link btn" href=/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/ rel=tag>机器学习</a></li><li class=tags__item><a class="tags__link btn" href=/tags/%E6%97%A0%E7%9B%91%E7%9D%A3/ rel=tag>无监督</a></li></ul></div></footer></article></main><nav class="pager flex"><div class="pager__item pager__item--prev"><a class=pager__link href=/post/other/2016-11-27-java%E5%BC%80%E6%BA%90%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%A4%84%E7%90%86%E5%B7%A5%E5%85%B7.html rel=prev><span class=pager__subtitle>«&#8201;Previous</span><p class=pager__title>java开源字符串处理工具</p></a></div><div class="pager__item pager__item--next"><a class=pager__link href=/post/machine-learning/2016-11-27-%E6%9C%80%E5%A4%A7%E7%86%B5%E6%A8%A1%E5%9E%8B.html rel=next><span class=pager__subtitle>Next&#8201;»</span><p class=pager__title>最大熵模型</p></a></div></nav></div></div><footer class=footer><div class="container footer__container flex"><div class=footer__copyright>&copy; 2021 Writing Lite.
+<span class=footer__copyright-credits>Generated with <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> and <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> theme.</span></div></div></footer></div><script async defer src=/js/menu.js></script><script src=/js/custom.js></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script></body></html>

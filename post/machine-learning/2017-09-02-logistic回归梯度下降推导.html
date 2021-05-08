@@ -1,0 +1,55 @@
+<!doctype html><html class=no-js lang=en><head><meta charset=utf-8><meta name=viewport content="width=device-width,initial-scale=1"><meta http-equiv=x-ua-compatible content="IE=edge"><title>Logistic回归梯度下降推导 - Writing Lite</title><script>(function(a,b){a[b]=a[b].replace("no-js","js")})(document.documentElement,"className")</script><meta name=description content><meta property="og:title" content="Logistic回归梯度下降推导"><meta property="og:description" content="Logistic回归梯度下降推导 $$ P(p=1|x;\theta) = h_\theta(x) = \frac{exp(\theta^Tx)}{1+exp(\theta^Tx)} \
+P(p=0|x;\theta) = 1 - h_\theta(x) = \frac{1}{1+exp(\theta^Tx)} $$
+$$ \begin{align} L(\theta) & = L(\theta;X,\vec{y}) = p(\vec{y}|X;θ) \
+& =\prod_{i=1}^mp(y^{(i)}|x^{(i)};\theta) \
+& =\prod_{i=1}^m(h_\theta(x^{(i)}))^{y^{(i)}}(1-h_\theta(x^{(i)}))^{1-y^{(i)}} \end{align} $$
+$$ \begin{align} l(\theta) & = \log L(\theta) \
+& = \sum_{i=1}^m \left[ y^{(i)}\log h(x^{(i)}) + (1-y^{(i)})\log (1-h(x^{(i)})) \right] \
+& = \sum_{i=1}^m \left[ y^{(i)}\log \frac{h(x^{(i)})}{1-h(x^{(i)})} + \log (1-h(x^{(i)})) \right] \
+& = \sum_{i=1}^m \left[ y^{(i)}\theta^Tx + \log (1-h(x^{(i)})) \right] \end{align} $$"><meta property="og:type" content="article"><meta property="og:url" content="/post/machine-learning/2017-09-02-logistic%E5%9B%9E%E5%BD%92%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D%E6%8E%A8%E5%AF%BC.html"><meta property="article:section" content="post"><meta property="article:published_time" content="2017-09-02T20:34:00+00:00"><meta property="article:modified_time" content="2017-09-02T20:34:00+00:00"><meta itemprop=name content="Logistic回归梯度下降推导"><meta itemprop=description content="Logistic回归梯度下降推导 $$ P(p=1|x;\theta) = h_\theta(x) = \frac{exp(\theta^Tx)}{1+exp(\theta^Tx)} \
+P(p=0|x;\theta) = 1 - h_\theta(x) = \frac{1}{1+exp(\theta^Tx)} $$
+$$ \begin{align} L(\theta) & = L(\theta;X,\vec{y}) = p(\vec{y}|X;θ) \
+& =\prod_{i=1}^mp(y^{(i)}|x^{(i)};\theta) \
+& =\prod_{i=1}^m(h_\theta(x^{(i)}))^{y^{(i)}}(1-h_\theta(x^{(i)}))^{1-y^{(i)}} \end{align} $$
+$$ \begin{align} l(\theta) & = \log L(\theta) \
+& = \sum_{i=1}^m \left[ y^{(i)}\log h(x^{(i)}) + (1-y^{(i)})\log (1-h(x^{(i)})) \right] \
+& = \sum_{i=1}^m \left[ y^{(i)}\log \frac{h(x^{(i)})}{1-h(x^{(i)})} + \log (1-h(x^{(i)})) \right] \
+& = \sum_{i=1}^m \left[ y^{(i)}\theta^Tx + \log (1-h(x^{(i)})) \right] \end{align} $$"><meta itemprop=datePublished content="2017-09-02T20:34:00+00:00"><meta itemprop=dateModified content="2017-09-02T20:34:00+00:00"><meta itemprop=wordCount content="184"><meta itemprop=keywords content="机器学习,"><meta name=twitter:card content="summary"><meta name=twitter:title content="Logistic回归梯度下降推导"><meta name=twitter:description content="Logistic回归梯度下降推导 $$ P(p=1|x;\theta) = h_\theta(x) = \frac{exp(\theta^Tx)}{1+exp(\theta^Tx)} \
+P(p=0|x;\theta) = 1 - h_\theta(x) = \frac{1}{1+exp(\theta^Tx)} $$
+$$ \begin{align} L(\theta) & = L(\theta;X,\vec{y}) = p(\vec{y}|X;θ) \
+& =\prod_{i=1}^mp(y^{(i)}|x^{(i)};\theta) \
+& =\prod_{i=1}^m(h_\theta(x^{(i)}))^{y^{(i)}}(1-h_\theta(x^{(i)}))^{1-y^{(i)}} \end{align} $$
+$$ \begin{align} l(\theta) & = \log L(\theta) \
+& = \sum_{i=1}^m \left[ y^{(i)}\log h(x^{(i)}) + (1-y^{(i)})\log (1-h(x^{(i)})) \right] \
+& = \sum_{i=1}^m \left[ y^{(i)}\log \frac{h(x^{(i)})}{1-h(x^{(i)})} + \log (1-h(x^{(i)})) \right] \
+& = \sum_{i=1}^m \left[ y^{(i)}\theta^Tx + \log (1-h(x^{(i)})) \right] \end{align} $$"><link rel=preconnect href=https://fonts.gstatic.com crossorigin><link rel=dns-prefetch href=//fonts.googleapis.com><link rel=dns-prefetch href=//fonts.gstatic.com><link rel=stylesheet href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700"><link rel=stylesheet href=/css/style.css><link rel=stylesheet href=/css/custom.css><link rel="shortcut icon" href=/favicon.ico></head><body class=body><div class="container container--outer"><header class=header><div class="container header__container"><div class=logo><a class=logo__link href=/ title="Writing Lite" rel=home><div class="logo__item logo__text"><div class=logo__title>Writing Lite</div><div class=logo__tagline>Just writing a lite blog</div></div></a></div><div class=divider></div></div></header><div class="wrapper flex"><div class=primary><main class=main role=main><article class=post><header class=post__header><h1 class=post__title>Logistic回归梯度下降推导</h1><div class="post__meta meta"><div class="meta__item-author meta__item"><svg class="meta__icon icon icon-author" width="16" height="16" viewBox="0 0 12 16"><path d="M6 1c2.2.0 3.5 2 3.5 4.5C9.5 7 8.9 8.2 8 9c2.9.8 4 2.5 4 5v1H0v-1c0-2.5 1.1-4.2 4-5-.9-.8-1.5-2-1.5-3.5C2.5 3 3.8 1 6 1z"/></svg><span class=meta__text>hwyang</span></div><div class="meta__item-datetime meta__item"><svg class="meta__icon icon icon-time" width="16" height="14" viewBox="0 0 30 28"><path d="M15 0C7 0 1 6 1 14s6 14 14 14 14-6 14-14S23 0 15 0zm0 25C9 25 4 20 4 14S9 3 15 3s11 5 11 11-5 11-11 11zm1-18h-2v8.4l6.8 4.4L22 18l-6-3.8V7z"/></svg><time class=meta__text datetime=2017-09-02T20:34:00Z>2017-09-02</time></div><div class="meta__item-categories meta__item"><svg class="meta__icon icon icon-category" width="16" height="16" viewBox="0 0 16 16"><path d="m7 2 1 2h8v11H0V2z"/></svg><span class=meta__text><a class=meta__link href=/categories/machine-learning.html rel=category>machine learning</a></span></div></div></header><div class="post__toc toc"><div class=toc__title>Page content</div><div class=toc__menu><nav id=TableOfContents><ul><li><a href=#logistic回归梯度下降推导>Logistic回归梯度下降推导</a></li></ul></nav></div></div><div class="content post__content clearfix"><h2 id=logistic回归梯度下降推导>Logistic回归梯度下降推导</h2><p>$$
+P(p=1|x;\theta) = h_\theta(x) = \frac{exp(\theta^Tx)}{1+exp(\theta^Tx)} \<br>P(p=0|x;\theta) = 1 - h_\theta(x) = \frac{1}{1+exp(\theta^Tx)}
+$$</p><p>$$
+\begin{align}
+L(\theta) & = L(\theta;X,\vec{y}) = p(\vec{y}|X;θ) \<br>& =\prod_{i=1}^mp(y^{(i)}|x^{(i)};\theta) \<br>& =\prod_{i=1}^m(h_\theta(x^{(i)}))^{y^{(i)}}(1-h_\theta(x^{(i)}))^{1-y^{(i)}}
+\end{align}
+$$</p><p>$$
+\begin{align}
+l(\theta) & = \log L(\theta) \<br>& = \sum_{i=1}^m \left[ y^{(i)}\log h(x^{(i)}) + (1-y^{(i)})\log (1-h(x^{(i)})) \right] \<br>& = \sum_{i=1}^m \left[ y^{(i)}\log \frac{h(x^{(i)})}{1-h(x^{(i)})} + \log (1-h(x^{(i)})) \right] \<br>& = \sum_{i=1}^m \left[ y^{(i)}\theta^Tx + \log (1-h(x^{(i)})) \right]
+\end{align}
+$$</p><p>$$
+\frac{\partial}{\partial\theta_j}l(\theta) = \frac{\partial}{\partial\theta_j}y\theta^Tx + \frac{\partial}{\partial\theta_j}\log(1-h(x))
+$$</p><p>$$
+\frac{\partial}{\partial\theta_j}y\theta^Tx = yx_j
+$$</p><p>$$
+\begin{align}
+\frac{\partial}{\partial\theta_j}\log(1-h(x)) & = \frac{1}{1-h(x)}<em>\frac{\partial}{\partial\theta_j}(1-h(x)) \<br>& = \frac{1}{1-h(x)}</em>(-1)\frac{\partial}{\partial\theta_j}h(x) \
+& = \frac{1}{1-h(x)}<em>(-1)\frac{\partial}{\partial\theta_j} \frac{g(\theta^Tx)}{1+g(\theta^Tx)} \
+& = \frac{1}{1-h(x)}</em>(-1)\frac{\partial}{\partial\theta_j} \frac{g(\theta^Tx)}{1+g(\theta^Tx)} \<br>\end{align}
+$$</p><p>$$
+\begin{align}
+\frac{\partial}{\partial\theta_j}\log(1-h(x)) & = \frac{\partial \log(1-h(x))}{\partial (1-h(x))} * \frac{\partial (1-h(x))}{\partial h(x)} * \frac{\partial h(x)}{\partial g(\theta^Tx)} * \frac{\partial g(\theta^Tx)}{\partial \theta^Tx} * \frac{\partial \theta^Tx}{\partial \theta_j} \
+& = \frac{1}{1-h(\theta(x))} * (-1) * \frac{1}{(1-g(\theta^Tx))^2} * g(\theta^Tx) * x_j \
+& = \frac{1}{1-h(\theta(x))} * (-1) * \frac{1}{1-g(\theta^Tx)} * \frac{g(\theta^Tx)}{1-g(\theta^Tx)} * x_j \
+& = \frac{1}{1-h(\theta^Tx)} * (-1) * (1-h(\theta^Tx) * h(\theta^Tx) * x_j \
+& = - h(\theta^Tx)x_j
+\end{align}
+$$</p><p>$$
+\frac{\partial}{\partial\theta_j}l(\theta) = yx_j - h(\theta^Tx)x_j = (y-h(\theta^Tx))x_j
+$$</p></div><footer class=post__footer><div class="post__tags tags clearfix"><svg class="tags__badge icon icon-tag" width="16" height="16" viewBox="0 0 32 32"><path d="M32 19c0 1-1 2-1 2L21 31s-1 1-2 1-2-1-2-1L2 16c-1-1-1.4-2-1.4-2S0 12.5.0 11V3C0 1.5.8.8.8.8S1.5.0 3 0h8c1.5.0 3 .6 3 .6S15 1 16 2l15 15s1 1 1 2zM7 10a3 3 0 100-6 3 3 0 000 6z"/></svg><ul class=tags__list><li class=tags__item><a class="tags__link btn" href=/tags/%E6%9C%BA%E5%99%A8%E5%AD%A6%E4%B9%A0/ rel=tag>机器学习</a></li></ul></div></footer></article></main><nav class="pager flex"><div class="pager__item pager__item--prev"><a class=pager__link href=/post/machine-learning/2017-07-19-%E5%86%B3%E7%AD%96%E6%A0%91.html rel=prev><span class=pager__subtitle>«&#8201;Previous</span><p class=pager__title>决策树</p></a></div><div class="pager__item pager__item--next"><a class=pager__link href=/post/nlp/2017-09-08-mmseg%E5%88%86%E8%AF%8D%E6%96%B9%E6%B3%95.html rel=next><span class=pager__subtitle>Next&#8201;»</span><p class=pager__title>MMSeg分词方法</p></a></div></nav></div></div><footer class=footer><div class="container footer__container flex"><div class=footer__copyright>&copy; 2021 Writing Lite.
+<span class=footer__copyright-credits>Generated with <a href=https://gohugo.io/ rel="nofollow noopener" target=_blank>Hugo</a> and <a href=https://github.com/Vimux/Mainroad/ rel="nofollow noopener" target=_blank>Mainroad</a> theme.</span></div></div></footer></div><script async defer src=/js/menu.js></script><script src=/js/custom.js></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.6/MathJax.js?config=TeX-AMS-MML_HTMLorMML" async></script></body></html>
