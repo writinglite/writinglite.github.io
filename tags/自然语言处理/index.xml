@@ -2,8 +2,12 @@
 HAN (Hierarchical Attention Networks for Document Classification) 是一个针对文本分类任务的层次化 attention 模型。它有个显著的特点:通过&amp;quot;词-句子-文章&amp;quot;的层次化结构来表示一篇文本。
 HAN 模型的灵感来源于人在阅读 document 的时候，不同的词和句子对人理解 document 信息有不同的影响。因为，词和句子的重要性是和上下文息息相关的，即使是相同的词和句子，在不同的上下文中重要性也不一样。人在阅读一篇文章时，对 document 不同的内容是有着不同的注意度的。
 attention 的目的是要把一个句子中，对句子的含义影响最大的词语找出来。
-论文通过将 $h_{it}$ 输入到一个 dense 网络中得到的结果$u_{it}$ 作为$h_{it}$的隐含表示。$h_{it}$可以是双向RNN的结果，或者bert中经过encoder后的结果。 \( u_{it}=\tanh(W_wh_{it}+b_w) \) 为了衡量单词的重要性，这里用$u_{it}$ 和一个随机初始化的上下文向量$uw$ 的相似度来表示，然后经过 softmax 操作获得了一个归一化的 attention 权重矩阵 $\alpha{it}$，代表句子$i$中第 $t$个词的权重。
-\( \alpha_{it}=\frac{\exp(u^T_{it}u_w)}{\sum_t(\exp(u^T_{it}u_w))} \) 得到了 attention 权重矩阵之后，句子向量 $s_i$ 可以看作这些词向量的加权求和。这里的上下文向量$u_w$ 是在训练网络的过程中学习获得的。我们可以把 $u_w$当作一种询问的高级表示，比如&amp;quot;哪些词含有比较重要的信息? \( s_i=\sum_t\alpha_{it}h_{it} \)
+论文通过将 $h_{it}$ 输入到一个 dense 网络中得到的结果$u_{it}$ 作为$h_{it}$的隐含表示。$h_{it}$可以是双向RNN的结果，或者bert中经过encoder后的结果。
+\[ u_{it}=\tanh(W_wh_{it}+b_w) \]
+为了衡量单词的重要性，这里用$u_{it}$ 和一个随机初始化的上下文向量$uw$ 的相似度来表示，然后经过 softmax 操作获得了一个归一化的 attention 权重矩阵 $\alpha{it}$，代表句子$i$中第 $t$个词的权重。
+\[ \alpha_{it}=\frac{\exp(u^T_{it}u_w)}{\sum_t(\exp(u^T_{it}u_w))} \]
+得到了 attention 权重矩阵之后，句子向量 $s_i$ 可以看作这些词向量的加权求和。这里的上下文向量$u_w$ 是在训练网络的过程中学习获得的。我们可以把 $u_w$当作一种询问的高级表示，比如&amp;quot;哪些词含有比较重要的信息?
+\[ s_i=\sum_t\alpha_{it}h_{it} \]
 使用这个句子向量就可以做句子level的任务，例如文本分类等。
 主要查考：https://zhuanlan.zhihu.com/p/54165155</description></item><item><title>基于统计的词切分和标注一体化模型</title><link>/post/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86/2017-09-09-%E5%9F%BA%E4%BA%8E%E7%BB%9F%E8%AE%A1%E7%9A%84%E8%AF%8D%E5%88%87%E5%88%86%E5%92%8C%E6%A0%87%E6%B3%A8%E4%B8%80%E4%BD%93%E5%8C%96%E6%A8%A1%E5%9E%8B.html</link><pubDate>Sat, 09 Sep 2017 16:18:00 +0000</pubDate><guid>/post/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86/2017-09-09-%E5%9F%BA%E4%BA%8E%E7%BB%9F%E8%AE%A1%E7%9A%84%E8%AF%8D%E5%88%87%E5%88%86%E5%92%8C%E6%A0%87%E6%B3%A8%E4%B8%80%E4%BD%93%E5%8C%96%E6%A8%A1%E5%9E%8B.html</guid><description>基于统计的切记和标注一体化模型 假设$C=c_1,c_2 \dots c_m$为m个的字符串，$W=w_1,_2 \dots w_n$是把C切分后得到的由n个词组成的词序列，$T=t_1,t_2 \dots t_n$是对W进行标注后的标记序列。
 $$ P(W|C) = \frac{P(C|W)P(W)}{P(C)} $$ 可知P(C)是一个确定的值，P(C|W)是在给定词序列的情况下字符串的概率，可以认为是1。因此可得： $$ \max P(W|C) = \max P(W) $$ 即是说，分词的过程即是寻找概率最大词序列的过程。 我们再来考虑词序列与词序列与词性标注序列的关系。 $$ P(T|W) = \frac{P(W|T)P(T)}{P(W)} $$ 可推导出： $$ P(W) = \frac{P(W|T)P(T)}{P(T|W)} $$ 如果隐马尔可夫假设和独立输出假设 即： $$ P(T) = \prod_i^n P(t_i)P(t_{i-1}) \
