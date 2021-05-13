@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>算法 on Writing Lite</title><link>/tags/%E7%AE%97%E6%B3%95.html</link><description>Recent content in 算法 on Writing Lite</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Tue, 16 May 2017 20:18:00 +0000</lastBuildDate><atom:link href="/tags/%E7%AE%97%E6%B3%95/index.xml" rel="self" type="application/rss+xml"/><item><title>全域哈希</title><link>/post/algorithm/2017-05-16-%E5%85%A8%E5%9F%9F%E5%93%88%E5%B8%8C.html</link><pubDate>Tue, 16 May 2017 20:18:00 +0000</pubDate><guid>/post/algorithm/2017-05-16-%E5%85%A8%E5%9F%9F%E5%93%88%E5%B8%8C.html</guid><description>全域哈希的讲解有些不同，它是先给出一个奇怪的定义，然后推论出一些较好的性质。最后介绍构造方法，并证明符合定义。
+<?xml version="1.0" encoding="utf-8" standalone="yes"?><rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom"><channel><title>算法 on Writing Lite</title><link>/tags/%E7%AE%97%E6%B3%95.html</link><description>Recent content in 算法 on Writing Lite</description><generator>Hugo -- gohugo.io</generator><language>zh-cn</language><lastBuildDate>Tue, 16 May 2017 20:18:00 +0000</lastBuildDate><atom:link href="/tags/%E7%AE%97%E6%B3%95/index.xml" rel="self" type="application/rss+xml"/><item><title>全域哈希</title><link>/post/%E7%AE%97%E6%B3%95/2017-05-16-%E5%85%A8%E5%9F%9F%E5%93%88%E5%B8%8C.html</link><pubDate>Tue, 16 May 2017 20:18:00 +0000</pubDate><guid>/post/%E7%AE%97%E6%B3%95/2017-05-16-%E5%85%A8%E5%9F%9F%E5%93%88%E5%B8%8C.html</guid><description>全域哈希的讲解有些不同，它是先给出一个奇怪的定义，然后推论出一些较好的性质。最后介绍构造方法，并证明符合定义。
 定义 设H为一组有限散列函数，它将给定的关键字全域 U映射到{1,2,&amp;hellip;m-1}中。这样的一组函数称为全域的，如果对每对不同的关键字$x,y \in U$，满足h(x)=h(y)的散列函数的个数至多为|H|/m。
 性质 推论1 当关键字x!=y时，两者发生冲突的概率小于等于1/m。
 推论2 随机选择一个函数，将n个关键字放进T表的m个槽中，对于给定的关键字x，它发生冲突的期望次数小于n/m（也就是装载因子）。 $$ E[#与x碰撞]&amp;lt;n/m $$ 证明： 设$C_{x}$表示哈希表T里与x发生碰撞的次数 $$ C_{xy}= \begin{cases} 1 \ if \ h(x) = h(y)\
@@ -7,12 +7,12 @@
 &amp;amp;=\sum_{y\in T-{x}}E\left[C_{xy} \right] \
 &amp;amp;=\sum_{y\in T-{x}} 1/m \
 &amp;amp;= \frac{n-1}{m} \end{align} $$
-全域哈希构造方法 假设m是一个质数，将关键字k转换成r+1位的m进制数，$k=&amp;lt;k_0,k_1,\dots,k_r&amp;gt;,0&amp;lt;=k_r&amp;lt;=m-1$ 设随机数$a=&amp;lt;a_0,a_1,\dots,a_r&amp;gt;$同样为成r+1位的m进制数，defin 哈希函数为 $$ h_a(x)=(\sum_{i=0}^ra_ik_i) \mod m $$ 哈希函数集H的大小为$m^{r+1}$</description></item><item><title>散列表</title><link>/post/algorithm/2017-05-14-%E6%95%A3%E5%88%97%E8%A1%A8.html</link><pubDate>Sun, 14 May 2017 11:17:00 +0000</pubDate><guid>/post/algorithm/2017-05-14-%E6%95%A3%E5%88%97%E8%A1%A8.html</guid><description>背影 散列表是普通数组概念的推广。由于对普通数组可以直接寻址，使得能在O(1)时间内访问数组中的任意位置。
+全域哈希构造方法 假设m是一个质数，将关键字k转换成r+1位的m进制数，$k=&amp;lt;k_0,k_1,\dots,k_r&amp;gt;,0&amp;lt;=k_r&amp;lt;=m-1$ 设随机数$a=&amp;lt;a_0,a_1,\dots,a_r&amp;gt;$同样为成r+1位的m进制数，defin 哈希函数为 $$ h_a(x)=(\sum_{i=0}^ra_ik_i) \mod m $$ 哈希函数集H的大小为$m^{r+1}$</description></item><item><title>散列表</title><link>/post/%E7%AE%97%E6%B3%95/2017-05-14-%E6%95%A3%E5%88%97%E8%A1%A8.html</link><pubDate>Sun, 14 May 2017 11:17:00 +0000</pubDate><guid>/post/%E7%AE%97%E6%B3%95/2017-05-14-%E6%95%A3%E5%88%97%E8%A1%A8.html</guid><description>背影 散列表是普通数组概念的推广。由于对普通数组可以直接寻址，使得能在O(1)时间内访问数组中的任意位置。
 如果存储空间允许，我们可以提供一个数组，为每个关键字保留一个位置，以利用直接寻址的技术。
 当实际关键字数目比全部的可能关键字总数要小时，采用散列表就成为直接数组寻址的一种有效替代，因为散列表使用一个长度与实际存储的关键字数目成比例的数组来存储在散列表中，不是直接把关键字作为数组下标，而是根据关键字计算出相应的下标。
 当实际关键字数目比全部的可能关键字总数要小时，可能会导致多个关键字映射到同一个下标。解决这种冲突有以下三种方式：
 链接方法 利用散列函数 开放寻址法 当关键字集合是静态存储时（即关键字一但存入后不再改变）时，通过“完全散列”在最坏时间为O(1)的情况下完成关键字查找。
-直接寻址法 链接法 开放寻址法 完全散列 参考 《算法导论》</description></item><item><title>PageRank算法</title><link>/post/algorithm/2016-11-25-pagerank%E7%AE%97%E6%B3%95.html</link><pubDate>Sat, 13 May 2017 15:53:00 +0000</pubDate><guid>/post/algorithm/2016-11-25-pagerank%E7%AE%97%E6%B3%95.html</guid><description>背景 总的来讲，对于一个特定的查询，搜索结果的排名取决于两组信息，关于网页的质量信息，和这个查询与每个网页的相关信息。PageRank算法就是一种衡量网页质量的方法。
+直接寻址法 链接法 开放寻址法 完全散列 参考 《算法导论》</description></item><item><title>PageRank算法</title><link>/post/%E7%AE%97%E6%B3%95/2016-11-25-pagerank%E7%AE%97%E6%B3%95.html</link><pubDate>Sat, 13 May 2017 15:53:00 +0000</pubDate><guid>/post/%E7%AE%97%E6%B3%95/2016-11-25-pagerank%E7%AE%97%E6%B3%95.html</guid><description>背景 总的来讲，对于一个特定的查询，搜索结果的排名取决于两组信息，关于网页的质量信息，和这个查询与每个网页的相关信息。PageRank算法就是一种衡量网页质量的方法。
 核心思想（原理） 在互联网上，如果一个网页被很多其它网页所连接，说明它受到普遍的承认和信赖，那么它的排名就高。
 算法细节 算法的思想如上文所诉，但实际上要复杂得多。比如说，对于来自不同网页的链接区别对待，因此网页排名高的那些网页的链接更可靠，于是给这些链接以较大的权重。
 可以想像，一个新开的质量差的网站与另一个质量好的老网站它们的权重显然是不同的，否则就可以轻易作弊。
@@ -25,7 +25,7 @@ a_{m1} &amp;amp; \cdots &amp;amp; a_{mn} &amp;amp; \cdots &amp;amp; a_{mM} \
 a_{M1} &amp;amp; \cdots &amp;amp; a_{Mn} &amp;amp; \cdots &amp;amp; a_{MM} \
 \end{bmatrix} $$ A是已知的，B是未知的，是我们需要计算的。 假定$B_i$是第i次的迭代的结果，那么 $$ B_i=A \cdot B_{i-1} $$ 初始假设：所有网页的排名都是1/N，即 $$ B_0=\left( \frac{1}{N},\frac{1}{N},\cdots,\frac{1}{N} \right) $$
 **注：**关于矩阵计算的优化与技巧和链接数量的平滑，这里并没有给出，可以查阅相关资源。
-参考 《数学之美》</description></item><item><title>多模字符串匹配算法-Aho–Corasick</title><link>/post/algorithm/2017-04-16-%E5%A4%9A%E6%A8%A1%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95-ahocorasick.html</link><pubDate>Sun, 16 Apr 2017 10:59:00 +0000</pubDate><guid>/post/algorithm/2017-04-16-%E5%A4%9A%E6%A8%A1%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95-ahocorasick.html</guid><description>背景 在做实际工作中，最简单也最常用的一种自然语言处理方法就是关键词匹配，例如我们要对n条文本进行过滤，那本身是一个过滤词表的，通常进行过滤的代码如下
+参考 《数学之美》</description></item><item><title>多模字符串匹配算法-Aho–Corasick</title><link>/post/%E7%AE%97%E6%B3%95/2017-04-16-%E5%A4%9A%E6%A8%A1%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95-ahocorasick.html</link><pubDate>Sun, 16 Apr 2017 10:59:00 +0000</pubDate><guid>/post/%E7%AE%97%E6%B3%95/2017-04-16-%E5%A4%9A%E6%A8%A1%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95-ahocorasick.html</guid><description>背景 在做实际工作中，最简单也最常用的一种自然语言处理方法就是关键词匹配，例如我们要对n条文本进行过滤，那本身是一个过滤词表的，通常进行过滤的代码如下
 for (String document : documents) { for (String filterWord : filterWords) { if (document.contains(filterWord)) { //process ... } } } 如果文本的数量是n，过滤词的数量是k，那么复杂度为O(nk)；如果关键词的数量较多，那么支行效率是非常低的。
 计算机科学中，Aho–Corasick算法是由Alfred V. Aho和Margaret J.Corasick 发明的字符串搜索算法，用于在输入的一串字符串中匹配有限组“字典”中的子串。它与普通字符串匹配的不同点在于同时与所有字典串进行匹配。算法均摊情况下具有近似于线性的时间复杂度，约为字符串的长度加所有匹配的数量。然而由于需要找到所有匹配数，如果每个子串互相匹配（如字典为a，aa，aaa，aaaa，输入的字符串为aaaa），算法的时间复杂度会近似于匹配的二次函数。
 原理 在一般的情况下，针对一个文本进行关键词匹配，在匹配的过程中要与每个关键词一一进行计算。也就是说，每与一个关键词进行匹配，都要重新从文档的开始到结束进行扫描。AC自动机的思想是，在开始时先通过词表，对以下三种情况进行缓存：
@@ -34,45 +34,15 @@ for (String document : documents) { for (String filterWord : filterWords) { if (
 按照字符转移成功进行跳转（success表） sucess表实际就是一棵trie树，构建的方式和trie树是一样的，这里就不赘述。
 按照字符转移失败进行跳转（fail表） 设这个节点上的字母为C，沿着他父亲的失败指针走，直到走到一个节点，他的儿子中也有字母为C的节点。然后把当前节点的失败指针指向那个字母也为C的儿子。如果一直走到了root都没找到，那就把失败指针指向root。 使用广度优先搜索BFS，层次遍历节点来处理，每一个节点的失败路径。
 匹配成功输出表（output表） 匹配 举例说明，按顺序先后添加关键词he，she，,his，hers。在匹配ushers过程中。先构建三个表，如下图，实线是sucess表，虚线是fail表，结点后的单词是ourput表。
-代码 gist 2fed6f4569d4da8029e7ef08458cad6b</description></item><item><title>堆排序算法</title><link>/post/algorithm/2017-03-26-%E5%A0%86%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95.html</link><pubDate>Sun, 26 Mar 2017 10:50:00 +0000</pubDate><guid>/post/algorithm/2017-03-26-%E5%A0%86%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95.html</guid><description>堆排序的时间复杂度是nlong(n)，并且具有空间原址性。堆排序使用一种被称为堆的数据结构来进行信息管理。堆不仅用在堆排序中，而且它也可以构造一种有效的优先队列。
-堆 堆是一个数组，它可以被看成一个近似的完全二叉树。 二叉堆有两种形式，最大堆和最小堆。在堆排序算法中我们使用最大堆，最小堆常用于构造优先队列。</description></item><item><title>排序算法总结</title><link>/post/algorithm/2017-03-12-%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93.html</link><pubDate>Sun, 12 Mar 2017 10:50:00 +0000</pubDate><guid>/post/algorithm/2017-03-12-%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93.html</guid><description>排序算法分为比较排序算法与非比较排序算法，通过决策树可以证明，比较排序算法性能的下界为nlogn。但非比较排序算法就没有此限制，可以达到线性复杂度，但也会有一定的限制。本篇会先介绍常见的几种比较排序算法，然后再介绍几个非比较排序算法。
+代码 gist 2fed6f4569d4da8029e7ef08458cad6b</description></item><item><title>堆排序算法</title><link>/post/%E7%AE%97%E6%B3%95/2017-03-26-%E5%A0%86%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95.html</link><pubDate>Sun, 26 Mar 2017 10:50:00 +0000</pubDate><guid>/post/%E7%AE%97%E6%B3%95/2017-03-26-%E5%A0%86%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95.html</guid><description>堆排序的时间复杂度是nlong(n)，并且具有空间原址性。堆排序使用一种被称为堆的数据结构来进行信息管理。堆不仅用在堆排序中，而且它也可以构造一种有效的优先队列。
+堆 堆是一个数组，它可以被看成一个近似的完全二叉树。 二叉堆有两种形式，最大堆和最小堆。在堆排序算法中我们使用最大堆，最小堆常用于构造优先队列。</description></item><item><title>排序算法总结</title><link>/post/%E7%AE%97%E6%B3%95/2017-03-12-%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93.html</link><pubDate>Sun, 12 Mar 2017 10:50:00 +0000</pubDate><guid>/post/%E7%AE%97%E6%B3%95/2017-03-12-%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93.html</guid><description>排序算法分为比较排序算法与非比较排序算法，通过决策树可以证明，比较排序算法性能的下界为nlogn。但非比较排序算法就没有此限制，可以达到线性复杂度，但也会有一定的限制。本篇会先介绍常见的几种比较排序算法，然后再介绍几个非比较排序算法。
 比较排序算法 插入排序（INSERTION-SORT） 插入排序采用增量方法是一种原址排序，它的工作方式像排序一手扑克牌。我人每次从桌子上拿走一张牌将它插入左手中正确的位置。
-伪码 INSERTION-SORT(A)
-for j=2 to A.length
-key=A[j]
-//将A[j]插入到已排序的序列中
-i=j-1
-while i&amp;gt;0 and A[i]&amp;gt;key
-A[i+1]=A[i]
-i=i-1
-A[i+j]=key
-时间复杂度 插入排序的最坏情况运行时间为$\Theta(n^2)$，最好情况的运行时间为$\theta(n)$
+伪码 INSERTION-SORT(A) for j=2 to A.length key=A[j] //将A[j]插入到已排序的序列中 i=j-1 while i&amp;gt;0 and A[i]&amp;gt;key A[i+1]=A[i] i=i-1 A[i+j]=key 时间复杂度 插入排序的最坏情况运行时间为$\Theta(n^2)$，最好情况的运行时间为$\theta(n)$
 java代码 gist 60af1c98917c6bc6115e639d1d491f9c
 归并排序（MERGE-SORT） 归并排序采用分治方法，它需要额外的空间，所以不是原址排序的。归并排序的思想是，将数据分成两个子数组，分别对这两个子数组进行排序，最后再将其合并。
-伪码 MERGE-SORT(A,p,r)
-if p&amp;lt;r
-q=(p+r)/2//向下取整
-MERGE-SORT(A,p,q)
-MERGE-SORT(A,q+1,r)
-MERGE(A,p,q,r)
-MERGE(A,p,q,r)
-时间复杂度 归并排序的递归式为： $$ T(n) = \begin{cases} c, &amp;amp; \text{n=1} \
+伪码 MERGE-SORT(A,p,r) if p&amp;lt;r q=(p+r)/2//向下取整 MERGE-SORT(A,p,q) MERGE-SORT(A,q+1,r) MERGE(A,p,q,r) MERGE(A,p,q,r) 时间复杂度 归并排序的递归式为： $$ T(n) = \begin{cases} c, &amp;amp; \text{n=1} \
 2T(n/2)+cn, &amp;amp; \text{n&amp;gt;1} \
 \end{cases} $$ c代表求解规模为1的问题所需的时间以及在分解步骤与合并步骤处理每个数组元素所需的时间。 因此，它的时间复杂度为$\Theta(n\log n)$
 java代码 gist 0159937f2bc9a536f3685ebc5bfbbad1
 快度排序（QUICKSORT）（非随机） 快速排序也采用分治方法，是原址排序的。在比较排序中（本篇介绍），是最快的排序算法。快速排序的思想是，先找到一个主元，根据该主元将数组划分成两个子数组，左子数组中的数小于等于该主元，右数组的数大于主元，其实相当于每一次划分确定了这次划分该主元的位置。
-伪码 QUICKSORT(A,p,r)
-if p&amp;lt;r
-q=PARTITION(A,p,r)
-QUICKSORT(A,p,q-1)
-QUICKSORT(A,q+1,r)
-PARTITION(A,p,r)
-x=A[r]
-i=p-1
-for j=p to r-1
-if A[j]&amp;lt;=x
-i=i+1
-exchange A[i] with A[j]
-exchange A[i+1] wotj A[r]
-return i+1
-时间复杂度 最坏情况下，快速排序的时间复杂度为$\Theta(n^2)$，不过在使用随机数方法，通过指示器向量可以证明，随机版本的快速速排序的期望时间复杂度是$\Theta(nlgn)$ 递归式： $$ T(n)=2T(n/2)+\Theta(n) $$</description></item></channel></rss>
+伪码 QUICKSORT(A,p,r) if p&amp;lt;r q=PARTITION(A,p,r) QUICKSORT(A,p,q-1) QUICKSORT(A,q+1,r) PARTITION(A,p,r) x=A[r] i=p-1 for j=p to r-1 if A[j]&amp;lt;=x i=i+1 exchange A[i] with A[j] exchange A[i+1] wotj A[r] return i+1 时间复杂度 最坏情况下，快速排序的时间复杂度为$\Theta(n^2)$，不过在使用随机数方法，通过指示器向量可以证明，随机版本的快速速排序的期望时间复杂度是$\Theta(nlgn)$ 递归式： $$ T(n)=2T(n/2)+\Theta(n) $$</description></item></channel></rss>
