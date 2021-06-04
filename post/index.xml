@@ -567,4 +567,9 @@ subtitle: 随心 随笔 ## 简介
 description: 随心 随笔 ## 描述
 author: Charlotte ## 网站作者
 language: default ## 网站语言
-email: yhw1813@gmail.</description></item></channel></rss>
+email: yhw1813@gmail.</description></item><item><title>对LSTM的持续理解</title><link>/post/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86/2021-06-02-%E5%AF%B9lstm%E7%9A%84%E6%8C%81%E7%BB%AD%E7%90%86%E8%A7%A3.html</link><pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate><guid>/post/%E8%87%AA%E7%84%B6%E8%AF%AD%E8%A8%80%E5%A4%84%E7%90%86/2021-06-02-%E5%AF%B9lstm%E7%9A%84%E6%8C%81%E7%BB%AD%E7%90%86%E8%A7%A3.html</guid><description>深度学习的流行起源于图像领域，CNN算是最早被大家所熟悉的网络结构。但是对于带有时间特性或序列性质的数据任务上，CNN式的网络结构并不是完美契合的。因此后来有人提出了与上述任务更加契合的网络结构-RNN。
+RNN实际上是一类网络结构的统称，具有以下特点的网络都可以算法是RNN。
+即： \( y^t, h^t = f(x^t, h^{t-1}) \) 因此对$f$的不同处理产生了不同的RNN算法，如LSTM、GRU。
+与CNN相同，也可以对RNN进行Deep：
+RNN面临的问题 回到单层的RNN，设计一个简单的$f$函数 \( \begin{align} h_t &amp;= tanh(W^xx_t + W^hh_{t-1}) \\ y_t &amp;= tanh(W^oh_t) \end{align} \) 上述方法有一个致命的缺点——梯度消失（梯度爆炸）。那如何解决这个问题呢，其中一种方案就是LSTM。
+LSTM的提出 LSTM的计算方式如下： \( \begin{align} &amp; i_t = sigm(W^{xi}x_t + W^{hi}h_{t-1}) \\ &amp; f_t = sigm(W^{xf}x_t + W^{hf}h_{t-1}) \\ &amp; o_t = sigm(W^{xo}x_t + W^{ho}h_{t-1}) \\ &amp; \tilde{c_t} = tanh(W^{xc}x_t + W^{hc}h_{t-1}) \\ &amp; c_t = f_t \bigodot c_{t-1} + i_t \bigodot \tilde{c_t} \\ &amp; h_t = o_t \bigodot tanh(c_t) \\ &amp; y_t = \sigma(W^o h_t) \end{align} \)</description></item></channel></rss>
